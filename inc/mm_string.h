@@ -12,7 +12,7 @@
 #if !defined(_INCLUDE_MM_STRING_H_)
 #define _INCLUDE_MM_STRING_H_ 1
 #include "mm_result.h"
-#include "mu_typedef.h"
+#include "mm_typedef.h"
 
 /**
  * @brief 栈上分配的空间大小

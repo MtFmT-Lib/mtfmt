@@ -10,8 +10,8 @@
  *
  */
 #include "mm_fmt.h"
-#include "mu_typedef.h"
-#include "runtime_system.h"
+#include "mm_typedef.h"
+//#include "runtime_system.h"
 
 static void div_mod_10(u32_t, u32_t*, u32_t*);
 static void div_mod_10_u64(u64_t, u64_t*, u32_t*);

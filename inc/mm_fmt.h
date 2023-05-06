@@ -13,8 +13,8 @@
 #define _INCLUDE_MM_FMT_H_
 #include "mm_result.h"
 #include "mm_string.h"
-#include "mu_typedef.h"
-#include "runtime_system.h"
+#include "mm_typedef.h"
+//#include "runtime_system.h"
 
 //! sizeof(MStrFmtParserState)
 #define MFMT_PARSER_STATE_SIZE    32
@@ -607,4 +607,16 @@ extern mstr_result_t mstr_fmt_ttoa(
     const sys_time_t* tm,
     const MStrFmtChronoFormatSpec* spec
 );
+
+#if defined(USE_FULL_ASSERT)
+#include "stm32_assert.h"
+/**
+ * @brief 标记不可达的分支
+ *
+ */
+#define system_unreachable() assert_param(0)
+#else
+#define system_unreachable() ((void)0U)
+#endif
+
 #endif // !_INCLUDE_MM_FMT_H_

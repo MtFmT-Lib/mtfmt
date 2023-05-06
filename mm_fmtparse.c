@@ -10,8 +10,8 @@
  *
  */
 #include "mm_fmt.h"
-#include "mu_typedef.h"
-#include "runtime_system.h"
+#include "mm_typedef.h"
+//#include "runtime_system.h"
 #include <stddef.h>
 
 //! peek一个字符
@@ -384,7 +384,7 @@ extern void mstr_fmt_parser_init(
 )
 {
     if (MFMT_PARSER_STATE_SIZE < sizeof(MStrFmtParserState)) {
-        system_panic("Static memory is too small.");
+        //system_panic("Static memory is too small.");
     }
     MStrFmtParserState* pstate = (MStrFmtParserState*)mem;
     pstate->current = inp;

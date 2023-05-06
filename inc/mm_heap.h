@@ -11,7 +11,7 @@
  */
 #if !defined(_INCLUDE_MM_HEAP_H_)
 #define _INCLUDE_MM_HEAP_H_ 1
-#include "mu_typedef.h"
+#include "mm_typedef.h"
 
 #if !defined(_MSTR_USE_MALLOC)
 /**

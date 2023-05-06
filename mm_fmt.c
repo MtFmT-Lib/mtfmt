@@ -10,8 +10,8 @@
  *
  */
 #include "mm_fmt.h"
-#include "mu_typedef.h"
-#include "runtime_system.h"
+#include "mm_typedef.h"
+//#include "runtime_system.h"
 #include <stdarg.h>
 #include <string.h>
 
