@@ -228,7 +228,7 @@ static void* mstr_realloc(
 #if _MSTR_USE_MALLOC
     void* new_ptr;
     if (!is_stack) {
-        new_ptr = realloc(old_ptr, new_size, 8);
+        new_ptr = realloc(old_ptr, new_size);
     }
     else {
         new_ptr = mstr_heap_alloc(new_size);
