@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: GPL-2.0
+Language: Cpp
+BasedOnStyle: Microsoft
+# 每行字符的限制
+ColumnLimit: 72
+# 缩进宽度
+IndentWidth: 4
+# 大括号的换行规则
+BreakBeforeBraces: Custom
+BraceWrapping:
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+  SplitEmptyNamespace: true
+  AfterCaseLabel: true
+  # 换行定义
+  BeforeElse: true
+  AfterControlStatement: Never
+  # 缩进大括号(整个大括号框起来的部分都缩进)
+  IndentBraces: false
+# 指针
+PointerAlignment: Left
+DerivePointerAlignment: false
+# 括号内的内容对齐方式
+# clang-format version >= 14.0
+AlignAfterOpenBracket: BlockIndent
+# 允许短的case标签放在同一行
+AllowShortCaseLabelsOnASingleLine: true
+# 实参要么都在同一行，要么都各自一行
+BinPackArguments: false
+# 形参要么都在同一行，要么都各自一行
+BinPackParameters: false
+# 对#include进行排序
+IncludeCategories:
+  - Regex: '^(<|"(m*))'
+    Priority: 2
+  - Regex: ".*"
+    Priority: 1
+# 连续空行的最大数量
+MaxEmptyLinesToKeep: 1
+# 函数返回类型换行时，缩进函数声明或函数定义的函数名
+IndentWrappedFunctionNames: true
+# 允许函数声明的所有参数在放在下一行
+AllowAllParametersOfDeclarationOnNextLine: true
+# 反斜杠
+AlignEscapedNewlines: Left
+# 宏
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: true
+# ? : 不要换行
+BreakBeforeTernaryOperators: false
