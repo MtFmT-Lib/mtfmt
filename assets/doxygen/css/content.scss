@@ -416,3 +416,42 @@ div.ttc {
     padding-left: 0.75em;
     border-left: 4px solid mix(#884898, white, 25%);
 }
+
+// markdown表格
+table.markdownTable {
+    line-height: 150%;
+    border-collapse: collapse;
+    border-radius: 2px;
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+
+    th {
+        text-align: left;
+        border-top: 2px solid $light-line-color;
+        border-bottom: 2px solid $light-line-color;
+        background-color: $table-background-color;
+    }
+
+    th,
+    td {
+        padding-left: 0.25em;
+        padding-right: 0.5em;
+    }
+
+    td {
+        border-right: 2px solid $light-line-color;
+    }
+
+    tr {
+        border-bottom: 2px solid $light-line-color;
+    }
+
+    tr:last-child {
+        border: none;
+    }
+
+    // 偶数的表格项
+    .markdownTableRowOdd {
+        background-color: $table-background-color;
+    }
+}
