@@ -5,7 +5,9 @@
 .vscode
 build
 target
+dist
 lib
+node_modules
 
 !*.md
 !LICENSE
@@ -17,3 +19,8 @@ lib
 !*.h
 !*.c
 !Makefile
+
+!*.ts
+!*.json
+!*.yml
+!*.html
