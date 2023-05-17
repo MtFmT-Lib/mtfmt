@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    mm_fmtimp.c
+ * @file    mm_into.c
  * @author  向阳 (hinata.hoshino@foxmail.com)
  * @brief   格式化的函数实现
  * @version 1.0
@@ -11,7 +11,7 @@
  */
 #include "mm_fmt.h"
 #include "mm_typedef.h"
-//#include "runtime_system.h"
+// #include "runtime_system.h"
 
 static void div_mod_10(u32_t, u32_t*, u32_t*);
 static void div_mod_10_u64(u64_t, u64_t*, u32_t*);
@@ -21,9 +21,8 @@ static mstr_result_t uqtoa_helper_dpart(MString*, u32_t, u32_t);
 static mstr_result_t utoa_impl_2base(MString*, u32_t, char, u32_t);
 static mstr_result_t utoa_impl_10base(MString*, u32_t);
 
-extern mstr_result_t mstr_fmt_uqtoa(
-    MString* res_str, u32_t value, u32_t quat
-)
+MSTR_EXPORT_API(mstr_result_t)
+mstr_fmt_uqtoa(MString* res_str, u32_t value, u32_t quat)
 {
     if (quat > 31) {
         // 最高支持q31
@@ -34,9 +33,8 @@ extern mstr_result_t mstr_fmt_uqtoa(
     }
 }
 
-extern mstr_result_t mstr_fmt_utoa(
-    MString* res_str, u32_t value, MStrFmtIntIndex index
-)
+MSTR_EXPORT_API(mstr_result_t)
+mstr_fmt_utoa(MString* res_str, u32_t value, MStrFmtIntIndex index)
 {
     mstr_result_t result = MStr_Ok;
     switch (index) {
@@ -59,7 +57,8 @@ extern mstr_result_t mstr_fmt_utoa(
     return result;
 }
 
-extern mstr_result_t mstr_fmt_ttoa(
+MSTR_EXPORT_API(mstr_result_t)
+mstr_fmt_ttoa(
     MString* res_str,
     const sys_time_t* tm,
     const MStrFmtChronoFormatSpec* spec

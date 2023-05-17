@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    mm_fmtparse.c
+ * @file    mm_parse.c
  * @author  向阳 (hinata.hoshino@foxmail.com)
  * @brief   formatter parser实现
  * @version 1.0
@@ -11,7 +11,7 @@
  */
 #include "mm_fmt.h"
 #include "mm_typedef.h"
-//#include "runtime_system.h"
+// #include "runtime_system.h"
 #include <stddef.h>
 
 //! peek一个字符
@@ -379,12 +379,13 @@ static const usize_t MFMT_DEFAULT_CHRONO_SUBSEC_SPLIT_LENGTH = 1;
 // public functions:
 //
 
-extern void mstr_fmt_parser_init(
+MSTR_EXPORT_API(void)
+mstr_fmt_parser_init(
     byte_t* mem, const char* inp, MStrFmtParserState** ppstate
 )
 {
     if (MFMT_PARSER_STATE_SIZE < sizeof(MStrFmtParserState)) {
-        //system_panic("Static memory is too small.");
+        // system_panic("Static memory is too small.");
     }
     MStrFmtParserState* pstate = (MStrFmtParserState*)mem;
     pstate->current = inp;
@@ -393,7 +394,8 @@ extern void mstr_fmt_parser_init(
     *ppstate = pstate;
 }
 
-extern mstr_result_t mstr_fmt_parse_goal(
+MSTR_EXPORT_API(mstr_result_t)
+mstr_fmt_parse_goal(
     MStrFmtParserState* state, MStrFmtParseResult* result
 )
 {
@@ -421,7 +423,8 @@ extern mstr_result_t mstr_fmt_parse_goal(
     return ret;
 }
 
-extern usize_t mstr_fmt_parser_end_position(
+MSTR_EXPORT_API(usize_t)
+mstr_fmt_parser_end_position(
     MStrFmtParserState* state, const char* pbeg
 )
 {

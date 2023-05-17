@@ -11,6 +11,7 @@
  */
 #if !defined(_INCLUDE_MM_STRING_H_)
 #define _INCLUDE_MM_STRING_H_ 1
+#include "mm_cfg.h"
 #include "mm_result.h"
 #include "mm_typedef.h"
 
@@ -55,7 +56,8 @@ typedef struct tagMString
  *
  * @return mstr_result_t: 创建结果
  */
-extern mstr_result_t mstr_create(MString* str, const char* content);
+MSTR_EXPORT_API(mstr_result_t)
+mstr_create(MString* str, const char* content);
 
 // 创建空字符串
 #define mstr_create_empty(s) (mstr_create((s), "\0"))
@@ -65,7 +67,7 @@ extern mstr_result_t mstr_create(MString* str, const char* content);
  *
  * @param[inout] str: 需要清空的字符串
  */
-extern void mstr_clear(MString* str);
+MSTR_EXPORT_API(void) mstr_clear(MString* str);
 
 /**
  * @brief 拼接字符串
@@ -75,7 +77,8 @@ extern void mstr_clear(MString* str);
  *
  * @return mstr_result_t: 拼接结果
  */
-extern mstr_result_t mstr_concat(MString* str, const MString* other);
+MSTR_EXPORT_API(mstr_result_t)
+mstr_concat(MString* str, const MString* other);
 
 /**
  * @brief 拼接字符串(cstr)
@@ -85,7 +88,8 @@ extern mstr_result_t mstr_concat(MString* str, const MString* other);
  *
  * @return mstr_result_t: 拼接结果
  */
-extern mstr_result_t mstr_concat_cstr(MString* str, const char* other);
+MSTR_EXPORT_API(mstr_result_t)
+mstr_concat_cstr(MString* str, const char* other);
 
 /**
  * @brief 拼接字符串(cstr slice)
@@ -96,7 +100,8 @@ extern mstr_result_t mstr_concat_cstr(MString* str, const char* other);
  *
  * @return mstr_result_t: 拼接结果
  */
-extern mstr_result_t mstr_concat_cstr_slice(
+MSTR_EXPORT_API(mstr_result_t)
+mstr_concat_cstr_slice(
     MString* str, const char* start, const char* end
 );
 
@@ -107,7 +112,7 @@ extern mstr_result_t mstr_concat_cstr_slice(
  * @param[in] ch: 需要放入的字符
  * @return mstr_result_t: 结果
  */
-extern mstr_result_t mstr_append(MString* str, char ch);
+MSTR_EXPORT_API(mstr_result_t) mstr_append(MString* str, char ch);
 
 /**
  * @brief 向字符串尾部重复插入一个字符
@@ -117,9 +122,8 @@ extern mstr_result_t mstr_append(MString* str, char ch);
  * @param[in] cnt: 重复次数
  * @return mstr_result_t: 结果
  */
-extern mstr_result_t mstr_repeat_append(
-    MString* str, char ch, usize_t cnt
-);
+MSTR_EXPORT_API(mstr_result_t)
+mstr_repeat_append(MString* str, char ch, usize_t cnt);
 
 /**
  * @brief 翻转字符串
@@ -128,7 +132,7 @@ extern mstr_result_t mstr_repeat_append(
  *
  * @return mstr_result_t: 结果, 永远为MStr_Ok
  */
-extern mstr_result_t mstr_reverse_self(MString* str);
+MSTR_EXPORT_API(mstr_result_t) mstr_reverse_self(MString* str);
 
 /**
  * @brief 转换为cstr
@@ -136,13 +140,13 @@ extern mstr_result_t mstr_reverse_self(MString* str);
  * @param str: 字符串
  * @return const char*: C字符串指针
  */
-extern const char* mstr_as_cstr(MString* str);
+MSTR_EXPORT_API(const char*) mstr_as_cstr(MString* str);
 
 /**
  * @brief 释放一个字符串所占的内存
  *
  * @param str: 字符串结构
  */
-extern void mstr_free(MString* str);
+MSTR_EXPORT_API(void) mstr_free(MString* str);
 
 #endif // _INCLUDE_MM_STRING_H_

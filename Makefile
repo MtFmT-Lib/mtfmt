@@ -3,7 +3,7 @@
 # Copyright (c) 向阳, all rights reserved.
 #
 
-TARGET = MtFmt
+TARGET = mtfmt
 
 # 编译时显示的内容
 CC_DISPLAY = CC:
@@ -29,14 +29,16 @@ $(wildcard ./src/*.c) \
 $(wildcard ./src/**/*.c)
 
 # 编译器
-PREFIX = arm-none-eabi-
+ifdef GCC_PREFIX
+PREFIX = $(GCC_PREFIX)
+else
+PREFIX = 
+endif
 ifdef GCC_PATH
 CC = $(GCC_PATH)/$(PREFIX)gcc
-AS = $(GCC_PATH)/$(PREFIX)gcc -x assembler-with-cpp
 AR = $(GCC_PATH)/$(PREFIX)ar
 else
 CC = $(PREFIX)gcc
-AS = $(PREFIX)gcc -x assembler-with-cpp
 AR = $(PREFIX)ar
 endif
 
@@ -44,7 +46,8 @@ endif
 ifdef MTFMT_BUILD_ARCH
 ARCH = $(MTFMT_BUILD_ARCH)
 else
-ARCH = -mcpu=cortex-m0plus -mthumb
+ARCH = 
+# e.g., -mcpu=cortex-m0plus -mthumb
 endif
 
 # C defines
