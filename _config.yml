@@ -1,0 +1,8 @@
+title: MtFmt
+theme: jekyll-theme-cayman
+show_downloads: true
+markdown: kramdown
+# sass
+sass:
+  style: compressed
+  load_paths: ["./assets/css", "./assets/common"]
