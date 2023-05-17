@@ -15,9 +15,6 @@
 #include "mm_typedef.h"
 
 #if _MSTR_USE_MALLOC
-#include <stdlib.h>
-#include <string.h>
-
 #define mstr_heap_alloc(s) (malloc((s)))
 
 #define mstr_heap_free(m) \

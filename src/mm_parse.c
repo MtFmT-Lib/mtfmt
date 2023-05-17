@@ -1166,7 +1166,7 @@ static mstr_result_t parse_align(
     MStrFmtParserState* state, MStrFmtAlign* align
 )
 {
-    mstr_result_t res;
+    mstr_result_t res = MStr_Ok;
     MStrFmtAlign matched;
     const Token* cur_token = &LEX_CURRENT_TOKEN(state);
     switch (cur_token->type) {

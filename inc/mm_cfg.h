@@ -20,6 +20,11 @@
 #define _MSTR_USE_MALLOC 0
 #endif // _MSTR_USE_MALLOC
 
+#if _MSTR_USE_MALLOC
+#include <stdlib.h>
+#include <string.h>
+#endif // _MSTR_USE_MALLOC
+
 #if !defined(_MSTR_RUNTIME_HEAP_SIZE)
 /**
  * @brief 指定堆的大小
@@ -46,6 +51,7 @@
 #define MSTR_EXPORT_MANGLE
 #endif // __cplusplus
 #if __EMSCRIPTEN__
+#include <emscripten.h>
 /**
  * @brief 定义导出定义
  *
