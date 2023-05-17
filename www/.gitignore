@@ -25,5 +25,5 @@ node_modules
 !*.json
 !*.yml
 !*.html
-!*.config.js
+!*.js
 !*.svelte

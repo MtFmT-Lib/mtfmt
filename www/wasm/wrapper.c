@@ -9,3 +9,11 @@
  * @copyright Copyright (c) 向阳, all rights reserved.
  *
  */
+#include "mm_cfg.h"
+#include <emscripten.h>
+#include <stdint.h>
+
+MSTR_EXPORT_API(uint32_t) mstr_wasm_version()
+{
+    return 0x01000000;
+}
