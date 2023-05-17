@@ -83,9 +83,8 @@ static mstr_result_t convert_sign_helper(
 // public:
 //
 
-extern mstr_result_t mstr_format(
-    const char* fmt, MString* res_str, usize_t fmt_place, ...
-)
+MSTR_EXPORT_API(mstr_result_t)
+mstr_format(const char* fmt, MString* res_str, usize_t fmt_place, ...)
 {
     va_list ap;
     va_start(ap, fmt_place);
@@ -98,7 +97,8 @@ extern mstr_result_t mstr_format(
     return res;
 }
 
-extern mstr_result_t mstr_vformat(
+MSTR_EXPORT_API(mstr_result_t)
+mstr_vformat(
     const char* fmt, MString* res_str, usize_t fmt_place, isize_t ap_ptr
 )
 {

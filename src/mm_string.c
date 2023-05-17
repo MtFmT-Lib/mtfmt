@@ -13,10 +13,6 @@
 #include "mm_heap.h"
 #include <stddef.h>
 #include <string.h>
-#if defined(_MSTR_USE_MALLOC)
-#include <stdlib.h>
-#include <string.h>
-#endif // _MSTR_USE_MALLOC
 
 /**
  * @brief 每次分配的步进大小
@@ -35,7 +31,8 @@ static mstr_result_t mstr_expand_size(MString*, usize_t);
 // public:
 //
 
-extern mstr_result_t mstr_create(MString* str, const char* content)
+MSTR_EXPORT_API(mstr_result_t)
+mstr_create(MString* str, const char* content)
 {
     usize_t content_len =
         content[0] == '\0' ? 0 : (usize_t)strlen(content);
@@ -65,19 +62,18 @@ extern mstr_result_t mstr_create(MString* str, const char* content)
     }
 }
 
-extern void mstr_clear(MString* str)
+MSTR_EXPORT_API(void) mstr_clear(MString* str)
 {
     str->length = 0;
 }
 
-extern mstr_result_t mstr_append(MString* str, char ch)
+MSTR_EXPORT_API(mstr_result_t) mstr_append(MString* str, char ch)
 {
     return mstr_repeat_append(str, ch, 1);
 }
 
-extern mstr_result_t mstr_repeat_append(
-    MString* str, char ch, usize_t cnt
-)
+MSTR_EXPORT_API(mstr_result_t)
+mstr_repeat_append(MString* str, char ch, usize_t cnt)
 {
     if (cnt == 0) {
         return MStr_Ok;
@@ -101,7 +97,8 @@ extern mstr_result_t mstr_repeat_append(
     return result;
 }
 
-extern mstr_result_t mstr_concat(MString* str, const MString* other)
+MSTR_EXPORT_API(mstr_result_t)
+mstr_concat(MString* str, const MString* other)
 {
     mstr_result_t result = MStr_Ok;
     if (str->length + other->length >= str->cap_size) {
@@ -124,7 +121,8 @@ extern mstr_result_t mstr_concat(MString* str, const MString* other)
     return result;
 }
 
-extern mstr_result_t mstr_concat_cstr(MString* str, const char* other)
+MSTR_EXPORT_API(mstr_result_t)
+mstr_concat_cstr(MString* str, const char* other)
 {
     MString lit;
     // const MString不会被修改, 所以可强转一下
@@ -134,9 +132,8 @@ extern mstr_result_t mstr_concat_cstr(MString* str, const char* other)
     return mstr_concat(str, &lit);
 }
 
-extern mstr_result_t mstr_concat_cstr_slice(
-    MString* str, const char* start, const char* end
-)
+MSTR_EXPORT_API(mstr_result_t)
+mstr_concat_cstr_slice(MString* str, const char* start, const char* end)
 {
     MString lit;
     // const MString不会被修改, 所以可强转一下
@@ -146,7 +143,7 @@ extern mstr_result_t mstr_concat_cstr_slice(
     return mstr_concat(str, &lit);
 }
 
-extern mstr_result_t mstr_reverse_self(MString* str)
+MSTR_EXPORT_API(mstr_result_t) mstr_reverse_self(MString* str)
 {
     char* pend = str->buff + str->length - 1;
     char* pbeg = str->buff;
@@ -161,7 +158,7 @@ extern mstr_result_t mstr_reverse_self(MString* str)
     return MStr_Ok;
 }
 
-extern const char* mstr_as_cstr(MString* str)
+MSTR_EXPORT_API(const char*) mstr_as_cstr(MString* str)
 {
     // 在length的地方补上0
     // 因为cap_size至少比length大1, 因此不需要担心内存问题
@@ -169,7 +166,7 @@ extern const char* mstr_as_cstr(MString* str)
     return str->buff;
 }
 
-extern void mstr_free(MString* str)
+MSTR_EXPORT_API(void) mstr_free(MString* str)
 {
     if (str->buff != str->stack_region) {
         mstr_heap_free(str->buff);

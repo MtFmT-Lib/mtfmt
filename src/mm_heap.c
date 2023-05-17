@@ -97,7 +97,7 @@ static Heap heap;
  * @brief 堆的内存区
  *
  */
-static byte_t heap_memory[RUNTIME_HEAP_SIZE];
+static byte_t heap_memory[_MSTR_RUNTIME_HEAP_SIZE];
 
 //
 // private:
@@ -116,36 +116,35 @@ static void* heap_allocate_impl(Heap*, heap_size_t, heap_size_t);
 // public:
 //
 
-extern void mheap_init(void)
+MSTR_EXPORT_API(void) mheap_init(void)
 {
-    heap_init_impl(&heap, (iptr_t)heap_memory, RUNTIME_HEAP_SIZE);
+    heap_init_impl(&heap, (iptr_t)heap_memory, _MSTR_RUNTIME_HEAP_SIZE);
 }
 
-extern void* mheap_allocate(usize_t size, usize_t align)
+MSTR_EXPORT_API(void*) mheap_allocate(usize_t size, usize_t align)
 {
     return heap_allocate_impl(
         &heap, (heap_size_t)size, (heap_size_t)align
     );
 }
 
-extern void mheap_free(void* memory)
+MSTR_EXPORT_API(void) mheap_free(void* memory)
 {
     heap_free_impl(&heap, memory);
 }
 
-extern usize_t mheap_get_free_size(void)
+MSTR_EXPORT_API(usize_t) mheap_get_free_size(void)
 {
     return heap.cur_free_size;
 }
 
-extern usize_t mheap_get_high_water_mark(void)
+MSTR_EXPORT_API(usize_t) mheap_get_high_water_mark(void)
 {
     return heap.free_highwatermark;
 }
 
-extern void mheap_get_allocate_count(
-    usize_t* alloc_count, usize_t* free_count
-)
+MSTR_EXPORT_API(void)
+mheap_get_allocate_count(usize_t* alloc_count, usize_t* free_count)
 {
     *alloc_count = heap.alloc_count;
     *free_count = heap.free_count;
@@ -162,7 +161,7 @@ static void heap_init_impl(
     Heap* heap, iptr_t memory, usize_t memory_size
 )
 {
-    iptr_t head_addr = align_of(memory, RUNTIME_HEAP_ALIGN);
+    iptr_t head_addr = align_of(memory, _MSTR_RUNTIME_HEAP_ALIGN);
     usize_t total_size = memory_size - (usize_t)(head_addr - memory);
     // 起始位置的node
     FreeBlock* head_block = (FreeBlock*)head_addr;
@@ -170,7 +169,8 @@ static void heap_init_impl(
     head_block->align_fill = 0;
     // 结束位置的node
     iptr_t end_addr = align_of(
-        head_addr + total_size - sizeof(FreeBlock), RUNTIME_HEAP_ALIGN
+        head_addr + total_size - sizeof(FreeBlock),
+        _MSTR_RUNTIME_HEAP_ALIGN
     );
     FreeBlock* end_block = (FreeBlock*)end_addr;
     end_block->size = 0;

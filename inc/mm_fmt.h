@@ -11,10 +11,10 @@
  */
 #if !defined(_INCLUDE_MM_FMT_H_)
 #define _INCLUDE_MM_FMT_H_
+#include "mm_cfg.h"
 #include "mm_result.h"
 #include "mm_string.h"
 #include "mm_typedef.h"
-//#include "runtime_system.h"
 
 //! sizeof(MStrFmtParserState)
 #define MFMT_PARSER_STATE_SIZE    32
@@ -31,114 +31,6 @@
 //
 // 这个东东实现了一个超级小的支持类python的format语法的格式化器
 // 并且提供了一些其它的格式化函数
-//
-// 它专门为嵌入式的片片写的, 旨在避免内存分配(← 划掉,
-// 现在string要内存分配了)的情况下,
-// 以足够低的资源占用和足够高的性能实现string format
-//
-// 格式化内容的占位符(replacement field)使用 `{` 和 `}` 包起来,
-// 中间描述需要的格式
-//
-// replacement field的内容文法如下。我们使用 `{ A }` 表示0到多个的A, `[
-// A ]`表示可选的A,
-// `{ A }+` 表示1到多个的A, `{ A }?`
-// 表示0或1个A。使用不同的行或者“|”以表示“或”，使用缩进区分符号。
-//
-// ```plaintext
-// replacement_field :=
-//      `{` arg_id `:` arg_type [`:` format_spec] `}`
-//      `{[` arg_id `:` arg_type  [`|:` split_ch] [`:` format_spec] `]}`
-//
-// arg_id :=
-//      { digit }+
-//
-// digit :=
-//      one of
-//          0 1 2 3 4 5 6 7 8 9
-//
-// split_ch :=
-//      split_ch_content
-//      split_ch split_ch_content
-//
-// split_ch_content :=
-//      any characters other than `:`, `}`, or `]}`
-//
-// format_spec :=
-//      [ [fill] align] [sign] [width] [format_type | chrono_spec]
-//
-// fill :=
-//      a character other than `]`, `|`, [0-9], or `}`
-//
-// align :=
-//      one of
-//          < = >
-//
-// sign :=
-//      one of
-//          + - ' '
-//
-// width :=
-//      { digit }+
-//
-// format_type :=
-//      one of
-//          b   d   o   h   H   c   s   x   X   p   P
-//
-// chrono_spec :=
-//      `%` standard_chrono
-//      user_def_chrono
-//
-// standard_chrono :=
-//      one of
-//          r
-//          R
-//          f
-//          F
-//          g
-//          G
-//
-// user_def_chrono :=
-//      `%` chrono_fromat_type
-//      `%` chrono_fromat_type chrono_split_string user_def_chrono
-//
-// chrono_split_string :=
-//      none, or one and more chrono_split_char
-//
-// chrono_split_char :=
-//      any character other than `:`, `}`, or `]}`
-//      `%%`
-//
-// chrono_fromat_type :=
-//      one of
-//          y   yy   yyy   yyyy   yyyyy
-//          M   MM
-//          d   dd
-//          h   hh
-//          H   HH
-//          m   mm
-//          s   ss
-//          x   xx   xxx
-//          w
-//          W
-//
-// arg_type :=
-//      one of
-//          i8  i16  i32
-//          u8  u16  u32
-//          q { digit }+ [ `u` ]
-//          F { digit }+ [ `.` { digit }+ ] [ `u` ]
-//          s
-//          c
-//          t
-// ```
-//
-// 参考:
-//
-//  * https://fmt.dev/latest/syntax.html
-//  * https://peps.python.org/pep-3101/
-//  * https://learn.microsoft.com/zh-cn/dotnet/standard/base-types/composite-formatting
-//  * https://learn.microsoft.com/zh-cn/dotnet/standard/base-types/custom-date-and-time-format-strings
-//  * https://learn.microsoft.com/zh-cn/dotnet/standard/base-types/standard-date-and-time-format-strings
 //
 
 /**
@@ -514,9 +406,8 @@ typedef struct tagMStrFmtParseResult
  *
  * @return minfmt_result_t: 格式化结果
  */
-extern mstr_result_t mstr_format(
-    const char* fmt, MString* res_str, usize_t fmt_place, ...
-);
+MSTR_EXPORT_API(mstr_result_t)
+mstr_format(const char* fmt, MString* res_str, usize_t fmt_place, ...);
 
 /**
  * @brief 格式化字符串
@@ -530,7 +421,8 @@ extern mstr_result_t mstr_format(
  *
  * @return minfmt_result_t: 格式化结果
  */
-extern mstr_result_t mstr_vformat(
+MSTR_EXPORT_API(mstr_result_t)
+mstr_vformat(
     const char* fmt, MString* res_str, usize_t fmt_place, isize_t ap_ptr
 );
 
@@ -543,7 +435,8 @@ extern mstr_result_t mstr_vformat(
  *
  * @note 使用macro MFMT_PARSER_STATE_SIZE 来帮助解决 mem 的大小问题
  */
-extern void mstr_fmt_parser_init(
+MSTR_EXPORT_API(void)
+mstr_fmt_parser_init(
     byte_t* mem, const char* inp, MStrFmtParserState** ppstate
 );
 
@@ -555,7 +448,8 @@ extern void mstr_fmt_parser_init(
  *
  * @return mstr_result_t: parser结果
  */
-extern mstr_result_t mstr_fmt_parse_goal(
+MSTR_EXPORT_API(mstr_result_t)
+mstr_fmt_parse_goal(
     MStrFmtParserState* state, MStrFmtParseResult* result
 );
 
@@ -566,7 +460,8 @@ extern mstr_result_t mstr_fmt_parse_goal(
  * @param pbeg: parser init时候传进去的inp指针
  *
  */
-extern usize_t mstr_fmt_parser_end_position(
+MSTR_EXPORT_API(usize_t)
+mstr_fmt_parser_end_position(
     MStrFmtParserState* state, const char* pbeg
 );
 
@@ -578,9 +473,8 @@ extern usize_t mstr_fmt_parser_end_position(
  * @param[in] quat: 量化精度
  *
  */
-extern mstr_result_t mstr_fmt_uqtoa(
-    MString* res_str, u32_t value, u32_t quat
-);
+MSTR_EXPORT_API(mstr_result_t)
+mstr_fmt_uqtoa(MString* res_str, u32_t value, u32_t quat);
 
 /**
  * @brief 将无符号整数转换为字符串
@@ -590,9 +484,8 @@ extern mstr_result_t mstr_fmt_uqtoa(
  * @param[in] index: Index
  *
  */
-extern mstr_result_t mstr_fmt_utoa(
-    MString* res_str, u32_t value, MStrFmtIntIndex index
-);
+MSTR_EXPORT_API(mstr_result_t)
+mstr_fmt_utoa(MString* res_str, u32_t value, MStrFmtIntIndex index);
 
 /**
  * @brief 将日期时间值转换为字符串
@@ -602,7 +495,8 @@ extern mstr_result_t mstr_fmt_utoa(
  * @param[in] tm: 日期时间值
  * @param[in] spec: 格式化信息
  */
-extern mstr_result_t mstr_fmt_ttoa(
+MSTR_EXPORT_API(mstr_result_t)
+mstr_fmt_ttoa(
     MString* res_str,
     const sys_time_t* tm,
     const MStrFmtChronoFormatSpec* spec

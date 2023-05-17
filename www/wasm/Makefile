@@ -25,52 +25,39 @@ OUTPUT_DIR = target
 
 # C sources
 C_SOURCES =  \
-$(wildcard ./src/*.c) \
-$(wildcard ./src/**/*.c)
+$(wildcard ./*.c) \
+$(wildcard ../../src/*.c) \
+$(wildcard ../../src/**/*.c)
+
+# 需要导出的函数
+C_EXPORT_FUNCS = \
+"_mstr_format"
 
 # 编译器
-ifdef GCC_PREFIX
-PREFIX = $(GCC_PREFIX)
-else
-PREFIX = 
-endif
-ifdef GCC_PATH
-CC = $(GCC_PATH)/$(PREFIX)gcc
-AR = $(GCC_PATH)/$(PREFIX)ar
-else
-CC = $(PREFIX)gcc
-AR = $(PREFIX)ar
-endif
-
-# arch opt
-ifdef MTFMT_BUILD_ARCH
-ARCH = $(MTFMT_BUILD_ARCH)
-else
-ARCH = 
-# e.g., -mcpu=cortex-m0plus -mthumb
-endif
+CC = emcc
+AR = ar
 
 # C defines
-C_DEFS =
+C_DEFS = -D_MSTR_USE_MALLOC=0
 
 # C includes
 C_INCLUDES =  \
--Iinc
+-I../../inc
 
 # Standard
 C_STANDARD = --std=c11
 
 ifeq ($(DEBUG), 1)
-CFLAGS = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) -D_DEBUG -Wall -fdata-sections -ffunction-sections -g -gdwarf-2
+CFLAGS = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) -D_DEBUG -Wall
 else
-CFLAGS = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
+CFLAGS = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall
 endif
 
 # 依赖文件
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 
 # build all
-all: $(OUTPUT_DIR)/$(TARGET).a
+all: $(OUTPUT_DIR)/$(TARGET).wasm
 	@echo build completed.
 
 # list of objects
@@ -84,6 +71,10 @@ $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
 $(OUTPUT_DIR)/$(TARGET).a: $(OBJECTS) Makefile | $(OUTPUT_DIR)
 	@echo $(AR_DISPLAY) $@
 	@$(AR) rcs $@ $(OBJECTS)
+
+$(OUTPUT_DIR)/$(TARGET).wasm: $(OUTPUT_DIR)/$(TARGET).a
+	@echo $(LD_DISPLAY) $@
+	$(CC) $< -o $@ --no-entry -s STANDALONE_WASM -s WASM=1 -s EXPORTED_FUNCTIONS=[$(C_EXPORT_FUNCS)]
 
 $(BUILD_DIR):
 	mkdir $@

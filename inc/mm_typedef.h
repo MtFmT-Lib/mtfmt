@@ -1,12 +1,14 @@
+// SPDX-License-Identifier: LGPL-3.0
 /**
  * @file mm_typedef.h
- * @author HalfSweet (HalfSweet@HalfSweet.cn)
+ * @author HalfSweet (HalfSweet@HalfSweet.cn), 向阳
+ * (hinatahoshino@foxmail.com)
  * @brief 字符串格式化依赖的类型
  * @version 0.1
  * @date 2023-05-06
- * 
- * @copyright Copyright (c) 2023 HalfSweet
- * 
+ *
+ * @copyright Copyright (C) 2023 HalfSweet, 向阳, all rights reserved.
+ *
  */
 
 #ifndef __MM_TYPEDEF_H__
@@ -15,8 +17,9 @@
 #if 0 // TODO
 
 #else
-#include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 /**
  * @brief 8位有符号整数
@@ -32,7 +35,7 @@ typedef uint8_t u8_t;
 
 /**
  * @brief 字节(无符号)
- * 
+ *
  */
 typedef uint8_t byte_t;
 
@@ -64,14 +67,14 @@ typedef uint32_t u32_t;
  * @brief 尺寸(无符号)
  *
  */
-typedef u32_t usize_t;
+typedef size_t usize_t;
 
 /**
  * @brief 尺寸(有符号, sizeof(isize_t) == sizeof(usize_t) ==
  * sizeof(iptr_t))
  *
  */
-typedef i32_t isize_t, iptr_t;
+typedef intptr_t isize_t, iptr_t;
 
 /**
  * @brief 64位有符号整数
