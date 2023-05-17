@@ -1,0 +1,210 @@
+@import 'config';
+
+// SPDX-License-Identifier: LGPL-3.0
+
+// 顶部
+#top {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    border: none;
+    border-bottom: 1px solid $light-line-color;
+
+}
+
+// 导航栏
+#titlearea,
+.header {
+    margin: 0 auto;
+    width: $content-width;
+    min-width: $content-min-width;
+    max-width: $header-footer-max-width;
+}
+
+.navpath {
+    // 项目与项目的间隙
+    $item-sapce: 0.5em;
+
+    ul {
+        padding: 0;
+        margin: 0 auto;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+        width: $content-width;
+        min-width: $content-min-width;
+        max-width: $header-footer-max-width;
+    }
+
+    li {
+        font-weight: bold;
+        font-size: 105%;
+        margin-right: $item-sapce;
+        display: inline-block;
+        list-style-type: none;
+
+        a {
+            display: block;
+            color: $hyper-link-color;
+            text-decoration: none;
+            outline: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+
+            &:visited {
+                color: mix($hyper-link-color, black, 90%);
+            }
+
+            &::after {
+                content: "->";
+                margin-left: $item-sapce;
+                color: mix($hyper-link-color, black, 50%);
+            }
+        }
+
+        &:last-child {
+
+            // 消除最后一个元素的"箭头"
+            a::after {
+                content: "";
+            }
+        }
+    }
+}
+
+// header
+#titlearea {
+    padding-top: 1em;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: baseline;
+
+    #projectlogo {
+        max-width: 4.5em;
+        max-height: 4.5em;
+
+        img {
+            border: 0px none;
+        }
+    }
+
+    #project_descript {
+        #projectname {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        #projectbrief {
+            color: #575757;
+            font-size: 0.9em;
+            margin-top: 1em;
+        }
+
+        #projectnumber {
+            font-size: 0.5em;
+        }
+    }
+}
+
+// header title
+.title {
+    font-size: 150%;
+    font-weight: bold;
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+    color: $section-text-color;
+}
+
+// 导航栏
+#main-nav {
+    margin: 0 auto;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    width: $content-width;
+    min-width: $content-min-width;
+    max-width: $header-footer-max-width;
+
+    #main-menu {
+        padding: 0;
+
+        li {
+            display: inline-block;
+            margin-left: 1em;
+            margin-right: 1em;
+
+            &:first-child {
+                margin-left: 0em;
+            }
+
+            // 菜单项
+            a {
+                color: $hyper-link-color;
+                text-decoration: none;
+                outline: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        // 搜索框
+        #searchBoxPos2 {
+            float: initial;
+            display: inline-flex;
+        }
+    }
+}
+
+.sm ul {
+    // 菜单项
+    display: none;
+}
+
+div.sm.sm-dox {
+    // "Toggle"的checkbox
+    margin: 0 auto;
+    width: $content-width;
+    min-width: $content-min-width;
+    max-width: $header-footer-max-width;
+    text-align: right;
+
+    input[type=checkbox] {
+        width: 14px;
+        height: 14px;
+        outline: none;
+        position: relative;
+        -webkit-appearance: none;
+        border: 1px solid $checkbox-border-color;
+        border-radius: 2px;
+
+        &:checked {
+            border: 1px solid #1e6bb8;
+        }
+
+        &:after {
+            inset: 0;
+            pointer-events: none;
+            background: $checkbox-color;
+            mask-size: cover;
+            -webkit-mask-size: cover;
+        }
+
+        &:checked:after {
+            content: "";
+            position: absolute;
+            mask-image: $checkbox-img;
+            -webkit-mask-image: $checkbox-img;
+        }
+    }
+}
+
+.sm-dox ul {
+    // 子菜单项
+    position: absolute;
+    padding: 1em 1em;
+    border-radius: 2px;
+    border: 1px solid $split-line-color;
+    background-color: $bg-color;
+}

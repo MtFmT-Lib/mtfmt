@@ -1,0 +1,37 @@
+// SPDX-License-Identifier: LGPL-3.0
+// 内容宽度
+$content-width: 80%;
+$content-min-width: 480px;
+$content-max-width: 960px;
+$header-footer-max-width: 1024px;
+// 基本样式的主题色
+$bg-color: white;
+$fr-color: #32393b;
+$text-color: #363534;
+// 分割线颜色
+$split-line-color: #cccccc;
+// 浅色边框颜色
+$light-line-color: #eff0f1;
+// 超链接的颜色
+$hyper-link-color: #1e6bb8;
+// 首行缩进 (懒得搞)
+$line-ident: 0em;
+// 段颜色
+$section-text-color: #2a83a2;
+// checkbox 选中显示的图片
+$checkbox-img: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 18 18" width="16" height="16">'
+        + '<path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0'
+        + 'L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg>'
+    );
+// checkbox 显示的图片颜色
+$checkbox-color: #333333;
+// checkbox 边框颜色
+$checkbox-border-color: #c9c9c9;
+// 表格文字颜色
+$table-text-color: mix(#89c3eb, black, 75%);
+// 表格超链接颜色
+$table-hyper-color: mix(#0095d9, black, 75%);
+// 表格偶数项颜色
+$table-background-color: mix($light-line-color, white, 50%);
+// 程序使用的字体
+$fixed-font: 'Cascadia Code', monospace, fixed;
