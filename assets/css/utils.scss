@@ -1,0 +1,29 @@
+@import 'config';
+
+// SPDX-License-Identifier: LGPL-3.0
+
+// 按钮样式
+.btn {
+    color: rgba(16, 16, 16, 0.7);
+    background-color: rgba(255, 255, 255, 0.5);
+    border-color: rgba(64, 64, 64, 0.2);
+
+    &:hover {
+        color: rgba(16, 16, 16, 1.0);
+        border-color: rgba(64, 64, 64, 0.5);
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+}
+
+.main-content {
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-weight: bold;
+        color: $section-text-color;
+    }
+}
