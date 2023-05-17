@@ -1,0 +1,35 @@
+name: "Check code style"
+
+on:
+  push:
+    paths:
+      - "**.c"
+      - "**.h"
+      - "**.clang-format"
+  pull_request:
+    branches: [master]
+    paths:
+      - "**.c"
+      - "**.h"
+      - "**.clang-format"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Check code style
+        uses: jidicula/clang-format-action@v4.11.0
+        with:
+          clang-format-version: "16"
+          check-path: "./"
+          fallback-style: Microsoft
