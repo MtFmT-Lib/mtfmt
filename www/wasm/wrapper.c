@@ -10,10 +10,30 @@
  *
  */
 #include "mm_cfg.h"
+#include "mm_heap.h"
+#include "mm_string.h"
 #include <emscripten.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 MSTR_EXPORT_API(uint32_t) mstr_wasm_version()
 {
     return 0x01000000;
+}
+
+MSTR_EXPORT_API(size_t) mstr_wasm_string_len(intptr_t str)
+{
+    const MString* s = (const MString*)str;
+    return s->length;
+}
+
+MSTR_EXPORT_API(intptr_t) mstr_wasm_new_string()
+{
+    return (intptr_t)mstr_heap_alloc(sizeof(MString));
+}
+
+MSTR_EXPORT_API(void) mstr_wasm_free_string(intptr_t str)
+{
+    void* pstr = (void*)str;
+    mstr_heap_free(pstr);
 }
