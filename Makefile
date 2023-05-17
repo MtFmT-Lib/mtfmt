@@ -40,11 +40,12 @@ AS = $(PREFIX)gcc -x assembler-with-cpp
 AR = $(PREFIX)ar
 endif
 
-# cpu
-CPU = -mcpu=cortex-m0plus
-
-# mcu
-MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
+# arch opt
+ifdef MTFMT_BUILD_ARCH
+ARCH = $(MTFMT_BUILD_ARCH)
+else
+ARCH = -mcpu=cortex-m0plus -mthumb
+endif
 
 # C defines
 C_DEFS =
@@ -57,9 +58,9 @@ C_INCLUDES =  \
 C_STANDARD = --std=c11
 
 ifeq ($(DEBUG), 1)
-CFLAGS = $(MCU) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) -D_DEBUG -Wall -fdata-sections -ffunction-sections -g -gdwarf-2
+CFLAGS = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) -D_DEBUG -Wall -fdata-sections -ffunction-sections -g -gdwarf-2
 else
-CFLAGS = $(MCU) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
+CFLAGS = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
 endif
 
 # 依赖文件
