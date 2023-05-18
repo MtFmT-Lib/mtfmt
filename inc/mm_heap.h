@@ -23,7 +23,6 @@
         (m) = NULL;       \
     } while (0)
 
-#define mheap_init() ((void)0)
 #else
 /**
  * @brief 初始化堆分配器

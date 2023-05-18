@@ -3,6 +3,7 @@
 
 .pyenv
 .vscode
+.svelte-kit
 build
 target
 dist
@@ -24,3 +25,5 @@ node_modules
 !*.json
 !*.yml
 !*.html
+!*.js
+!*.svelte

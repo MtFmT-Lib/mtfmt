@@ -34,8 +34,9 @@ static mstr_result_t mstr_expand_size(MString*, usize_t);
 MSTR_EXPORT_API(mstr_result_t)
 mstr_create(MString* str, const char* content)
 {
-    usize_t content_len =
-        content[0] == '\0' ? 0 : (usize_t)strlen(content);
+    usize_t content_len = (content == NULL || content[0] == '\0') ?
+                              0 :
+                              (usize_t)strlen(content);
     if (content_len == 0) {
         str->buff = str->stack_region;
         str->length = 0;

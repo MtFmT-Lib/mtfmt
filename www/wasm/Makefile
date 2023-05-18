@@ -31,14 +31,21 @@ $(wildcard ../../src/**/*.c)
 
 # 需要导出的函数
 C_EXPORT_FUNCS = \
-"_mstr_format"
+"EXPORTED_FUNCTIONS=[\
+_mstr_create,_mstr_as_cstr,_mstr_clear,\
+_mstr_concat_cstr,_mstr_free,\
+_mstr_format,\
+_mstr_wasm_version,\
+_mstr_wasm_new_string,_mstr_wasm_free_string,\
+_mstr_wasm_string_len,\
+_mstr_wasm_allocate,_mstr_wasm_free]"
 
 # 编译器
 CC = emcc
 AR = ar
 
 # C defines
-C_DEFS = -D_MSTR_USE_MALLOC=0
+C_DEFS = -D_MSTR_USE_MALLOC=1
 
 # C includes
 C_INCLUDES =  \
@@ -74,7 +81,7 @@ $(OUTPUT_DIR)/$(TARGET).a: $(OBJECTS) Makefile | $(OUTPUT_DIR)
 
 $(OUTPUT_DIR)/$(TARGET).wasm: $(OUTPUT_DIR)/$(TARGET).a
 	@echo $(LD_DISPLAY) $@
-	$(CC) $< -o $@ --no-entry -s STANDALONE_WASM -s WASM=1 -s EXPORTED_FUNCTIONS=[$(C_EXPORT_FUNCS)]
+	@$(CC) $< -o $@ --no-entry -s STANDALONE_WASM -s WASM=1 -s $(C_EXPORT_FUNCS)
 
 $(BUILD_DIR):
 	mkdir $@
