@@ -2,6 +2,7 @@ name: Document
 
 on:
   push:
+    branches: [master]
     paths:
       - "**.c"
       - "**.h"
@@ -9,7 +10,7 @@ on:
       - ".github/**.yml"
       - "assets/**.scss"
   pull_request:
-    branches: [main]
+    branches: [master]
     paths:
       - "**.c"
       - "**.h"
