@@ -37,3 +37,14 @@ MSTR_EXPORT_API(void) mstr_wasm_free_string(intptr_t str)
     void* pstr = (void*)str;
     mstr_heap_free(pstr);
 }
+
+MSTR_EXPORT_API(intptr_t) mstr_wasm_allocate(size_t size)
+{
+    return (intptr_t)mstr_heap_alloc(size);
+}
+
+MSTR_EXPORT_API(void) mstr_wasm_free(intptr_t str)
+{
+    void* pstr = (void*)str;
+    mstr_heap_free(pstr);
+}

@@ -2,11 +2,7 @@
 #  SPDX-License-Identifier: LGPL-3.0
 -->
 <script lang="ts">
-    import { test } from "../mtfmt/lib";
-
-    function eval_test() {
-        test();
-    }
+    function eval_test() {}
 </script>
 
 <div>
