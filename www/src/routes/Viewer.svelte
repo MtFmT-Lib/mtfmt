@@ -3,10 +3,20 @@
 -->
 <script lang="ts">
     import Editor from "./Editor.svelte";
+    import { CString } from "$lib/mtfmt/lib";
+    import ScopeObject from "$lib/mtfmt/scope";
     import IntoImage from "$lib/images/into.svg";
     import FromImage from "$lib/images/from.svg";
 
     export const prerender = true;
+
+    function into_action() {
+        // TODO
+    }
+
+    function from_action() {
+        // TODO
+    }
 </script>
 
 <div class="demo">
@@ -14,11 +24,11 @@
         <Editor />
     </div>
     <div class="center-part">
-        <button>
+        <button on:click={into_action}>
             <img src={IntoImage} alt="Into" />
         </button>
         <br />
-        <button>
+        <button on:click={from_action}>
             <img src={FromImage} alt="Scan" />
         </button>
     </div>
