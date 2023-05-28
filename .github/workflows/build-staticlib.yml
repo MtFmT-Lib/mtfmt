@@ -39,7 +39,9 @@ jobs:
           MTFMT_BUILD_GCC_PREFIX: "arm-none-eabi-"
           MTFMT_BUILD_ARCH: "-mcpu=cortex-m0plus -mthumb"
           MTFMT_BUILD_TARGET_NAME: "mtfmt_cm0plus"
-          MTFMT_BUILD_OUTPUT_DIR: "_site"
       # 打包
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-artifact@v3
+        with:
+          name: lib-artifact
+          path: target/*

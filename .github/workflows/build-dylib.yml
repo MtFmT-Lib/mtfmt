@@ -40,7 +40,9 @@ jobs:
         env:
           MTFMT_BUILD_C_DEFS: "-D_MSTR_BUILD_DYLIB=1 -D_MSTR_USE_MALLOC=1"
           MTFMT_BUILD_USE_LTO: "1"
-          MTFMT_BUILD_OUTPUT_DIR: "_site"
       # 打包
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-artifact@v3
+        with:
+          name: dylib-artifact
+          path: target/*
