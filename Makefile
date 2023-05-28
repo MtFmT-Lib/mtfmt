@@ -137,7 +137,7 @@ $(OUTPUT_DIR)/$(LIB_TARGET): $(OBJECTS) Makefile | $(OUTPUT_DIR)
 
 $(OUTPUT_DIR)/$(DYLIB_TARGET): $(OBJECTS) Makefile | $(OUTPUT_DIR)
 	@echo $(LD_DISPLAY) $@
-	@$(CC) -shared $(OBJECTS) -L$(OUTPUT_DIR) -l$(TARGET_NAME) -o $@ $(DYLIB_LD_OPTS)
+	@$(CC) -shared $(OBJECTS) -o $@ $(DYLIB_LD_OPTS)
 
 $(BUILD_DIR):
 	mkdir $@

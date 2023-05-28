@@ -9,14 +9,6 @@ on:
       - "**.md"
       - ".github/**.yml"
       - "assets/**.scss"
-  pull_request:
-    branches: [master]
-    paths:
-      - "**.c"
-      - "**.h"
-      - "**.md"
-      - ".github/**.yml"
-      - "assets/**.scss"
   workflow_dispatch:
     inputs:
       logLevel:
