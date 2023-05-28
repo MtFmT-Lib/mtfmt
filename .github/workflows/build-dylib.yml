@@ -23,7 +23,13 @@ on:
 
 jobs:
   build-dylib:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [x86, x64]
+        os: [ubuntu-latest, windows-latest]
+    runs-on: "${{ matrix.os }}"
+    name: "Build dylib: ${{ matrix.os }} / ${{ matrix.platform }}"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -32,14 +38,26 @@ jobs:
         uses: egor-tensin/setup-gcc@v1
         with:
           version: latest
-          platform: x64
-      # 构建
-      - name: Make dylib at linux_amd64
+          platform: "${{ matrix.platform }}"
+      # 构建 (linux)
+      - name: Make dylib at ${{ matrix.os }} / ${{ matrix.platform }}
+        if: matrix.os != 'windows-latest'
         run: |
           make dylib
         env:
-          MTFMT_BUILD_C_DEFS: "-D_MSTR_BUILD_DYLIB=1 -D_MSTR_USE_MALLOC=1"
+          MTFMT_BUILD_C_DEFS: "-D_MSTR_BUILD_DYLIB=1 -D_MSTR_USE_MALLOC=1 -D_MSTR_USE_HARDWARE_DIV=1"
           MTFMT_BUILD_USE_LTO: "1"
+          MTFMT_BUILD_TARGET_NAME: "mtfmt_${{ matrix.platform }}"
+      # 构建 (windows)
+      - name: Make dll at ${{ matrix.os }} / ${{ matrix.platform }}
+        if: matrix.os == 'windows-latest'
+        run: |
+          make dylib
+        env:
+          MTFMT_BUILD_C_DEFS: "-D_MSTR_BUILD_DLL=1 -D_MSTR_USE_MALLOC=1 -D_MSTR_USE_HARDWARE_DIV=1"
+          MTFMT_BUILD_USE_LTO: "1"
+          MTFMT_BUILD_INC_ADDITIONAL_OUT: "1"
+          MTFMT_BUILD_TARGET_NAME: "mtfmt_win_${{ matrix.platform }}"
       # 打包
       - name: Upload artifact
         uses: actions/upload-artifact@v3
