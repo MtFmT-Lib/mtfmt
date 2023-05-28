@@ -59,7 +59,7 @@ jobs:
       fail-fast: true
       matrix:
         as-debug: ["1", "0"]
-        target-cpu: ["m3", "m4", "m4f", "m7"]
+        target-cpu: ["m3", "m4", "m7"]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
