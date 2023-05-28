@@ -14,6 +14,14 @@
 
 #include <stdint.h>
 
+#if !defined(_MSTR_USE_HARDWARE_DIV)
+/**
+ * @brief 指定是否使用硬件除法指令
+ *
+ */
+#define _MSTR_USE_HARDWARE_DIV 0
+#endif // _MSTR_USE_HARDWARE_DIV
+
 #if !defined(_MSTR_USE_MALLOC)
 /**
  * @brief 是否使用malloc替代自带的分配器

@@ -352,6 +352,10 @@ static mstr_result_t bcdtoa(
  */
 static void div_mod_10(u32_t x, u32_t* div, u32_t* rem)
 {
+#if _MSTR_USE_HARDWARE_DIV
+    *div = x / 10;
+    *rem = x % 10;
+#else
     u32_t q = (x >> 1) + (x >> 2);
     q += (q >> 4);
     q += (q >> 8);
@@ -368,6 +372,7 @@ static void div_mod_10(u32_t x, u32_t* div, u32_t* rem)
         *div = q;
         *rem = r;
     }
+#endif // _MSTR_USE_HARDWARE_DIV
 }
 
 /**
@@ -376,6 +381,10 @@ static void div_mod_10(u32_t x, u32_t* div, u32_t* rem)
  */
 static void div_mod_10_u64(u64_t x, u64_t* div, u32_t* rem)
 {
+#if _MSTR_USE_HARDWARE_DIV
+    *div = (u64_t)(x / 10);
+    *rem = (u32_t)(x % 10);
+#else
     u64_t q = (x >> 1) + (x >> 2);
     q += (q >> 4);
     q += (q >> 8);
@@ -393,4 +402,5 @@ static void div_mod_10_u64(u64_t x, u64_t* div, u32_t* rem)
         *div = q;
         *rem = (u32_t)(r & 0xffffffff);
     }
+#endif // _MSTR_USE_HARDWARE_DIV
 }
