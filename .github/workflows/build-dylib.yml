@@ -77,6 +77,8 @@ jobs:
           MTFMT_BUILD_USE_LTO: "1"
           MTFMT_BUILD_INC_ADDITIONAL_OUT: "1"
           MTFMT_BUILD_TARGET_NAME: "mtfmt_win_${{ matrix.platform }}"
+          MTFMT_BUILD_LIB_EXT: ".lib"
+          MTFMT_BUILD_DYLIB_EXT: ".dll"
       # 打包
       - name: Upload artifact
         uses: actions/upload-artifact@v3
