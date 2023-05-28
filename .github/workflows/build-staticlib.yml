@@ -1,4 +1,4 @@
-name: "Build dylib"
+name: "Build staticlib"
 
 on:
   push:
@@ -22,7 +22,7 @@ on:
         default: "warning"
 
 jobs:
-  build-dylib:
+  build-lib:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,6 +39,7 @@ jobs:
           MTFMT_BUILD_GCC_PREFIX: "arm-none-eabi-"
           MTFMT_BUILD_ARCH: "-mcpu=cortex-m0plus -mthumb"
           MTFMT_BUILD_TARGET_NAME: "mtfmt_cm0plus"
+          MTFMT_BUILD_OUTPUT_DIR: "_site"
       # 打包
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1

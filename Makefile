@@ -43,7 +43,11 @@ TBGEN_DISPLAY = TB:
 BUILD_DIR = build
 
 # 构建输出
+ifdef MTFMT_BUILD_OUTPUT_DIR
+OUTPUT_DIR = $(MTFMT_BUILD_OUTPUT_DIR)
+else
 OUTPUT_DIR = target
+endif
 
 # C sources
 C_SOURCES =  \
