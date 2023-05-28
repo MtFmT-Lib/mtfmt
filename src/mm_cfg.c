@@ -21,6 +21,9 @@ MSTR_EXPORT_API(uint32_t) mstr_configure(void)
 #if _MSTR_BUILD_DLL
     configure |= MSTRCFG_BUILD_DLL_BIT;
 #endif // _MSTR_USE_MALLOC
+#if _MSTR_BUILD_DYLIB
+    configure |= MSTRCFG_BUILD_DYLIB_BIT;
+#endif // _MSTR_BUILD_DYLIB
 #if __EMSCRIPTEN__
     configure |= MSTRCFG_USE_WASM_BIT;
 #endif // __EMSCRIPTEN__

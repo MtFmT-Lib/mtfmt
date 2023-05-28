@@ -79,6 +79,9 @@ else
 LTO_OPT =
 endif
 
+# 选项
+OPT = -fpic
+
 # C defines
 C_DEFS =
 
