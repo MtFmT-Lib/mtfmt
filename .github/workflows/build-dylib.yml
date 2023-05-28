@@ -67,10 +67,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Install Cygwin
         uses: egor-tensin/setup-cygwin@v4
-      - name: Set up GCC
-        uses: ./
         with:
-          cygwin: 1
+          packages: make gcc-g++
       - name: Make dll at ${{ matrix.os }} / ${{ matrix.platform }}
         run: |
           make dylib
