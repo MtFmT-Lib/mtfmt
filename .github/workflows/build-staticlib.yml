@@ -22,7 +22,7 @@ on:
         default: "warning"
 
 jobs:
-  build-lib:
+  build-lib-cm0plus:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -43,5 +43,26 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: lib-artifact
+          name: gcc-lib-cm0plus-artifact
+          path: target/*
+
+  build-lib-cm0:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: fiam/arm-none-eabi-gcc@v1
+        with:
+          release: "9-2019-q4"
+      - name: Make static library at CM0
+        run: |
+          make lib
+        env:
+          MTFMT_BUILD_GCC_PREFIX: "arm-none-eabi-"
+          MTFMT_BUILD_ARCH: "-mcpu=cortex-m0 -mthumb"
+          MTFMT_BUILD_TARGET_NAME: "mtfmt_cm0"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: gcc-lib-cm0-artifact
           path: target/*
