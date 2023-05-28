@@ -1,0 +1,41 @@
+name: "Build dylib"
+
+on:
+  push:
+    paths:
+      - "**.c"
+      - "**.h"
+      - "Makefile"
+  pull_request:
+    branches: [master]
+    paths:
+      - "**.c"
+      - "**.h"
+      - "Makefile"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+
+jobs:
+  build-dylib:
+    runs-on: ubuntu-latest
+    steps:
+      # 设置GCC版本
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: latest
+          platform: x64
+      # 构建
+      - name: Make dylib at linux_amd64
+        run: |
+          make dylib
+        env:
+          MTFMT_BUILD_C_DEFS: "-D_MSTR_BUILD_DLL=1 -D_MSTR_USE_MALLOC=1"
+          MTFMT_BUILD_USE_LTO: "1"
+      # 打包
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
