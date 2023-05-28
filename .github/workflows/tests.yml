@@ -22,9 +22,30 @@ on:
         default: "warning"
 
 jobs:
-  tests:
+  tests-pchost:
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [x86, x64]
+        buildin-div: ["0", "1"]
+        buildin-alloc: ["0", "1"]
     runs-on: ubuntu-latest
     name: "Tests"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          submodules: true
+      # 设置GCC版本s
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: latest
+          platform: "${{ matrix.platform }}"
+      # 进行测试
+      - name: Test
+        run: |
+          make alltests
+        env:
+          MTFMT_BUILD_USE_LTO: "1"
+          MTFMT_BUILD_C_DEFS: "-D_MSTR_USE_MALLOC=${{ matrix.buildin-alloc }} -D_MSTR_USE_HARDWARE_DIV=${{ matrix.buildin-div }}"

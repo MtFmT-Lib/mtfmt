@@ -1,4 +1,4 @@
-name: "Check code style"
+name: "Code style"
 
 on:
   push:

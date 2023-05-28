@@ -31,7 +31,17 @@ else
 DYLIB_EXT = .so
 endif
 
+ifdef MTFMT_BUILD_TESTFILE_EXT
+EXE_EXT = $(MTFMT_BUILD_TESTFILE_EXT)
+else
+EXE_EXT = .out
+endif
+
 LIB_TARGET = lib$(TARGET_NAME)$(LIB_EXT)
+
+TESTLIB_TARGET_NAME = $(TARGET_NAME)_test
+
+TESTLIB_TARGET = lib$(TESTLIB_TARGET_NAME)$(LIB_EXT)
 
 DYLIB_TARGET = lib$(TARGET_NAME)_dy$(DYLIB_EXT)
 
@@ -46,11 +56,17 @@ LD_DISPLAY = Linker output :
 # 打包时显示的内容
 AR_DISPLAY = AR output :
 
+# 测试时显示的内容
+TEST_DISPLAY = Running test :
+
 # Table generator
 TBGEN_DISPLAY = TB:
 
 # Build path
 BUILD_DIR = build
+
+# Test path
+TEST_DIR = tests
 
 # 构建输出
 ifdef MTFMT_BUILD_OUTPUT_DIR
@@ -63,6 +79,18 @@ endif
 C_SOURCES =  \
 $(wildcard ./src/*.c) \
 $(wildcard ./src/**/*.c)
+
+# 测试框架的源
+TEST_C_STAB_INC = \
+thirds/unity/src
+
+TEST_C_STAB_SOURCES = \
+$(wildcard thirds/unity/src/*.c)
+
+
+# 测试源
+TEST_C_SOURCES = \
+$(wildcard ./tests/*.c)
 
 # 编译器
 ifdef MTFMT_BUILD_GCC_PREFIX
@@ -104,16 +132,16 @@ C_DEFS += $(MTFMT_BUILD_C_DEFS)
 endif
 
 # C includes
-C_INCLUDES =  \
+C_INCLUDES = \
 -Iinc
 
 # Standard
 C_STANDARD = --std=c11
 
 ifeq ($(MTFMT_BUILD_DEBUG), 1)
-CFLAGS = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) -D_DEBUG -Wall -fdata-sections -ffunction-sections -g -gdwarf-2
+CFLAGS_NODEP = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) -D_DEBUG -Wall -fdata-sections -ffunction-sections -g -gdwarf-2
 else
-CFLAGS = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) $(LTO_OPT) -Wall -fdata-sections -ffunction-sections
+CFLAGS_NODEP = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) $(LTO_OPT) -Wall -fdata-sections -ffunction-sections
 endif
 
 # 动态链接库的链接选项
@@ -130,24 +158,53 @@ ifeq ($(MTFMT_BUILD_INC_ADDITIONAL_OUT), 1)
 DYLIB_LD_OPTS += -Wl,--output-def,$(OUTPUT_DIR)/$(TARGET_NAME).def,--out-implib,$(OUTPUT_DIR)/$(DYLIB_IMPLIB_TARGET)
 endif
 
+# 编译测试文件的链接选项
+TEST_LD_OPTS =
+
+ifneq ($(MTFMT_BUILD_DEBUG), 1)
+TEST_LD_OPTS += $(LTO_OPT)
+endif
+
+# 回收不需要的段
+DYLIB_LD_OPTS += -Wl,--gc-sections
+
 # 依赖文件
-CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
-
-# build all
-all: $(OUTPUT_DIR)/$(LIB_TARGET) $(OUTPUT_DIR)/$(DYLIB_TARGET)
-	@echo build completed.
-
-# build static lib
-lib: $(OUTPUT_DIR)/$(LIB_TARGET)
-	@echo build static library completed.
-
-# build dylib
-dylib: $(OUTPUT_DIR)/$(DYLIB_TARGET)
-	@echo link completed.
+CFLAGS = $(CFLAGS_NODEP) -MMD -MP -MF"$(@:%.o=%.d)"
 
 # list of objects
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(C_SOURCES)))
+
+# list of objects for tests
+TEST_OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(TEST_C_STAB_SOURCES:.c=.o)))
+vpath %.c $(sort $(dir $(TEST_C_STAB_SOURCES)))
+
+# 测试的target
+TEST_TARGETS = $(addprefix $(TEST_DIR)/,$(notdir $(TEST_C_SOURCES:.c=)))
+
+# build all
+all: lib dylib alltests
+	@echo Build completed.
+
+# build static lib
+lib: $(OUTPUT_DIR)/$(LIB_TARGET)
+	@echo Build static library completed.
+
+# build dylib
+dylib: $(OUTPUT_DIR)/$(DYLIB_TARGET)
+	@echo Link completed.
+
+# 所有测试
+alltests: $(TEST_TARGETS)
+	@echo Test completed.
+
+$(TEST_DIR)/%: $(OUTPUT_DIR)/$(TESTLIB_TARGET) | $(OUTPUT_DIR)
+	@echo $(CC_DISPLAY) with $@
+	@gcc -c $@.c -I$(TEST_C_STAB_INC) $(CFLAGS_NODEP) -MMD -MP -MF"$(addprefix $(BUILD_DIR)/,$(notdir $@.d))" -o "$(addprefix $(BUILD_DIR)/,$(notdir $@.o))"
+	@echo $(LD_DISPLAY) $@
+	@gcc "$(addprefix $(BUILD_DIR)/,$(notdir $@.o))" $(TEST_C_STAB_SOURCES) $(OBJECTS) $(TEST_LD_OPTS) -o "$(addprefix $(OUTPUT_DIR)/,$(notdir $@$(EXE_EXT)))"
+	@echo $(TEST_DISPLAY) $@
+	@"$(addprefix ./$(OUTPUT_DIR)/,$(notdir $@$(EXE_EXT)))"
 
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
 	@echo $(CC_DISPLAY) $<
@@ -160,6 +217,9 @@ $(OUTPUT_DIR)/$(LIB_TARGET): $(OBJECTS) Makefile | $(OUTPUT_DIR)
 $(OUTPUT_DIR)/$(DYLIB_TARGET): $(OBJECTS) Makefile | $(OUTPUT_DIR)
 	@echo $(LD_DISPLAY) $@
 	@$(CC) -shared $(OBJECTS) -o $@ $(DYLIB_LD_OPTS)
+
+$(OUTPUT_DIR)/$(TESTLIB_TARGET): $(TEST_OBJECTS) $(OBJECTS) Makefile | $(OUTPUT_DIR)
+	@echo Test input compile completed.
 
 $(BUILD_DIR):
 	mkdir $@
