@@ -22,7 +22,12 @@ on:
         default: "warning"
 
 jobs:
-  build-lib-cm0plus:
+  build-lib-cortex-m:
+    strategy:
+      fail-fast: true
+      matrix:
+        as-debug: ["1", "0"]
+        target-cpu: ["m0", "m0plus"]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,37 +37,17 @@ jobs:
         with:
           release: "9-2019-q4"
       # 构建
-      - name: Make static library at CM0+
+      - name: Make static library at cortex-${{ matrix.target-cpu }} with debug= ${{ matrix.as-debug }}
         run: |
           make lib
         env:
           MTFMT_BUILD_GCC_PREFIX: "arm-none-eabi-"
-          MTFMT_BUILD_ARCH: "-mcpu=cortex-m0plus -mthumb"
-          MTFMT_BUILD_TARGET_NAME: "mtfmt_cm0plus"
+          MTFMT_BUILD_ARCH: "-mcpu=cortex-${{ matrix.target-cpu }} -mthumb"
+          MTFMT_BUILD_TARGET_NAME: "mtfmt_${{ matrix.target-cpu }}"
+          MTFMT_BUILD_DEBUG: "${{ matrix.as-debug }}"
       # 打包
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: gcc-lib-cm0plus-artifact
-          path: target/*
-
-  build-lib-cm0:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - uses: fiam/arm-none-eabi-gcc@v1
-        with:
-          release: "9-2019-q4"
-      - name: Make static library at CM0
-        run: |
-          make lib
-        env:
-          MTFMT_BUILD_GCC_PREFIX: "arm-none-eabi-"
-          MTFMT_BUILD_ARCH: "-mcpu=cortex-m0 -mthumb"
-          MTFMT_BUILD_TARGET_NAME: "mtfmt_cm0"
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: gcc-lib-cm0-artifact
+          name: "gcc-lib-${{ matrix.target-cpu }}-debug${{ matrix.as-debug }}-without-div"
           path: target/*
