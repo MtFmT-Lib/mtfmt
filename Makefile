@@ -31,7 +31,17 @@ else
 DYLIB_EXT = .so
 endif
 
+ifdef MTFMT_BUILD_TESTFILE_EXT
+EXE_EXT = $(MTFMT_BUILD_TESTFILE_EXT)
+else
+EXE_EXT = .out
+endif
+
 LIB_TARGET = lib$(TARGET_NAME)$(LIB_EXT)
+
+TESTLIB_TARGET_NAME = $(TARGET_NAME)_test
+
+TESTLIB_TARGET = lib$(TESTLIB_TARGET_NAME)$(LIB_EXT)
 
 DYLIB_TARGET = lib$(TARGET_NAME)_dy$(DYLIB_EXT)
 
@@ -52,6 +62,9 @@ TBGEN_DISPLAY = TB:
 # Build path
 BUILD_DIR = build
 
+# Test path
+TEST_DIR = tests
+
 # 构建输出
 ifdef MTFMT_BUILD_OUTPUT_DIR
 OUTPUT_DIR = $(MTFMT_BUILD_OUTPUT_DIR)
@@ -63,6 +76,18 @@ endif
 C_SOURCES =  \
 $(wildcard ./src/*.c) \
 $(wildcard ./src/**/*.c)
+
+# 测试框架的源
+TEST_C_STAB_INC = \
+thirds/unity/src
+
+TEST_C_STAB_SOURCES = \
+$(wildcard thirds/unity/src/*.c)
+
+
+# 测试源
+TEST_C_SOURCES = \
+$(wildcard ./tests/*.c)
 
 # 编译器
 ifdef MTFMT_BUILD_GCC_PREFIX
@@ -104,7 +129,7 @@ C_DEFS += $(MTFMT_BUILD_C_DEFS)
 endif
 
 # C includes
-C_INCLUDES =  \
+C_INCLUDES = \
 -Iinc
 
 # Standard
@@ -133,6 +158,17 @@ endif
 # 依赖文件
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 
+# list of objects
+OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
+vpath %.c $(sort $(dir $(C_SOURCES)))
+
+# list of objects for tests
+TEST_OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(TEST_C_STAB_SOURCES:.c=.o)))
+vpath %.c $(sort $(dir $(TEST_C_STAB_SOURCES)))
+
+# 测试的target
+TEST_TARGETS = $(addprefix $(TEST_DIR)/,$(notdir $(TEST_C_SOURCES:.c=)))
+
 # build all
 all: $(OUTPUT_DIR)/$(LIB_TARGET) $(OUTPUT_DIR)/$(DYLIB_TARGET)
 	@echo build completed.
@@ -145,9 +181,13 @@ lib: $(OUTPUT_DIR)/$(LIB_TARGET)
 dylib: $(OUTPUT_DIR)/$(DYLIB_TARGET)
 	@echo link completed.
 
-# list of objects
-OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
-vpath %.c $(sort $(dir $(C_SOURCES)))
+# 所有测试
+alltest: $(TEST_TARGETS)
+	@echo test completed.
+
+$(TEST_DIR)/%: $(OUTPUT_DIR)/$(TESTLIB_TARGET) | $(BUILD_DIR)
+	@gcc $@.c -L$(OUTPUT_DIR) -l$(TESTLIB_TARGET_NAME) -I$(TEST_C_STAB_INC) -o $(OUTPUT_DIR)/$(notdir $@)$(EXE_EXT)
+	@echo test target "$(notdir $@)" build completed.
 
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
 	@echo $(CC_DISPLAY) $<
@@ -160,6 +200,10 @@ $(OUTPUT_DIR)/$(LIB_TARGET): $(OBJECTS) Makefile | $(OUTPUT_DIR)
 $(OUTPUT_DIR)/$(DYLIB_TARGET): $(OBJECTS) Makefile | $(OUTPUT_DIR)
 	@echo $(LD_DISPLAY) $@
 	@$(CC) -shared $(OBJECTS) -o $@ $(DYLIB_LD_OPTS)
+
+$(OUTPUT_DIR)/$(TESTLIB_TARGET): $(TEST_OBJECTS) $(OBJECTS) Makefile | $(OUTPUT_DIR)
+	@echo $(AR_DISPLAY) $@
+	@$(AR) rcs $@ $(TEST_C_STAB_SOURCES) $(OBJECTS)
 
 $(BUILD_DIR):
 	mkdir $@
