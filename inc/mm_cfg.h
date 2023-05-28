@@ -81,25 +81,31 @@
  * @brief 构建使用了 _MSTR_USE_MALLOC
  *
  */
-#define MSTRCFG_USE_MALLOC_BIT  0x01
+#define MSTRCFG_USE_MALLOC_BIT     0x01
 
 /**
  * @brief 构建使用了 _MSTR_BUILD_DLL
  *
  */
-#define MSTRCFG_BUILD_DLL_BIT   0x02
+#define MSTRCFG_BUILD_DLL_BIT      0x02
 
 /**
  * @brief 构建使用了 _MSTR_BUILD_DYLIB
  *
  */
-#define MSTRCFG_BUILD_DYLIB_BIT 0x04
+#define MSTRCFG_BUILD_DYLIB_BIT    0x04
 
 /**
  * @brief 构建使用了 WASM
  *
  */
-#define MSTRCFG_USE_WASM_BIT    0x08
+#define MSTRCFG_USE_WASM_BIT       0x08
+
+/**
+ * @brief 指定是否使用了硬件除法
+ *
+ */
+#define MSTRCFG_BUILD_HARDWARE_DIV 0x10
 
 /**
  * @brief 取得构建配置

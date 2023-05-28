@@ -27,5 +27,8 @@ MSTR_EXPORT_API(uint32_t) mstr_configure(void)
 #if __EMSCRIPTEN__
     configure |= MSTRCFG_USE_WASM_BIT;
 #endif // __EMSCRIPTEN__
+#if _MSTR_USE_HARDWARE_DIV
+    configure |= MSTRCFG_BUILD_HARDWARE_DIV;
+#endif // _MSTR_USE_HARDWARE_DIV
     return configure;
 }
