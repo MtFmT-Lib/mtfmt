@@ -2,20 +2,21 @@
 #  SPDX-License-Identifier: LGPL-3.0
 -->
 <script lang="ts">
+    import { marked } from "marked";
     import Editor from "./Editor.svelte";
-    import { CString } from "$lib/mtfmt/lib";
-    import ScopeObject from "$lib/mtfmt/scope";
-    import IntoImage from "$lib/images/into.svg";
-    import FromImage from "$lib/images/from.svg";
+    import { writable } from "svelte/store";
+    import ArrowIcon from "$lib/images/arrow.svg";
 
-    export const prerender = true;
+    /**
+     * 是否从formatter变成scanner
+     */
+    let rev_direction = writable(false);
 
-    function into_action() {
-        // TODO
-    }
-
-    function from_action() {
-        // TODO
+    /**
+     * 更改方向
+     */
+    function change_direction() {
+        rev_direction.set(!$rev_direction);
     }
 </script>
 
@@ -24,16 +25,12 @@
         <Editor />
     </div>
     <div class="center-part">
-        <button on:click={into_action}>
-            <img src={IntoImage} alt="Into" />
-        </button>
-        <br />
-        <button on:click={from_action}>
-            <img src={FromImage} alt="Scan" />
+        <button on:click={change_direction}>
+            <img alt="Change direction" src={ArrowIcon} />
         </button>
     </div>
     <div class="right-part">
-        <textarea placeholder="Here is the output." />
+        <textarea placeholder="Output." value={$rev_direction.toString()} />
     </div>
 </div>
 
@@ -44,7 +41,7 @@
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        align-items: stretch;
+        align-items: center;
         min-height: 8em;
     }
 
@@ -53,41 +50,26 @@
         flex-grow: 1;
     }
 
-    .left-part {
-        border-right: 1px solid $border-color;
-    }
-
     .center-part {
         flex-grow: 0;
         margin-left: 1em;
         margin-right: 1em;
         text-align: center;
-        vertical-align: middle;
-        line-height: 4em;
 
         button {
-            height: 4em;
-            background-color: $bg-color;
             outline: none;
             border: none;
-
-            &:hover {
-                background-color: $border-color;
-            }
-
-            &:active {
-                background-color: mix($border-color, black, 40%);
-            }
+            overflow: hidden;
+            background-color: transparent;
 
             img {
-                width: 4em;
+                height: 4em;
             }
         }
     }
 
     .right-part textarea {
         border: none;
-        border-left: 1px solid $border-color;
         resize: none;
         font-size: inherit;
         font-family: inherit;
