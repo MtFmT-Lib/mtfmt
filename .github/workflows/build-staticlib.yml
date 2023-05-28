@@ -6,14 +6,14 @@ on:
       - "**.c"
       - "**.h"
       - "Makefile"
-      - ".github/build-staticlib.yml"
+      - ".github/workflows/build-staticlib.yml"
   pull_request:
     branches: [master]
     paths:
       - "**.c"
       - "**.h"
       - "Makefile"
-      - ".github/build-staticlib.yml"
+      - ".github/workflows/build-staticlib.yml"
   workflow_dispatch:
     inputs:
       logLevel:
