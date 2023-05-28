@@ -26,6 +26,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
+        platform: [x86, x64]
         buildin-div: ["0", "1"]
         buildin-alloc: ["0", "1"]
     runs-on: ubuntu-latest
@@ -36,9 +37,11 @@ jobs:
         with:
           submodules: true
       # 设置GCC版本s
-      - uses: fiam/arm-none-eabi-gcc@v1
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
         with:
-          release: "9-2019-q4"
+          version: latest
+          platform: "${{ matrix.platform }}"
       # 进行测试
       - name: Test
         run: |
