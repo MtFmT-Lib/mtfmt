@@ -22,7 +22,12 @@ on:
         default: "warning"
 
 jobs:
-  tests:
+  tests-pchost:
+    strategy:
+      fail-fast: true
+      matrix:
+        buildin-div: ["0", "1"]
+        buildin-alloc: ["0", "1"]
     runs-on: ubuntu-latest
     name: "Tests"
     steps:
@@ -30,3 +35,14 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: true
+      # 设置GCC版本s
+      - uses: fiam/arm-none-eabi-gcc@v1
+        with:
+          release: "9-2019-q4"
+      # 进行测试
+      - name: Test
+        run: |
+          make alltests
+        env:
+          MTFMT_BUILD_USE_LTO: "1"
+          MTFMT_BUILD_C_DEFS: "-D_MSTR_USE_MALLOC=${{ matrix.buildin-alloc }} -D_MSTR_USE_HARDWARE_DIV=${{ matrix.buildin-div }}"
