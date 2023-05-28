@@ -59,6 +59,9 @@
 #elif _MSTR_IMPORT_FROM_DLL
 #define MSTR_EXPORT_API(ret) \
     MSTR_EXPORT_MANGLE __declspec(dllimport) ret __stdcall
+#elif _MSTR_BUILD_DYLIB
+#define MSTR_EXPORT_API(ret) \
+    MSTR_EXPORT_MANGLE __attribute__((visibility("default"))) ret
 #elif __EMSCRIPTEN__
 #include <emscripten.h>
 #define MSTR_EXPORT_API(ret) MSTR_EXPORT_MANGLE ret EMSCRIPTEN_KEEPALIVE
@@ -70,19 +73,25 @@
  * @brief 构建使用了 _MSTR_USE_MALLOC
  *
  */
-#define MSTRCFG_USE_MALLOC_BIT 0x01
+#define MSTRCFG_USE_MALLOC_BIT  0x01
 
 /**
  * @brief 构建使用了 _MSTR_BUILD_DLL
  *
  */
-#define MSTRCFG_BUILD_DLL_BIT  0x02
+#define MSTRCFG_BUILD_DLL_BIT   0x02
+
+/**
+ * @brief 构建使用了 _MSTR_BUILD_DYLIB
+ *
+ */
+#define MSTRCFG_BUILD_DYLIB_BIT 0x04
 
 /**
  * @brief 构建使用了 WASM
  *
  */
-#define MSTRCFG_USE_WASM_BIT   0x04
+#define MSTRCFG_USE_WASM_BIT    0x08
 
 /**
  * @brief 取得构建配置

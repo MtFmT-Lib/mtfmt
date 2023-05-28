@@ -6,13 +6,18 @@
 # ENV:
 # MTFMT_BUILD_GCC_PREFIX 			gcc的前缀
 # GCC_PATH							gcc路径
+# MTFMT_BUILD_TARGET_NAME			目标输出的文件名
 # MTFMT_BUILD_C_DEFS				需要额外增加的cdefs
 # MTFMT_BUILD_INC_ADDITIONAL_OUT	输出def文件(opt)
 # MTFMT_BUILD_DEBUG					是否以DEBUG构建
 # MTFMT_BUILD_ARCH					体系结构标记
 # MTFMT_BUILD_USE_LTO				使用LTO
 
+ifdef MTFMT_BUILD_TARGET_NAME
+TARGET_NAME = $(MTFMT_BUILD_TARGET_NAME)
+else
 TARGET_NAME = mtfmt
+endif
 
 DYLIB_EXT = .so
 
@@ -38,7 +43,11 @@ TBGEN_DISPLAY = TB:
 BUILD_DIR = build
 
 # 构建输出
+ifdef MTFMT_BUILD_OUTPUT_DIR
+OUTPUT_DIR = $(MTFMT_BUILD_OUTPUT_DIR)
+else
 OUTPUT_DIR = target
+endif
 
 # C sources
 C_SOURCES =  \
@@ -73,6 +82,9 @@ LTO_OPT = -flto
 else
 LTO_OPT =
 endif
+
+# 选项
+OPT = -fpic
 
 # C defines
 C_DEFS =
