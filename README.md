@@ -7,6 +7,7 @@ MtFmT
 
 
 [![DOCUMENT](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/document.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/document.yml)
+[![DOCUMENT LINT](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/eslint.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/eslint.yml)
 [![TESTS](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/tests.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/tests.yml)
 [![DYLIB-BUILD](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-dylib.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-dylib.yml)
 [![LIB-BUILD](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-staticlib.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-staticlib.yml)

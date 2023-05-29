@@ -8,6 +8,14 @@ on:
       - "inc/**.h"
       - "**.md"
       - ".github/workflows/document.yml"
+      - "www/**.ts"
+      - "www/**.js"
+      - "www/**.md"
+      - "www/**.svg"
+      - "www/**.html"
+      - "www/**.scss"
+      - "www/**.svelte"
+      - "www/wasm/**"
       - "assets/**.scss"
   workflow_dispatch:
     inputs:
@@ -48,6 +56,18 @@ jobs:
         with:
           working-directory: "./"
           doxyfile-path: "Doxyfile"
+      # WWW
+      - name: Setup emsdk
+        uses: mymindstorm/setup-emsdk@v11
+      - name: WASM build
+        working-directory: "./www/wasm"
+        run: |
+          emmake make
+      - name: Yarn
+        working-directory: "./www"
+        run: |
+          yarn install
+          yarn build
       # Github page
       - name: Setup Pages
         uses: actions/configure-pages@v3
