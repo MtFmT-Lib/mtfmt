@@ -77,6 +77,8 @@ jobs:
         run: |
           mkdir _site
           mv www/dist/* _site
+          mkdir _site/doxygen
+          mv assets/autogen/html/* _site
       # 打包
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
