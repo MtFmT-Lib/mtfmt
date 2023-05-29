@@ -13,6 +13,13 @@ MtFmT
 [![CLANG-FORMAT](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/format-checker.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/format-checker.yml)
 
 
+\[ [HomePage](https://mtfmt-lib.github.io/mtfmt/) \]
+\[ [Document](https://mtfmt-lib.github.io/mtfmt/) \]
+\[ [Code Document](https://mtfmt-lib.github.io/mtfmt/assets/autogen/html/) \]
+\[ [Pre-build Download](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-staticlib.yml) \]
+\[ [Pre-build DLLs](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-dylib.yml) \]
+
+
 一个类似于`{fmtlib}`和python的format语法的字符串格式化库，以足够低的资源占用和足够高的性能实现string format。
 `mtfmt` （Mini template formatter）是为嵌入式系统设计的格式化库，它实现了 [PEP-3101](https://peps.python.org/pep-3101/) 中的格式化串的一个方言。其它类似的实现包括 [{fmtlib}](https://fmt.dev/latest/syntax.html) 等。另外，mtfmt 还实现了.Net中对于日期和时间格式化中的[标准部分](https://learn.microsoft.com/zh-cn/dotnet/standard/base-types/standard-date-and-time-format-strings)、[用户定义部分](https://learn.microsoft.com/zh-cn/dotnet/standard/base-types/custom-date-and-time-format-strings)的一个子集，mtfmt的其主要特性包括：
 
