@@ -2,7 +2,6 @@
 #  SPDX-License-Identifier: LGPL-3.0
 -->
 <script lang="ts">
-    import { marked } from "marked";
     import Editor from "./Editor.svelte";
     import { writable } from "svelte/store";
     import ArrowIcon from "$lib/images/arrow.svg";
