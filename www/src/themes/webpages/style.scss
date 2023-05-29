@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: LGPL-3.0
 @import "@theme/stylevars.scss";
+@import "@style/markdown.scss";
 @import "@style/pages.scss";
 
 body {
     margin: 0;
     padding: 0;
+    min-width: 240px;
 }

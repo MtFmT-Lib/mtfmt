@@ -1,7 +1,7 @@
 <!-- 
 #  SPDX-License-Identifier: LGPL-3.0
 -->
-<div>
+<div class="header-father">
     <div class="header">
         <h1 class="title">
             <span class="odd">M</span><span class="even">t</span><span
@@ -24,14 +24,21 @@
 <style lang="scss">
     @import "../../themes/common/stylevars.scss";
 
-    .header {
-        margin-bottom: 1em;
-        padding-bottom: 1em;
-        width: 100%;
+    .header-father {
         border: none;
         border-bottom: 1px solid $border-color;
+        margin-bottom: 1em;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: stretch;
+    }
 
-        h1.title {
+    .header {
+        width: 100%;
+        padding-bottom: 1em;
+
+        .title {
             padding: 0;
             margin: 0;
             font-size: 2em;
@@ -39,18 +46,18 @@
             padding-bottom: 0.25em;
             margin-top: 0.25em;
             margin-bottom: 0.25em;
+        }
 
-            .odd {
-                color: $transflag-blue;
-            }
+        .odd {
+            color: $transflag-blue;
+        }
 
-            .even {
-                color: $transflag-pink;
-            }
+        .even {
+            color: $transflag-pink;
+        }
 
-            .mid {
-                color: $transflag-gray;
-            }
+        .mid {
+            color: $transflag-gray;
         }
 
         .brief {
@@ -76,10 +83,79 @@
                 padding-right: 0.5em;
             }
 
-            &:first-child {
+            &:first-child:before {
+                content: "";
+                padding: 0;
+            }
+        }
+    }
+
+    @media screen and (max-width: 640px) {
+        .header-father {
+            flex-direction: row;
+            align-items: baseline;
+        }
+
+        .header .brief {
+            font-size: 0.85em;
+        }
+
+        .seealso {
+            a {
+                display: block;
+                white-space: nowrap;
+
+                &::before {
+                    padding: 0;
+                    padding-right: 0.4em;
+                }
+
+                &:first-child:before {
+                    content: "\00b7";
+                    padding-right: 0.4em;
+                }
+            }
+        }
+    }
+
+    @media screen and (max-width: 420px) {
+        .header {
+            text-align: center;
+        }
+    }
+
+    @media screen and (max-width: 320px) {
+        .header {
+            text-align: initial;
+
+            .title {
+                font-size: 1.5em;
+            }
+
+            .title span {
+                display: block;
+            }
+
+            .even {
+                margin-left: 0.5em;
+            }
+
+            .brief {
+                display: none;
+            }
+        }
+
+        .seealso {
+            a {
+                display: block;
+                white-space: nowrap;
+
                 &::before {
                     content: "";
-                    padding: 0;
+                }
+
+                &:first-child:before {
+                    content: "";
                 }
             }
         }

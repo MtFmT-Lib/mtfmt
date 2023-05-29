@@ -4,7 +4,7 @@
 <script lang="ts">
     import Header from "@comp/Header.svelte";
     import Markdown from "@comp/Markdown.svelte";
-    import { toc, html } from "@doc/README.md";
+    import { toc, html } from "@text/DOCUMENT.md";
 </script>
 
 <svelte:head>
@@ -14,5 +14,5 @@
 
 <div>
     <Header />
-    <Markdown html={html} toc={toc}/>
+    <Markdown html={html} toc={toc} />
 </div>

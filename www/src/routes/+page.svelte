@@ -4,6 +4,8 @@
 <script lang="ts">
     import Viewer from "@comp/Viewer.svelte";
     import Header from "@comp/Header.svelte";
+    import Markdown from "@comp/Markdown.svelte";
+    import { toc, html } from "@text/HOMEPAGE.md";
 </script>
 
 <svelte:head>
@@ -13,6 +15,7 @@
 
 <section>
     <Header />
+    <Markdown html={html} toc={toc} />
     <div class="active">
         <Viewer />
     </div>

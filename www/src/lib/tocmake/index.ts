@@ -27,5 +27,6 @@ export default function generate_toc(
  * @returns: HTML RAW, 表示目录, 拥有父元素<div class=".toc">
  */
 function generate_toc_helper(toc: { level: string; content: string }[]): string {
-    return '### 114514 ###'
+    console.log(toc)
+    return '@@TOC@@'
 }
