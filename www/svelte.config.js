@@ -19,6 +19,7 @@ const config = {
             precompress: false
         }),
         alias: {
+            '@doc': path.resolve('../doc'),
             '@comp': path.resolve('./src/lib/c'),
             '@style': path.resolve('./src/themes/webpages'),
             '@theme': path.resolve('./src/themes/common'),
