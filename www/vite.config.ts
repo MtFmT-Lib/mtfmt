@@ -1,17 +1,25 @@
 import { sveltekit } from '@sveltejs/kit/vite'
 import { defineConfig } from 'vite'
 import wasm from 'vite-plugin-wasm'
+import * as Markdown from 'vite-plugin-markdown'
 import topLevelAwait from 'vite-plugin-top-level-await'
 
 export default defineConfig({
     plugins: [
         sveltekit(),
         wasm(),
-        topLevelAwait()
+        topLevelAwait(),
+        Markdown.plugin({
+            mode: [Markdown.Mode.HTML, Markdown.Mode.TOC],
+            markdownIt: {
+                html: false,
+                typographer: true
+            }
+        })
     ],
     server: {
         fs: {
             allow: ['./wasm/target'],
         },
-    },
+    }
 })

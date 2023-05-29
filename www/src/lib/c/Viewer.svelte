@@ -34,7 +34,7 @@
 </div>
 
 <style lang="scss">
-    @import "./stylevars.scss";
+    @import "../../themes/common/stylevars.scss";
 
     .demo {
         display: flex;

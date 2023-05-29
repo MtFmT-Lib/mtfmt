@@ -1,5 +1,6 @@
-import adapter from '@sveltejs/adapter-static';
-import { vitePreprocess } from '@sveltejs/kit/vite';
+import path from 'path'
+import adapter from '@sveltejs/adapter-static'
+import { vitePreprocess } from '@sveltejs/kit/vite'
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -16,8 +17,14 @@ const config = {
             assets: 'dist',
             strict: true,
             precompress: false
-        })
+        }),
+        alias: {
+            '@text': path.resolve('./src/texts'),
+            '@comp': path.resolve('./src/lib/c'),
+            '@style': path.resolve('./src/themes/webpages'),
+            '@theme': path.resolve('./src/themes/common'),
+        }
     }
-};
+}
 
-export default config;
+export default config

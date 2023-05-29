@@ -6,6 +6,15 @@ declare global {
         // interface Locals {}
         // interface PageData {}
         // interface Platform {}
+
+        // Markdown
+        declare module '*.md' {
+            const toc: { level: string, content: string }[]
+
+            const html: string
+
+            export { toc, html }
+        }
     }
 }
 
