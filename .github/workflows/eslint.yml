@@ -5,6 +5,7 @@ on:
     paths:
       - "www/**.ts"
       - "www/**.js"
+      - "www/.eslintrc.yml"
       - ".github/workflows/eslint.yml"
   pull_request:
     branches: [master]
