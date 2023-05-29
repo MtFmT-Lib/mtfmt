@@ -58,7 +58,7 @@ jobs:
           doxyfile-path: "Doxyfile"
       # WWW
       - name: Setup emsdk
-        uses: mymindstorm/setup-emsdk@v11
+        uses: mymindstorm/setup-emsdk@v12
       - name: WASM build
         working-directory: "./www/wasm"
         run: |
