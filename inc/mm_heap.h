@@ -63,10 +63,10 @@ MSTR_EXPORT_API(usize_t) mstr_heap_get_high_water_mark(void);
  * @brief 取得分配器的统计数据
  *
  * @param[out] alloc_count: 分配次数
- * @param[out free_count: 释放次数
+ * @param[out] free_count: 释放次数
  */
 MSTR_EXPORT_API(void)
-mheap_get_allocate_count(usize_t* alloc_count, usize_t* free_count);
+mstr_heap_get_allocate_count(usize_t* alloc_count, usize_t* free_count);
 
 #define mstr_heap_init(mem, leng)                         \
     do {                                                  \

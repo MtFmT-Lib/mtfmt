@@ -82,7 +82,8 @@ $(wildcard ./src/**/*.c)
 
 # 测试框架的源
 TEST_C_STAB_INC = \
-thirds/unity/src
+-Ithirds/unity/src \
+-Itests
 
 TEST_C_STAB_SOURCES = \
 $(wildcard thirds/unity/src/*.c)
@@ -200,7 +201,7 @@ alltests: $(TEST_TARGETS)
 
 $(TEST_DIR)/%: $(OUTPUT_DIR)/$(TESTLIB_TARGET) | $(OUTPUT_DIR)
 	@echo $(CC_DISPLAY) with $@
-	@gcc -c $@.c -I$(TEST_C_STAB_INC) $(CFLAGS_NODEP) -MMD -MP -MF"$(addprefix $(BUILD_DIR)/,$(notdir $@.d))" -o "$(addprefix $(BUILD_DIR)/,$(notdir $@.o))"
+	@gcc -c $@.c $(TEST_C_STAB_INC) $(CFLAGS_NODEP) -MMD -MP -MF"$(addprefix $(BUILD_DIR)/,$(notdir $@.d))" -o "$(addprefix $(BUILD_DIR)/,$(notdir $@.o))"
 	@echo $(LD_DISPLAY) $@
 	@gcc "$(addprefix $(BUILD_DIR)/,$(notdir $@.o))" $(TEST_C_STAB_SOURCES) $(OBJECTS) $(TEST_LD_OPTS) -o "$(addprefix $(OUTPUT_DIR)/,$(notdir $@$(EXE_EXT)))"
 	@echo $(TEST_DISPLAY) $@

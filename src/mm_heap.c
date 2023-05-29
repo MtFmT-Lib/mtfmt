@@ -143,7 +143,7 @@ MSTR_EXPORT_API(usize_t) mstr_heap_get_high_water_mark(void)
 }
 
 MSTR_EXPORT_API(void)
-mheap_get_allocate_count(usize_t* alloc_count, usize_t* free_count)
+mstr_heap_get_allocate_count(usize_t* alloc_count, usize_t* free_count)
 {
     *alloc_count = heap.alloc_count;
     *free_count = heap.free_count;
