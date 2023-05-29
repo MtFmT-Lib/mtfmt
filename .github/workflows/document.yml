@@ -46,9 +46,9 @@ jobs:
       - name: Doxygen scss compile
         uses: gha-utilities/sass-build@v0.5.1
         with:
-          source: "./assets/doxygen/css/style.scss"
-          destination: "./assets/doxygen/html/style.css"
-          includePaths: "./assets/doxygen/css/:./assets/common/"
+          source: "./www/src/themes/doxygen/css/style.scss"
+          destination: "./www/src/themes/doxygen/html/style.css"
+          includePaths: "./www/src/themes/doxygen/:./www/src/themes/common/"
           outputStyle: compressed
       # Doxygen
       - name: Doxygen
@@ -77,8 +77,8 @@ jobs:
         run: |
           mkdir _site
           mv www/dist/* _site
-          mkdir _site/doxygen
-          mv assets/autogen/html/* _site
+          mkdir _site/doc
+          mv doc _site/doc
       # 打包
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
