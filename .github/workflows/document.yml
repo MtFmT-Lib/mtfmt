@@ -68,6 +68,10 @@ jobs:
         run: |
           yarn install
           yarn build
+      # 移除node module
+      - name: Remove node module
+        run: |
+          rm -rf www/node_modules
       # Github page
       - name: Setup Pages
         uses: actions/configure-pages@v3
