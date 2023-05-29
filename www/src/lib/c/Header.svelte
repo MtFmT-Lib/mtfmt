@@ -16,7 +16,7 @@
         <a href="./">HOME</a>
         <a href="./start">QUISK START</a>
         <a href="./doc">DOCUMENTS</a>
-        <a href="https://mtfmt-lib.github.io/mtfmt/doc/html">CODE DOCUMENTS</a>
+        <a href="https://mtfmt-lib.github.io/mtfmt/html">CODE DOCUMENTS</a>
         <a href="https://github.com/MtFmT-Lib/mtfmt">GITHUB</a>
     </div>
 </div>

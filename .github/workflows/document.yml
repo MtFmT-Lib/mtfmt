@@ -75,7 +75,7 @@ jobs:
       - name: Move outputs
         run: |
           mkdir _site
-          mv doc _site
+          mv html _site
           mv www/dist/* _site
       # 打包
       - name: Upload artifact
