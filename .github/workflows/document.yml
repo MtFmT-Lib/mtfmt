@@ -89,7 +89,7 @@ jobs:
       - name: Move outputs
         run: |
           mkdir _site
-          sudo mv www/static/doxygen _site
+          sudo mv www/static/* _site
           sudo mv www/dist/* _site
       # 打包
       - name: Upload artifact
