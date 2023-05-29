@@ -2,7 +2,7 @@
 #  SPDX-License-Identifier: LGPL-3.0
 -->
 <script lang="ts">
-    import Header from "../Header.svelte";
+    import Header from "@comp/Header.svelte";
 </script>
 
 <svelte:head>

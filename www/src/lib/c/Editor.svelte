@@ -34,7 +34,7 @@
 </div>
 
 <style lang="scss">
-    @import "./stylevars.scss";
+    @import "../../themes/common/stylevars.scss";
 
     .structure-editor {
         input[type="text"] {

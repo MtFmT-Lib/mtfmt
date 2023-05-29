@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="seealso">
-        <a href="https://mtfmt-lib.github.io/mtfmt">HOME</a>
+        <a href="./">HOME</a>
         <a href="./start">QUISK START</a>
         <a href="./doc">DOCUMENTS</a>
         <a href="https://mtfmt-lib.github.io/mtfmt/doc/html">CODE DOCUMENTS</a>
@@ -22,7 +22,7 @@
 </div>
 
 <style lang="scss">
-    @import "./stylevars.scss";
+    @import "../../themes/common/stylevars.scss";
 
     .header {
         margin-bottom: 1em;

@@ -2,8 +2,8 @@
 #  SPDX-License-Identifier: LGPL-3.0
 -->
 <script lang="ts">
-    import Viewer from "./Viewer.svelte";
-    import Header from "./Header.svelte";
+    import Viewer from "@comp/Viewer.svelte";
+    import Header from "@comp/Header.svelte";
 </script>
 
 <svelte:head>
@@ -19,7 +19,7 @@
 </section>
 
 <style lang="scss">
-    @import "./stylevars.scss";
+    @import "@theme/stylevars.scss";
 
     .active {
         margin-top: 2em;
