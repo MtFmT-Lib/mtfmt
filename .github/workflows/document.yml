@@ -7,7 +7,7 @@ on:
       - "src/**.c"
       - "inc/**.h"
       - "**.md"
-      - ".github/**.yml"
+      - ".github/workflows/document.yml"
       - "assets/**.scss"
   workflow_dispatch:
     inputs:
