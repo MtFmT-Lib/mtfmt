@@ -1,12 +1,12 @@
 <!-- 
 #  SPDX-License-Identifier: LGPL-3.0
 -->
-<script>
-    import PreViewer from "./PreViewer.svelte";
+<script lang="ts">
+    import Viewer from "./Viewer.svelte";
 </script>
 
 <svelte:head>
-    <title>Mtfmt</title>
+    <title>Mtfmt library</title>
     <meta name="description" content="MtFmt library" />
 </svelte:head>
 
@@ -29,7 +29,7 @@
         <a href="https://github.com/MtFmT-Lib/mtfmt">GITHUB</a>
     </div>
     <div class="active">
-        <PreViewer />
+        <Viewer />
     </div>
 </section>
 

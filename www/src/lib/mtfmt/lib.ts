@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0
 import MtfmtWASM from './mtfmt'
+import Result from '$lib/fp/result'
+import type { CObject } from './scope'
 
 /**
  * 库错误
@@ -64,13 +66,6 @@ export function wrap_version(): number {
 }
 
 /**
- * C对象接口
- */
-export interface CObject {
-    destroy(): void
-}
-
-/**
  * 字符串
  */
 export class CString implements CObject {
@@ -104,12 +99,14 @@ export class CString implements CObject {
      * 
      * @param str: 需要增加的字符串
      */
-    public append(str: string) {
+    public append(str: string): Result<CString, MStrResult> {
         const handle = this.handle
-        CString.cstr_cont(str, s => {
+        return CString.cstr_cont(str, s => {
             const code = MtfmtWASM.mstr_concat_cstr(handle, s)
             if (code !== MStrResult.MStr_Ok) {
-                throw WebAssembly.RuntimeError('Cannot append to CString object')
+                return Result.Err<CString, MStrResult>(code)
+            } else {
+                return Result.Ok<CString, MStrResult>(this)
             }
         })
     }
@@ -117,8 +114,9 @@ export class CString implements CObject {
     /**
      * 清空字符串
      */
-    public clear() {
+    public clear(): Result<CString, MStrResult> {
         MtfmtWASM.mstr_clear(this.handle)
+        return Result.Ok<CString, MStrResult>(this)
     }
 
     /**
@@ -167,16 +165,4 @@ export class CString implements CObject {
         const result = cont(pstr)
         return result
     }
-}
-
-/**
- * 保证obj能被正确销毁的情况下执行代码
- * 
- * @param obj: 对象
- * @param cont: cont
- */
-export function pcall<T extends CObject, R>(obj: T, cont: (obj: T) => R): R {
-    const r = cont(obj)
-    obj.destroy()
-    return r
 }

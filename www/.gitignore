@@ -7,7 +7,6 @@
 build
 target
 dist
-lib
 node_modules
 
 !*.md
@@ -28,3 +27,4 @@ node_modules
 !*.js
 !*.svelte
 !*.scss
+!*.svg
