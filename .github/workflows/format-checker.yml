@@ -5,13 +5,19 @@ on:
     paths:
       - "src/**.c"
       - "inc/**.h"
+      - "tests/**.c"
+      - "tests/**.h"
       - "**.clang-format"
+      - ".github/workflows/format-checker.yml"
   pull_request:
     branches: [master]
     paths:
       - "src/**.c"
       - "inc/**.h"
+      - "tests/**.c"
+      - "tests/**.h"
       - "**.clang-format"
+      - ".github/workflows/format-checker.yml"
   workflow_dispatch:
     inputs:
       logLevel:
