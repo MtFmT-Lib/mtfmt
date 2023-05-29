@@ -32,32 +32,32 @@
  * @param[in] heap_size: 堆内存区的大小
  */
 MSTR_EXPORT_API(void)
-mheap_init(intptr_t heap_memory, usize_t heap_size);
+mstr_heap_init(intptr_t heap_memory, usize_t heap_size);
 
 /**
  * @brief 尝试从堆中分配size大小的内存
  *
  * @return void*: 分配结果, 如果分配失败返回NULL
  */
-MSTR_EXPORT_API(void*) mheap_allocate(usize_t size, usize_t align);
+MSTR_EXPORT_API(void*) mstr_heap_allocate(usize_t size, usize_t align);
 
 /**
- * @brief 释放由 mheap_allocate 分配的内存
+ * @brief 释放由 mstr_heap_allocate 分配的内存
  *
  */
-MSTR_EXPORT_API(void) mheap_free(void* memory);
+MSTR_EXPORT_API(void) mstr_heap_free(void* memory);
 
 /**
  * @brief 取得当前的空闲内存大小
  *
  */
-MSTR_EXPORT_API(usize_t) mheap_get_free_size(void);
+MSTR_EXPORT_API(usize_t) mstr_heap_get_free_size(void);
 
 /**
  * @brief 取得自运行以来空闲内存最小的值
  *
  */
-MSTR_EXPORT_API(usize_t) mheap_get_high_water_mark(void);
+MSTR_EXPORT_API(usize_t) mstr_heap_get_high_water_mark(void);
 
 /**
  * @brief 取得分配器的统计数据
@@ -68,17 +68,17 @@ MSTR_EXPORT_API(usize_t) mheap_get_high_water_mark(void);
 MSTR_EXPORT_API(void)
 mheap_get_allocate_count(usize_t* alloc_count, usize_t* free_count);
 
-#define mstr_heap_init(mem, leng)                     \
-    do {                                              \
-        mheap_init((intptr_t)(mem), (usize_t)(leng)); \
+#define mstr_heap_init(mem, leng)                         \
+    do {                                                  \
+        mstr_heap_init((intptr_t)(mem), (usize_t)(leng)); \
     } while (0)
 
-#define mstr_heap_alloc(s) (mheap_allocate((s), 4))
+#define mstr_heap_alloc(s) (mstr_heap_allocate((s), 4))
 
-#define mstr_heap_free(m) \
-    do {                  \
-        mheap_free(m);    \
-        (m) = NULL;       \
+#define mstr_heap_free(m)  \
+    do {                   \
+        mstr_heap_free(m); \
+        (m) = NULL;        \
     } while (0)
 
 #endif // _MSTR_USE_MALLOC
