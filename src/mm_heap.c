@@ -93,12 +93,6 @@ typedef struct tagHeap
  */
 static Heap heap;
 
-/**
- * @brief 堆的内存区
- *
- */
-static byte_t heap_memory[_MSTR_RUNTIME_HEAP_SIZE];
-
 //
 // private:
 //
@@ -116,9 +110,10 @@ static void* heap_allocate_impl(Heap*, heap_size_t, heap_size_t);
 // public:
 //
 
-MSTR_EXPORT_API(void) mheap_init(void)
+MSTR_EXPORT_API(void)
+mheap_init(intptr_t heap_memory, usize_t heap_size)
 {
-    heap_init_impl(&heap, (iptr_t)heap_memory, _MSTR_RUNTIME_HEAP_SIZE);
+    heap_init_impl(&heap, heap_memory, heap_size);
 }
 
 MSTR_EXPORT_API(void*) mheap_allocate(usize_t size, usize_t align)

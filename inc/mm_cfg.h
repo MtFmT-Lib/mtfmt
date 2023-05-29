@@ -33,15 +33,7 @@
 #if _MSTR_USE_MALLOC
 #include <stdlib.h>
 #include <string.h>
-#endif // _MSTR_USE_MALLOC
-
-#if !defined(_MSTR_RUNTIME_HEAP_SIZE)
-/**
- * @brief 指定堆的大小
- *
- */
-#define _MSTR_RUNTIME_HEAP_SIZE 2048
-#endif // _MSTR_RUNTIME_HEAP_SIZE
+#endif // _MSTR_USE_MALLOCs
 
 #if !defined(_MSTR_RUNTIME_HEAP_ALIGN)
 /**

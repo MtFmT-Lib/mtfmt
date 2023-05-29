@@ -13,11 +13,17 @@
 #include "unity.h"
 #include <stdio.h>
 
+#define RUNTIME_HEAP_SIZE 2048
+
+/**
+ * @brief 堆
+ *
+ */
+static byte_t heap[RUNTIME_HEAP_SIZE];
+
 void setUp(void)
 {
-#if !_MSTR_USE_MALLOC
-    mheap_init();
-#endif
+    mstr_heap_init(heap, RUNTIME_HEAP_SIZE);
 }
 
 void tearDown(void)
