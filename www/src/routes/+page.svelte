@@ -23,9 +23,9 @@
     </div>
     <div class="seealso">
         <a href="/">HOME</a>
-        <a href="/">SUPPORTS</a>
-        <a href="/">QUICK START</a>
-        <a href="/">SYNTAX</a>
+        <a href="/">QUISK START</a>
+        <a href="/doc">DOCUMENTS</a>
+        <a href="/doc/html">CODE DOCUMENTS</a>
         <a href="https://github.com/MtFmT-Lib/mtfmt">GITHUB</a>
     </div>
     <div class="active">
