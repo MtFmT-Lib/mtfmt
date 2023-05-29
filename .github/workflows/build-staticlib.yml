@@ -3,15 +3,15 @@ name: "Build staticlib"
 on:
   push:
     paths:
-      - "**.c"
-      - "**.h"
+      - "src/**.c"
+      - "inc/**.h"
       - "Makefile"
       - ".github/workflows/build-staticlib.yml"
   pull_request:
     branches: [master]
     paths:
-      - "**.c"
-      - "**.h"
+      - "src/**.c"
+      - "inc/**.h"
       - "Makefile"
       - ".github/workflows/build-staticlib.yml"
   workflow_dispatch:

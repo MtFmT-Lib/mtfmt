@@ -3,14 +3,14 @@ name: "Code style"
 on:
   push:
     paths:
-      - "**.c"
-      - "**.h"
+      - "src/**.c"
+      - "inc/**.h"
       - "**.clang-format"
   pull_request:
     branches: [master]
     paths:
-      - "**.c"
-      - "**.h"
+      - "src/**.c"
+      - "inc/**.h"
       - "**.clang-format"
   workflow_dispatch:
     inputs:

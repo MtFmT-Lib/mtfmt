@@ -3,15 +3,15 @@ name: "Build dylib"
 on:
   push:
     paths:
-      - "**.c"
-      - "**.h"
+      - "src/**.c"
+      - "inc/**.h"
       - "Makefile"
       - ".github/workflows/build-dylib.yml"
   pull_request:
     branches: [master]
     paths:
-      - "**.c"
-      - "**.h"
+      - "src/**.c"
+      - "inc/**.h"
       - "Makefile"
       - ".github/workflows/build-dylib.yml"
   workflow_dispatch:

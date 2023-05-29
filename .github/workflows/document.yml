@@ -4,8 +4,8 @@ on:
   push:
     branches: [master]
     paths:
-      - "**.c"
-      - "**.h"
+      - "src/**.c"
+      - "inc/**.h"
       - "**.md"
       - ".github/**.yml"
       - "assets/**.scss"
