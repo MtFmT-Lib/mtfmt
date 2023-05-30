@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-    <title>Mtfmt library - document</title>
+    <title>Mtfmt library - Document</title>
     <meta name="description" content="MtFmt library document" />
 </svelte:head>
 

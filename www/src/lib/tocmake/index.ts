@@ -27,6 +27,45 @@ export default function generate_toc(
  * @returns: HTML RAW, 表示目录, 拥有父元素<div class=".toc">
  */
 function generate_toc_helper(toc: { level: string; content: string }[]): string {
-    console.log(toc)
-    return '@@TOC@@'
+    let html_raw = ''
+    let last_level = 0
+    const MAX_LEVEL = 3
+    for (const toc_item of toc) {
+        const level = parseInt(toc_item.level)
+        const toc_content = toc_item.content
+        if (level > MAX_LEVEL) {
+            continue
+        }
+        // <ul>
+        if (last_level < level) {
+            html_raw += '<ul class="toc-tree">'
+        }
+        // </ul>
+        if (last_level > level) {
+            html_raw += '</ul>'
+        }
+        // 添加内容
+        const id_name = 'section-' + as_id_name(toc_content)
+        const id_label = `<a class="toc-hyper-link" href="#${id_name}">${toc_content}</a>`
+        html_raw += `<li class="toc-level${level}-content">${id_label}</li>`
+        // 记录目录level
+        last_level = level
+    }
+    return html_raw
+}
+
+/**
+ * 转换为合适的id名
+ */
+function as_id_name(content: string): string {
+    return content.replace(/[<>&" ]/g, (c: string) => {
+        const lut = new Map([
+            ['<', '&lt;'],
+            ['>', '&gt;'],
+            ['&', '&amp;'],
+            ['"', '&quot;'],
+            [' ', '_']
+        ])
+        return lut.get(c) ?? c
+    })
 }
