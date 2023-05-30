@@ -143,6 +143,16 @@ MSTR_EXPORT_API(mstr_result_t) mstr_reverse_self(MString* str);
 MSTR_EXPORT_API(const char*) mstr_as_cstr(MString* str);
 
 /**
+ * @brief 判断两个字符串是否相等
+ *
+ * @param[in] a: 字符串a
+ * @param[in] b: 字符串b
+ *
+ * @return bool_t: 字符串相等情况
+ */
+MSTR_EXPORT_API(bool_t) mstr_equal(const MString* a, const MString* b);
+
+/**
  * @brief 释放一个字符串所占的内存
  *
  * @param str: 字符串结构
