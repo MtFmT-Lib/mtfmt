@@ -1,13 +1,89 @@
-Mtfmt is a formatter library wrote by pure C language.
+Mtfmt is a formatter library. It's another implementation for the dialect of PEP-3101 and written in pure C language and optimized for the embedded system.
 
 [toc]
 
 # 1 Introduction
 
-The mini template formatting library, or Mtfmt is an effective, small formatter library wrote by pure C language. It implements a dialect for  
+The mini template formatting library, or MtFmt is an effective, small formatter library written in pure C language. It implements a dialect for [PEP-3101](https://peps.python.org/pep-3101/ "PEP-3101"). In addition, it implements fixed-point number and quantized value formatting without the divide operator required and implements real-time formatting referencing the [.Net standard](https://learn.microsoft.com/zh-cn/dotnet/standard/base-types/standard-date-and-time-format-strings "Standard time formatting"). The main features are the following.
 
-## 1.1 Section
+* Integer formatting supports binary, octal, decimal hexadecimal, and hexadecimal with prefix output
+* Quantized value formatting
+* Standard time formatting and user-defined time formatting
+* String formatting
+* Array formatting
+* Specifiable align, the filling width, fill character, and sign display style
+* Optional build-in heap manager for embedded system
+* Optional specific build-in divide operator implementing
+* Flexible syntax and clear error report.
 
-## 1.2 Section
+# 2 Providing API
 
-# 2 Usage
+Formatting API includes four parts. The first one is the string API, which provides a dynamic string for the library. And the second one is the formatting API, which provides the formatting implements with `va_arg`. The third one is a scanner and the last one is an optional heap manager, it's designed for embedded systems without malloc and RTOS. The full documents of source codes are deployed at [HERE](https://mtfmt-lib.github.io/mtfmt/doxygen/html/ "Doxygen document").
+
+## 2.1 Error handling
+
+TODO
+
+## 2.2 String
+
+The string API provides a dynamic string object, including optimizing the short string. The basic struct of that is the following.
+
+```c
+struct MString
+{
+    char* buff;
+    usize_t length;
+    usize_t cap_size;
+    char stack_region[MSTR_STACK_REGION_SIZE];
+};
+```
+
+As you see, the implementation has four properties mainly. The first one, `buff`, is the pointer of the string memory region. The second one, `length`, is the count of buff. It indicates how many bytes of the buffer. And the third one, `cap_size`, also called capacity, is the amount of space in the underlying character buffer. And with the help of property `stack_region`, the string can be allocated on the stack located in the currently active record. So the string is located in the stack when the `stack_region` is equal for the `buff`. Otherwise, it's located in the heap. The main motivation is assuming that the string usually contains few characters, so it can reduce the heap usage in usual. The following sections descript the export API and the design details of `MString`.
+
+### 2.2.1 Allocator
+
+The allocator is fixed and can be selected by macro `_MSTR_USE_MALLOC`. For the short string, which length is less than `MSTR_STACK_REGION_SIZE`,  the string will be allocated into the stack region. Otherwise, it will be allocated into the heap. The macro `_MSTR_USE_MALLOC` indicated which allocator should be used. When it's equal to 0, the built-in heap manager will be selected. Otherwise, the allocator is malloc, in `stdlib`. Normally, use the macro functions `mstr_heap_alloc` and `mstr_heap_free` in your application, it will be switched by the macro `_MSTR_USE_MALLOC`. 
+
+### 2.2.2 Appending & Concatenating
+
+The append and concatenating operator for string means that push one or more characters into the source string.
+
+## 2.3 Formatter
+
+TODO
+
+## 2.4 Scanner
+
+TODO
+
+## 2.5 Build-in heap manager
+
+TODO
+
+## 2.6 Advanced topics
+
+TODO
+
+# 3 Syntax
+
+The syntax is NOT context-free syntax.
+
+## 3.1 The formal language 101
+
+TODO
+
+# 4 Compile the library
+
+TODO
+
+## 4.1 The Compiler 101
+
+TODO
+
+# 5 Developing
+
+TODO
+
+# 6 See also
+
+TODO

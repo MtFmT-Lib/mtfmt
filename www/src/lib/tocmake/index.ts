@@ -28,6 +28,7 @@ export default function generate_toc(
  */
 function generate_toc_helper(toc: { level: string; content: string }[]): string {
     let html_raw = ''
+    let tag_count = 0
     let last_level = 0
     const MAX_LEVEL = 3
     for (const toc_item of toc) {
@@ -38,10 +39,12 @@ function generate_toc_helper(toc: { level: string; content: string }[]): string 
         }
         // <ul>
         if (last_level < level) {
+            tag_count += 1
             html_raw += '<ul class="toc-tree">'
         }
         // </ul>
         if (last_level > level) {
+            tag_count -= 1
             html_raw += '</ul>'
         }
         // 添加内容
@@ -50,6 +53,10 @@ function generate_toc_helper(toc: { level: string; content: string }[]): string 
         html_raw += `<li class="toc-level${level}-content">${id_label}</li>`
         // 记录目录level
         last_level = level
+    }
+    // </ul> 闭合
+    if (tag_count == 1) {
+        html_raw += '</ul>'
     }
     return html_raw
 }
