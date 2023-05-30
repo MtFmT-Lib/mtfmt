@@ -4,12 +4,12 @@
 <script lang="ts">
     import Header from "@comp/Header.svelte";
     import Markdown from "@comp/Markdown.svelte";
-    import { toc, html } from "@text/DOCUMENT.md";
+    import { toc, html } from "@text/FAQ.md";
 </script>
 
 <svelte:head>
-    <title>Mtfmt library - Document</title>
-    <meta name="description" content="MtFmt library document" />
+    <title>Mtfmt library - FAQ</title>
+    <meta name="description" content="MtFmt library faq" />
 </svelte:head>
 
 <div>

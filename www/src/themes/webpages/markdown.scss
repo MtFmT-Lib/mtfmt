@@ -1,23 +1,89 @@
 // SPDX-License-Identifier: LGPL-3.0
 @import "@theme/stylevars.scss";
+@import "@style/syntaxhighlight-c.scss";
 
 .markdown-box {
     color: $text-color;
     font-family: $text-font;
+    // 西文连字
+    // 参考: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_text/Wrapping_breaking_text
+    hyphens: auto;
+    // 两端对齐
+    text-align: justify;
+    text-justify: inter-ideograph;
 
     p {
         text-indent: 2em;
+        word-wrap: break-word;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+        font-weight: 500;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
     }
 
     h1 {
-        margin-top: 1.5em;
+        margin-top: 1em;
         margin-bottom: 1em;
-        font-weight: 500;
         font-size: 150%;
+    }
+
+    h2 {
+        font-size: 125%;
+    }
+
+    h3,
+    h4,
+    h5 {
+        font-size: 120%;
+    }
+
+    a {
+        color: $hpyer-link-color;
+        text-decoration: none;
+
+        &:hover {
+            color: mix($hpyer-link-color, $bg-color, 50%);
+        }
+    }
+
+    pre.hljs {
+        font-family: $mono-text-font;
+        font-weight: 400;
+        font-size: 85%;
+        margin-left: 3em;
+        overflow-x: auto;
+
+        code {
+            font-family: inherit;
+        }
     }
 
     .toc {
         margin-top: 1em;
         margin-bottom: 1em;
+    }
+
+    .toc-tree {
+        padding: 0;
+        padding-left: 2em;
+        list-style: none;
+
+        .toc-tree {
+            padding-left: 1.5em;
+        }
+    }
+
+    .toc-hyper-link:hover {
+        color: mix($hpyer-link-color, black, 50%);
+    }
+
+    .toc-level1-content {
+        font-weight: 600;
     }
 }
