@@ -42,9 +42,31 @@ void fmt_seq_arg_id(void)
     mstr_free(&s);
 }
 
+void fmt_seq_arg_id_err(void)
+{
+    MString s;
+    mstr_result_t result = MStr_Ok;
+    EVAL(mstr_create_empty(&s));
+    // ERR: 参数太少
+    result = mstr_format("@{0:i32}-{1:i32}@", &s, 1, 123);
+    TEST_ASSERT_TRUE(result == MStr_Err_InvaildArgumentID);
+    mstr_clear(&s);
+    // ERR: 参数顺序不对
+    result = mstr_format("@{1:i32}-{0:i32}@", &s, 2, 123, 456);
+    TEST_ASSERT_TRUE(result == MStr_Err_UnusedArgumentID);
+    mstr_clear(&s);
+    // ERR: 参数顺序类型
+    result = mstr_format("@{0:i32}-{0:u32}@", &s, 1, 123);
+    TEST_ASSERT_TRUE(result == MStr_Err_InvaildArgumentType);
+    mstr_clear(&s);
+    // free
+    mstr_free(&s);
+}
+
 int main()
 {
     UNITY_BEGIN();
     RUN_TEST(fmt_seq_arg_id);
+    RUN_TEST(fmt_seq_arg_id_err);
     return UNITY_END();
 }
