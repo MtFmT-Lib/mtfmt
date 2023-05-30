@@ -167,6 +167,22 @@ MSTR_EXPORT_API(const char*) mstr_as_cstr(MString* str)
     return str->buff;
 }
 
+MSTR_EXPORT_API(bool_t) mstr_equal(const MString* a, const MString* b)
+{
+    if (a->length != b->length) {
+        return False;
+    }
+    u32_t bit = 0;
+    usize_t len = a->length;
+    for (usize_t i = 0; i < len; i += 1) {
+        u32_t ch_a = a->buff[i];
+        u32_t ch_b = b->buff[i];
+        // equ
+        bit |= ch_a - ch_b;
+    }
+    return bit == 0;
+}
+
 MSTR_EXPORT_API(void) mstr_free(MString* str)
 {
     if (str->buff != str->stack_region) {

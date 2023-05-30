@@ -190,7 +190,7 @@ static mstr_result_t utoa_impl_2base(
             value = value >> shift;
             // 转换为字符
             char ch;
-            if (digit > 10) {
+            if (digit >= 10) {
                 ch = (char)(hex_base + digit - 10);
             }
             else {

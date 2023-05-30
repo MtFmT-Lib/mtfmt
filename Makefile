@@ -86,7 +86,7 @@ TEST_C_STAB_INC = \
 -Itests
 
 TEST_C_STAB_SOURCES = \
-$(wildcard thirds/unity/src/*.c)
+$(wildcard ./thirds/unity/src/*.c)
 
 
 # 测试源
@@ -140,9 +140,9 @@ C_INCLUDES = \
 C_STANDARD = --std=c11
 
 ifeq ($(MTFMT_BUILD_DEBUG), 1)
-CFLAGS_NODEP = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) -D_DEBUG -Wall -fdata-sections -ffunction-sections -g -gdwarf-2
+CFLAGS = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) -D_DEBUG -Wall -fdata-sections -ffunction-sections -g -gdwarf-2
 else
-CFLAGS_NODEP = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) $(LTO_OPT) -Wall -fdata-sections -ffunction-sections
+CFLAGS = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) $(LTO_OPT) -Wall -fdata-sections -ffunction-sections
 endif
 
 # 动态链接库的链接选项
@@ -168,9 +168,6 @@ endif
 
 # 回收不需要的段
 DYLIB_LD_OPTS += -Wl,--gc-sections
-
-# 依赖文件
-CFLAGS = $(CFLAGS_NODEP) -MMD -MP -MF"$(@:%.o=%.d)"
 
 # list of objects
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
@@ -199,9 +196,9 @@ dylib: $(OUTPUT_DIR)/$(DYLIB_TARGET)
 alltests: $(TEST_TARGETS)
 	@echo Test completed.
 
-$(TEST_DIR)/%: $(OUTPUT_DIR)/$(TESTLIB_TARGET) | $(OUTPUT_DIR)
-	@echo $(CC_DISPLAY) with $@
-	@gcc -c $@.c $(TEST_C_STAB_INC) $(CFLAGS_NODEP) -MMD -MP -MF"$(addprefix $(BUILD_DIR)/,$(notdir $@.d))" -o "$(addprefix $(BUILD_DIR)/,$(notdir $@.o))"
+$(TEST_DIR)/%: $(TEST_OBJECTS) $(OBJECTS) Makefile | $(OUTPUT_DIR)
+	@echo $(CC_DISPLAY) $@.c
+	@gcc -c $@.c $(TEST_C_STAB_INC) $(CFLAGS) -MMD -MP -MF"$(addprefix $(BUILD_DIR)/,$(notdir $@.d))" -o "$(addprefix $(BUILD_DIR)/,$(notdir $@.o))"
 	@echo $(LD_DISPLAY) $@
 	@gcc "$(addprefix $(BUILD_DIR)/,$(notdir $@.o))" $(TEST_C_STAB_SOURCES) $(OBJECTS) $(TEST_LD_OPTS) -o "$(addprefix $(OUTPUT_DIR)/,$(notdir $@$(EXE_EXT)))"
 	@echo $(TEST_DISPLAY) $@
@@ -209,7 +206,7 @@ $(TEST_DIR)/%: $(OUTPUT_DIR)/$(TESTLIB_TARGET) | $(OUTPUT_DIR)
 
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
 	@echo $(CC_DISPLAY) $<
-	@$(CC) -c $(CFLAGS) $< -o $@
+	@$(CC) -c $(CFLAGS) -MMD -MP -MF"$(@:%.o=%.d)" $< -o $@
 
 $(OUTPUT_DIR)/$(LIB_TARGET): $(OBJECTS) Makefile | $(OUTPUT_DIR)
 	@echo $(AR_DISPLAY) $@
@@ -218,9 +215,6 @@ $(OUTPUT_DIR)/$(LIB_TARGET): $(OBJECTS) Makefile | $(OUTPUT_DIR)
 $(OUTPUT_DIR)/$(DYLIB_TARGET): $(OBJECTS) Makefile | $(OUTPUT_DIR)
 	@echo $(LD_DISPLAY) $@
 	@$(CC) -shared $(OBJECTS) -o $@ $(DYLIB_LD_OPTS)
-
-$(OUTPUT_DIR)/$(TESTLIB_TARGET): $(TEST_OBJECTS) $(OBJECTS) Makefile | $(OUTPUT_DIR)
-	@echo Test input compile completed.
 
 $(BUILD_DIR):
 	mkdir $@

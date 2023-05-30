@@ -626,7 +626,7 @@ static mstr_result_t convert_sign_helper(
     char sign_ch = '\0';
     switch (sign) {
     case MStrFmtSignDisplay_Always:
-        sign_ch = (value >= 0) ? '+' : '-';
+        sign_ch = (value == 0) ? '\0' : (value > 0) ? '+' : '-';
         break;
     case MStrFmtSignDisplay_NegOnly:
         sign_ch = (value >= 0) ? '\0' : '-';
