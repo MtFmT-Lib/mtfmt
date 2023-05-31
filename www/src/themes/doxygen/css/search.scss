@@ -8,10 +8,10 @@
     box-shadow: none;
     border: 1px solid $light-line-color;
     border-radius: 2px;
+}
 
-    #MSearchClose {
-        display: none;
-    }
+#MSearchClose {
+    display: none;
 }
 
 // 搜索结果
@@ -19,5 +19,5 @@
     border-radius: 2px;
     border: 1px solid $split-line-color;
     background-color: $bg-color;
-    padding: 0.5em 0.5em;
+    padding: 0.5em;
 }

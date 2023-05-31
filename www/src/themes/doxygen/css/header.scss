@@ -62,12 +62,9 @@
             }
         }
 
-        &:last-child {
-
-            // 消除最后一个元素的"箭头"
-            a::after {
-                content: "";
-            }
+        // 消除最后一个元素的"箭头"
+        &:last-child::after {
+            content: "";
         }
     }
 }
@@ -85,7 +82,7 @@
         max-height: 4.5em;
 
         img {
-            border: 0px none;
+            border: none;
         }
     }
 
@@ -134,7 +131,7 @@
             margin-right: 1em;
 
             &:first-child {
-                margin-left: 0em;
+                margin-left: 0;
             }
 
             // 菜单项
@@ -170,12 +167,11 @@ div.sm.sm-dox {
     max-width: $header-footer-max-width;
     text-align: right;
 
-    input[type=checkbox] {
+    input[type="checkbox"] {
         width: 14px;
         height: 14px;
         outline: none;
         position: relative;
-        -webkit-appearance: none;
         border: 1px solid $checkbox-border-color;
         border-radius: 2px;
 
@@ -183,19 +179,17 @@ div.sm.sm-dox {
             border: 1px solid #1e6bb8;
         }
 
-        &:after {
+        &::after {
             inset: 0;
             pointer-events: none;
             background: $checkbox-color;
             mask-size: cover;
-            -webkit-mask-size: cover;
         }
 
-        &:checked:after {
+        &:checked::after {
             content: "";
             position: absolute;
             mask-image: $checkbox-img;
-            -webkit-mask-image: $checkbox-img;
         }
     }
 }
@@ -203,7 +197,7 @@ div.sm.sm-dox {
 .sm-dox ul {
     // 子菜单项
     position: absolute;
-    padding: 1em 1em;
+    padding: 1em;
     border-radius: 2px;
     border: 1px solid $split-line-color;
     background-color: $bg-color;

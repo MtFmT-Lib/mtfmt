@@ -8,7 +8,7 @@
     "license": "LGPL-3.0",
     "private": true,
     "scripts": {
-        "lint": "yarn run eslint ./src",
+        "lint": "yarn run eslint ./src && yarn run stylelint \"./src/**/*.scss\"",
         "dev": "vite dev",
         "build": "vite build",
         "preview": "vite preview",
@@ -28,6 +28,8 @@
         "highlight.js": "^11.8.0",
         "markdown-it": "^13.0.1",
         "sass": "^1.62.1",
+        "stylelint": "^15.6.2",
+        "stylelint-config-standard-scss": "^9.0.0",
         "svelte": "^3.54.0",
         "svelte-check": "^3.0.1",
         "tslib": "^2.4.1",

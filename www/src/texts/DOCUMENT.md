@@ -22,7 +22,7 @@ Formatting API includes four parts. The first one is the string API, which provi
 
 ## 2.1 Error handling
 
-TODO
+The result code, or `mstr_result_t` type, is a 32 bits unsigned integer.
 
 ## 2.2 String
 
@@ -42,15 +42,35 @@ As you see, the implementation has four properties mainly. The first one, `buff`
 
 ### 2.2.1 Allocator
 
-The allocator is fixed and can be selected by macro `_MSTR_USE_MALLOC`. For the short string, which length is less than `MSTR_STACK_REGION_SIZE`,  the string will be allocated into the stack region. Otherwise, it will be allocated into the heap. The macro `_MSTR_USE_MALLOC` indicated which allocator should be used. When it's equal to 0, the built-in heap manager will be selected. Otherwise, the allocator is malloc, in `stdlib`. Normally, use the macro functions `mstr_heap_alloc` and `mstr_heap_free` in your application, it will be switched by the macro `_MSTR_USE_MALLOC`. 
+The allocator is fixed and can be selected by macro `_MSTR_USE_MALLOC`. For the short string, which length is less than `MSTR_STACK_REGION_SIZE`,  the string will be allocated into the stack region. Otherwise, it will be allocated into the heap. The macro `_MSTR_USE_MALLOC` indicated which allocator should be used. When it's equal to 0, the built-in heap manager will be selected. Otherwise, the allocator is malloc, in `stdlib`. Normally, use the macro functions as follows to replace the malloc in your application. Those will be switched by the macro `_MSTR_USE_MALLOC`. See more details in [section 2.5](#section_2_5_Build_in_heap_manager).
 
-### 2.2.2 Appending & Concatenating
+* `mstr_heap_init`: Initialize the heap
+* `mstr_heap_alloc`: Allocate memory
+* `mstr_heap_free`: Release
 
-The append and concatenating operator for string means that push one or more characters into the source string.
+#### 2.2.1.1 Macro: mstr_heap_init
+
+The macro function `mstr_heap_init` 
+
+### 2.2.2 Transformation
+
+TODO
+
+### 2.2.3 Concatenating
+
+The concatenating operator for string means that push one or more characters into the source string. 
+
+### 2.2.4 Equal operator
+
+Equal
+
+### 2.2.5 Other functions
+
+The other
 
 ## 2.3 Formatter
 
-TODO
+The formatter API including two parts. The first parts is `mstr_format` function, which provides formatting inputs and append the output into string with var arguments.
 
 ## 2.4 Scanner
 
@@ -70,7 +90,7 @@ The syntax is NOT context-free syntax.
 
 ## 3.1 The formal language 101
 
-TODO
+The formal language, 
 
 # 4 Compile the library
 
