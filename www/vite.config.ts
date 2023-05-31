@@ -43,6 +43,7 @@ function markdown_preprocess(): MarkdownIt {
     // 超链接的addr
     markdown.core.ruler.push('toc-hyper', state => {
         state.tokens.forEach((token, index, self) => {
+            // 段落标记
             if (token.tag.match(/h[0-9]/g) && token.nesting == 1) {
                 // <hxx>认为是一个section</hxx>
                 // 检查下一个内容
@@ -57,6 +58,21 @@ function markdown_preprocess(): MarkdownIt {
                 const section_id = as_id_name(content)
                 // push attr
                 token.attrPush(['id', section_id])
+            }
+            // 插入断行(如果需要)
+            if (token.type === 'inline' && token.content.indexOf('`') != -1) {
+                token.children?.forEach(token => {
+                    if (token.type === 'code_inline') {
+                        token.attrPush(['class', 'wrap_code_inline'])
+                        // 理论上不应该存在children
+                        if (token.children !== null) {
+                            throw 'Token children is NOT null.'
+                        }
+                        // 处理内容, 插入断行
+                        const content = token.content
+                        token.content = insert_zero_space_to_code(content)
+                    }
+                })
             }
         })
     })
@@ -94,4 +110,12 @@ function highlight_process(str: string, lang: string): string {
     } else {
         return str
     }
+}
+
+/**
+ * 插入0宽度空格方便进行断行
+ */
+function insert_zero_space_to_code(str: string): string {
+    const arr = str.split('_')
+    return arr.join('_\u200B')
 }
