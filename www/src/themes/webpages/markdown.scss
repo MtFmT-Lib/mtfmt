@@ -18,6 +18,13 @@
     p {
         text-indent: 2em;
         word-wrap: break-word;
+
+        code {
+            color: #393e4f;
+            padding-left: 0.1em;
+            padding-right: 0.1em;
+            background-color: mix($bg-color, #f8f9fa, 50%);
+        }
     }
 
     h1,

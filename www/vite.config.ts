@@ -2,9 +2,10 @@ import { sveltekit } from '@sveltejs/kit/vite'
 import { defineConfig } from 'vite'
 import wasm from 'vite-plugin-wasm'
 import * as Markdown from 'vite-plugin-markdown'
-import MarkdownIt from 'markdown-it'
-import hljs from 'highlight.js'
 import topLevelAwait from 'vite-plugin-top-level-await'
+import hljs from 'highlight.js'
+import MarkdownIt from 'markdown-it'
+import { katex } from '@mdit/plugin-katex'
 
 export default defineConfig({
     plugins: [
@@ -30,14 +31,15 @@ function markdown_preprocess(): MarkdownIt {
     const markdown = new MarkdownIt({
         html: true,
         highlight: (str, lang) => {
-            if (lang && hljs.getLanguage(lang)) {
-                const html = hljs.highlight(str, { language: lang }).value
-                return '<pre class="hljs"><code>' + html + '</code></pre>'
+            if (lang) {
+                return highlight_process(str, lang)
             } else {
                 return str
             }
         }
     })
+    // katex
+    markdown.use(katex)
     // 超链接的addr
     markdown.core.ruler.push('toc-hyper', state => {
         state.tokens.forEach((token, index, self) => {
@@ -80,4 +82,16 @@ function as_id_name(content: string): string {
         return lut.get(c) ?? c
     })
     return 'section_' + name
+}
+
+/**
+ * 高亮处理
+ */
+function highlight_process(str: string, lang: string): string {
+    if (hljs.getLanguage(lang)) {
+        const html = hljs.highlight(str, { language: lang }).value
+        return '<pre class="hljs"><code>' + html + '</code></pre>'
+    } else {
+        return str
+    }
 }
