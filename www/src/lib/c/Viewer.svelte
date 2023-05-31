@@ -2,20 +2,20 @@
 #  SPDX-License-Identifier: LGPL-3.0
 -->
 <script lang="ts">
-    import Editor from "./Editor.svelte";
-    import { writable } from "svelte/store";
-    import ArrowIcon from "$lib/images/arrow.svg";
+    import Editor from './Editor.svelte'
+    import { writable } from 'svelte/store'
+    import ArrowIcon from '$lib/images/arrow.svg'
 
     /**
      * 是否从formatter变成scanner
      */
-    let rev_direction = writable(false);
+    let rev_direction = writable(false)
 
     /**
      * 更改方向
      */
     function change_direction() {
-        rev_direction.set(!$rev_direction);
+        rev_direction.set(!$rev_direction)
     }
 </script>
 
@@ -34,7 +34,7 @@
 </div>
 
 <style lang="scss">
-    @import "../../themes/common/stylevars.scss";
+    @import '../../themes/common/stylevars.scss';
 
     .demo {
         display: flex;

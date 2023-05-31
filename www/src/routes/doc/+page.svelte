@@ -2,9 +2,9 @@
 #  SPDX-License-Identifier: LGPL-3.0
 -->
 <script lang="ts">
-    import Header from "@comp/Header.svelte";
-    import Markdown from "@comp/Markdown.svelte";
-    import { toc, html } from "@text/DOCUMENT.md";
+    import Header from '@comp/Header.svelte'
+    import Markdown from '@comp/Markdown.svelte'
+    import { toc, html } from '@text/DOCUMENT.md'
 </script>
 
 <svelte:head>
@@ -14,5 +14,5 @@
 
 <div>
     <Header />
-    <Markdown html={html} toc={toc} />
+    <Markdown {html} {toc} />
 </div>

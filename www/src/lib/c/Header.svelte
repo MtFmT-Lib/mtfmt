@@ -23,7 +23,7 @@
 </div>
 
 <style lang="scss">
-    @import "../../themes/common/stylevars.scss";
+    @import '../../themes/common/stylevars.scss';
 
     .header-father {
         border: none;
@@ -79,13 +79,13 @@
             }
 
             &::before {
-                content: "\00b7";
+                content: '\00b7';
                 padding-left: 0.5em;
                 padding-right: 0.5em;
             }
 
             &:first-child:before {
-                content: "";
+                content: '';
                 padding: 0;
             }
         }
@@ -112,7 +112,7 @@
                 }
 
                 &:first-child:before {
-                    content: "\00b7";
+                    content: '\00b7';
                     padding-right: 0.4em;
                 }
             }
@@ -152,11 +152,11 @@
                 white-space: nowrap;
 
                 &::before {
-                    content: "";
+                    content: '';
                 }
 
                 &:first-child:before {
-                    content: "";
+                    content: '';
                 }
             }
         }
