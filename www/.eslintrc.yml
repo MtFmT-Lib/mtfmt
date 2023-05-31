@@ -3,8 +3,13 @@ env:
   es2021: true
 extends:
   - eslint:recommended
+  - plugin:svelte/recommended
   - plugin:@typescript-eslint/recommended
-overrides: []
+overrides:
+  - files: ["*.svelte"]
+    parser: "svelte-eslint-parser"
+    parserOptions:
+      parser: "@typescript-eslint/parser"
 parser: "@typescript-eslint/parser"
 parserOptions:
   ecmaVersion: latest
@@ -21,3 +26,5 @@ rules:
   semi:
     - error
     - never
+  svelte/no-at-html-tags:
+    - off

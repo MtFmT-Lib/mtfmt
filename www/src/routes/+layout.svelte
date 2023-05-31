@@ -2,7 +2,7 @@
 #  SPDX-License-Identifier: LGPL-3.0
 -->
 <script>
-    import "@style/style.scss";
+    import '@style/style.scss'
 </script>
 
 <div class="outter">
@@ -14,7 +14,7 @@
 </div>
 
 <style lang="scss">
-    @import "@theme/stylevars.scss";
+    @import '@theme/stylevars.scss';
 
     .outter {
         width: 100%;

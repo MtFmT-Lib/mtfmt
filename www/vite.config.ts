@@ -51,10 +51,8 @@ function markdown_preprocess(): MarkdownIt {
                     const token = arr[pos]
                     return token.content
                 })(index + 1, self)
-                // 替换处理为合适的html标签
-                const id_name = as_id_name(content)
                 // section的id
-                const section_id = `section-${id_name}`
+                const section_id = as_id_name(content)
                 // push attr
                 token.attrPush(['id', section_id])
             }
@@ -68,14 +66,18 @@ function markdown_preprocess(): MarkdownIt {
  * 转换为合适的id名
  */
 function as_id_name(content: string): string {
-    return content.replace(/[<>&" ]/g, (c: string) => {
+    const name = content.replace(/[<>&". -:]/g, (c: string) => {
         const lut = new Map([
             ['<', '&lt;'],
             ['>', '&gt;'],
             ['&', '&amp;'],
             ['"', '&quot;'],
-            [' ', '_']
+            [' ', '_'],
+            ['-', '_'],
+            [':', '_'],
+            ['.', '_']
         ])
         return lut.get(c) ?? c
     })
+    return 'section_' + name
 }

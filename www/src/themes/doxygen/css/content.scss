@@ -2,55 +2,7 @@
 
 // SPDX-License-Identifier: LGPL-3.0
 
-// 内容
-.contents {
-    width: $content-width;
-    min-width: $content-min-width;
-    max-width: $content-max-width;
-    margin: 0 auto;
-
-    p {
-        margin-top: 0.25em;
-        margin-bottom: 0.25em;
-        line-height: 150%;
-    }
-
-
-    a {
-        color: $hyper-link-color;
-        text-decoration: none;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
-
-    .textblock {
-        margin-top: 0.25em;
-        margin-bottom: 0.25em;
-    }
-
-    h1 {
-        color: $section-text-color;
-        font-size: 150%;
-        margin-top: 1em;
-        margin-bottom: 1em;
-    }
-
-    h2 {
-        color: $section-text-color;
-        font-size: 120%;
-        margin-top: 0.75em;
-        margin-bottom: 0.75em;
-    }
-
-    h3 {
-        color: $section-text-color;
-        font-size: 100%;
-        margin-top: 0.75em;
-        margin-bottom: 0.75em;
-    }
-}
+// stylelint-disable no-descending-specificity
 
 // 成员表格
 .memberdecls {
@@ -129,7 +81,7 @@
 
     // 代码块片段
     .fragment {
-        padding: 0.75em 0.75em;
+        padding: 0.75em;
         border: 1px solid $light-line-color;
         border-radius: 2px;
         background-color: $table-background-color;
@@ -232,6 +184,7 @@ dl.params {
     margin-top: 0.75em;
     margin-bottom: 0.75em;
     padding-bottom: 0.5em;
+
     // 为了和注解等等的对齐
     border-left: 4px solid $split-line-color;
     padding-left: 0.5em;
@@ -346,7 +299,7 @@ dl.section.return {
 // 函数等等的说明的section header
 div.memproto {
     font-family: $fixed-font;
-    padding: 1em 1em;
+    padding: 1em;
     margin-top: 0.75em;
     margin-bottom: 0.75em;
     border: 1px solid $light-line-color;
@@ -455,3 +408,55 @@ table.markdownTable {
         background-color: $table-background-color;
     }
 }
+
+// 内容
+.contents {
+    width: $content-width;
+    min-width: $content-min-width;
+    max-width: $content-max-width;
+    margin: 0 auto;
+
+    p {
+        margin-top: 0.25em;
+        margin-bottom: 0.25em;
+        line-height: 150%;
+    }
+
+
+    a {
+        color: $hyper-link-color;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    .textblock {
+        margin-top: 0.25em;
+        margin-bottom: 0.25em;
+    }
+
+    h1 {
+        color: $section-text-color;
+        font-size: 150%;
+        margin-top: 1em;
+        margin-bottom: 1em;
+    }
+
+    h2 {
+        color: $section-text-color;
+        font-size: 120%;
+        margin-top: 0.75em;
+        margin-bottom: 0.75em;
+    }
+
+    h3 {
+        color: $section-text-color;
+        font-size: 100%;
+        margin-top: 0.75em;
+        margin-bottom: 0.75em;
+    }
+}
+
+// stylelint-enable no-descending-specificity

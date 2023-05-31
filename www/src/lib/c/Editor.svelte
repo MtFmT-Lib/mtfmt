@@ -4,12 +4,12 @@
 <script lang="ts">
     let tests = [
         {
-            type: "i32",
+            type: 'i32',
         },
         {
-            type: "i16",
+            type: 'i16',
         },
-    ];
+    ]
 </script>
 
 <div class="structure-editor">
@@ -34,10 +34,10 @@
 </div>
 
 <style lang="scss">
-    @import "@theme/stylevars.scss";
+    @import '@theme/stylevars.scss';
 
     .structure-editor {
-        input[type="text"] {
+        input[type='text'] {
             margin-left: 0.25em;
             outline: none;
             border: none;

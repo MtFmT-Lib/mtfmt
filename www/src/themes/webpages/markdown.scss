@@ -1,13 +1,16 @@
+@import "@theme/stylevars";
+@import "@style/syntaxhighlight-c";
+
 // SPDX-License-Identifier: LGPL-3.0
-@import "@theme/stylevars.scss";
-@import "@style/syntaxhighlight-c.scss";
 
 .markdown-box {
     color: $text-color;
     font-family: $text-font;
+
     // 西文连字
     // 参考: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_text/Wrapping_breaking_text
     hyphens: auto;
+
     // 两端对齐
     text-align: justify;
     text-justify: inter-ideograph;
