@@ -31,7 +31,7 @@ export default defineConfig({
  */
 function markdown_preprocess(): MarkdownIt {
     const markdown = new MarkdownIt({
-        html: true,
+        html: false,
         highlight: (str, lang) => {
             if (lang) {
                 return highlight_process(str, lang)
@@ -44,6 +44,8 @@ function markdown_preprocess(): MarkdownIt {
     markdown.use(katex)
     // 超链接的addr
     markdown.use(plugin_section_id)
+    // 断行
+    markdown.use(plugin_line_break)
     // bionic reading
     markdown.use(plugin_bionic_reading)
     return markdown
@@ -96,6 +98,37 @@ function as_id_name(content: string): string {
 }
 
 /**
+ * 断行
+ */
+function plugin_line_break(md: MarkdownIt): void {
+    md.core.ruler.push('code-line-break', state => {
+        state.tokens.forEach(token => {
+            token.children?.forEach(token => {
+                if (token.type === 'code_inline') {
+                    token.attrPush(['class', 'wrap_code_inline'])
+                    // 理论上不应该存在children
+                    if (token.children !== null) {
+                        throw 'Token children is NOT null.'
+                    }
+                    // 处理内容, 插入断行
+                    const content = token.content
+                    token.content = insert_line_break_marker(content)
+                }
+            })
+        })
+    })
+    md.enable(['code-line-break'])
+}
+
+/**
+ * 插入0宽度空格方便进行断行
+ */
+function insert_line_break_marker(str: string): string {
+    const arr = str.split('_')
+    return arr.join('_\u200B')
+}
+
+/**
  * bionic-reading
  */
 function plugin_bionic_reading(md: MarkdownIt): void {
@@ -123,7 +156,6 @@ function plugin_bionic_reading(md: MarkdownIt): void {
                             }
                             const result = add_bionic_reading(token.content)
                             children.push(...result)
-                            //children.push(make_text_token(token.content))
                         } else {
                             children.push(token)
                         }
