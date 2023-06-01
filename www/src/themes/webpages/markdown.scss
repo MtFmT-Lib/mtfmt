@@ -24,11 +24,11 @@
             color: #393e4f;
             padding-left: 0.1em;
             padding-right: 0.1em;
-            background-color: mix($bg-color, #f8f9fa, 50%);
+            background-color: mix($bg-color, #f8f9fa, 20%);
         }
 
         .bio-reading-bold {
-            font-weight: 500;
+            color: $text-color;
         }
     }
 
@@ -64,6 +64,10 @@
 
         &:hover {
             color: mix($hpyer-link-color, $bg-color, 50%);
+        }
+
+        .bio-reading-bold {
+            color: inherit;
         }
     }
 
