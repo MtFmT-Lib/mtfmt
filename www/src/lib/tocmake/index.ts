@@ -49,7 +49,12 @@ function generate_toc_helper(toc: { level: string; content: string }[]): string 
         }
         // 添加内容
         const id_name = as_id_name(toc_content)
-        const id_label = `<a class="toc-hyper-link" href="#${id_name}">${toc_content}</a>`
+        const id_label = `
+            <a class="toc-hyper-link"
+               href="#${id_name}"
+               title="${toc_content}">
+                ${toc_content}
+            </a>`
         html_raw += `<li class="toc-level${level}-content">${id_label}</li>`
         // 记录目录level
         last_level = level
