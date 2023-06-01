@@ -25,6 +25,13 @@
      * 当前的语言
      */
     let cur_language = writable(language[0])
+
+    /**
+     * 设置语言
+     */
+    function set_language(lang: string) {
+        cur_language.set(lang.toLowerCase())
+    }
 </script>
 
 <div class="markdown">
@@ -33,8 +40,8 @@
             <button>BIO</button>
         </div>
         <div class="reader-language">
-            {#each language as lang, i}
-                <button id={`lang_${lang.toLowerCase()}`}>
+            {#each language as lang}
+                <button on:click={() => set_language(lang)}>
                     <span>{lang.toUpperCase()}</span>
                 </button>
             {/each}
@@ -42,8 +49,8 @@
     </div>
     <div class="markdown-box">
         {@html generate_toc(
-            contents[$cur_language.toLowerCase()].html,
-            contents[$cur_language.toLowerCase()].toc
+            contents[$cur_language].html,
+            contents[$cur_language].toc
         )}
     </div>
 </div>
