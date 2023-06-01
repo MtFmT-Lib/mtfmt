@@ -16,6 +16,7 @@
     text-justify: inter-ideograph;
 
     p {
+        color: $text-color;
         text-indent: 2em;
         word-wrap: break-word;
 
@@ -24,6 +25,10 @@
             padding-left: 0.1em;
             padding-right: 0.1em;
             background-color: mix($bg-color, #f8f9fa, 50%);
+        }
+
+        .bio-reading-bold {
+            font-weight: 500;
         }
     }
 
