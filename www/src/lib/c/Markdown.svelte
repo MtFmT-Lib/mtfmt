@@ -2,17 +2,29 @@
 #  SPDX-License-Identifier: LGPL-3.0
 -->
 <script lang="ts">
+    import { writable } from 'svelte/store'
     import generate_toc from '$lib/tocmake'
 
     /**
-     * HTML内容
+     * 内容
      */
-    export let html: string
+    export let contents: Record<
+        string,
+        {
+            html: string
+            toc: { level: string; content: string }[]
+        }
+    >
 
     /**
-     * 目录内容
+     * 语言表
      */
-    export let toc: { level: string; content: string }[]
+    export let language: string[]
+
+    /**
+     * 当前的语言
+     */
+    let cur_language = writable(language[0])
 </script>
 
 <div class="markdown">
@@ -21,11 +33,18 @@
             <button>BIO</button>
         </div>
         <div class="reader-language">
-            <button>EN</button>
+            {#each language as lang, i}
+                <button id={`lang_${lang.toLowerCase()}`}>
+                    <span>{lang.toUpperCase()}</span>
+                </button>
+            {/each}
         </div>
     </div>
     <div class="markdown-box">
-        {@html generate_toc(html, toc)}
+        {@html generate_toc(
+            contents[$cur_language.toLowerCase()].html,
+            contents[$cur_language.toLowerCase()].toc
+        )}
     </div>
 </div>
 
