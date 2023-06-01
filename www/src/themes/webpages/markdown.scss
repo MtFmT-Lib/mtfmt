@@ -7,9 +7,10 @@
     color: $text-color;
     font-family: $text-font;
 
-    // 西文连字
+    // 西文连字和连字符
     // 参考: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_text/Wrapping_breaking_text
     hyphens: auto;
+    font-variant-ligatures: contextual;
 
     // 两端对齐
     text-align: justify;
@@ -25,10 +26,6 @@
             padding-left: 0.1em;
             padding-right: 0.1em;
             background-color: mix($bg-color, #f8f9fa, 20%);
-        }
-
-        .bio-reading-bold {
-            color: $text-color;
         }
     }
 
@@ -104,5 +101,9 @@
 
     .toc-level1-content {
         font-weight: 600;
+    }
+
+    .bio-reading-bold {
+        color: $text-color;
     }
 }

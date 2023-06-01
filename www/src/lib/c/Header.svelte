@@ -26,9 +26,6 @@
     @import '../../themes/common/stylevars.scss';
 
     .header-father {
-        border: none;
-        border-bottom: 1px solid $border-color;
-        margin-bottom: 1em;
         display: flex;
         flex-direction: column;
         flex-wrap: nowrap;
