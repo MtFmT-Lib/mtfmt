@@ -3,7 +3,6 @@
 -->
 <script lang="ts">
     import generate_toc from '$lib/tocmake'
-    import { writable } from 'svelte/store'
 
     /**
      * HTML内容

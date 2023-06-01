@@ -16,6 +16,12 @@
     text-align: justify;
     text-justify: inter-ideograph;
 
+    // bio reading 加粗的内容
+    .bio-reading-bold {
+        color: $text-color;
+    }
+
+    // 段落文本
     p {
         color: $text-color;
         text-indent: 2em;
@@ -101,9 +107,5 @@
 
     .toc-level1-content {
         font-weight: 600;
-    }
-
-    .bio-reading-bold {
-        color: $text-color;
     }
 }
