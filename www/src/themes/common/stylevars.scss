@@ -23,3 +23,7 @@ $mono-text-font: 'Cascadia Mono', consolas, 'Courier New', monospace;
 
 // 文本颜色
 $text-color: #2c2f31;
+
+*[page-theme='dark'] {
+    $text-color: red;
+}

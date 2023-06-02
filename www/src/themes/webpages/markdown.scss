@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: LGPL-3.0
 
 .markdown-box {
-    color: $text-color;
     font-family: $text-font;
 
     // 西文连字和连字符
@@ -16,19 +15,12 @@
     text-align: justify;
     text-justify: inter-ideograph;
 
-    // bio reading 加粗的内容
-    .bio-reading-bold {
-        color: $text-color;
-    }
-
     // 段落文本
     p {
-        color: $text-color;
         text-indent: 2em;
         word-wrap: break-word;
 
         code {
-            color: #393e4f;
             padding-left: 0.1em;
             padding-right: 0.1em;
             background-color: mix($bg-color, #f8f9fa, 20%);
@@ -62,7 +54,6 @@
     }
 
     a {
-        color: $hpyer-link-color;
         text-decoration: none;
 
         &:hover {
