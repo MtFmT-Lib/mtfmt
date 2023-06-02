@@ -4,26 +4,26 @@
 // SPDX-License-Identifier: LGPL-3.0
 
 .markdown-box {
-    color: $text-color;
     font-family: $text-font;
 
-    // 西文连字
+    // 西文连字和连字符
     // 参考: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_text/Wrapping_breaking_text
     hyphens: auto;
+    font-variant-ligatures: contextual;
 
     // 两端对齐
     text-align: justify;
     text-justify: inter-ideograph;
 
+    // 段落文本
     p {
         text-indent: 2em;
         word-wrap: break-word;
 
         code {
-            color: #393e4f;
             padding-left: 0.1em;
             padding-right: 0.1em;
-            background-color: mix($bg-color, #f8f9fa, 50%);
+            background-color: var(--text-block-bg-color)
         }
     }
 
@@ -54,11 +54,14 @@
     }
 
     a {
-        color: $hpyer-link-color;
         text-decoration: none;
 
         &:hover {
-            color: mix($hpyer-link-color, $bg-color, 50%);
+            color: var(--hpyer-link-color-hover);
+        }
+
+        .bio-reading-bold {
+            color: inherit;
         }
     }
 
@@ -90,7 +93,7 @@
     }
 
     .toc-hyper-link:hover {
-        color: mix($hpyer-link-color, black, 50%);
+        color: var(--hpyer-link-color-hover);
     }
 
     .toc-level1-content {

@@ -1,0 +1,50 @@
+@import "@theme/stylevars";
+@import "@style/markdown";
+@import "@style/pages";
+
+// SPDX-License-Identifier: LGPL-3.0
+
+// default theme:
+:root {
+    --bg-color: #{$bg-color};
+    --text-color: #{$text-color};
+    --border-color: #{$border-color};
+    --text-block-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
+
+    // 超链接
+    --hpyer-link-color: #{$hpyer-link-color};
+    --hpyer-link-color-hover:#{mix($hpyer-link-color, $bg-color, 50%)};
+    --hpyer-link-color-actived: #{mix($hpyer-link-color, $bg-color, 25%)};
+
+    // 按钮
+    --button-color: #{$button-color};
+    --button-hover-bg-color: #{mix($bg-color, $text-color, 80%)};
+    --button-actived-bg-color: #{mix($bg-color, $text-color, 75%)};
+}
+
+// dark theme
+[page-theme='dark'] {
+    --bg-color: #{$bg-color-dark};
+    --text-color: #{invert($text-color)};
+    --border-color: #{mix($bg-color-dark, $border-color, 75%)};
+    --text-block-bg-color: #{mix($bg-color-dark, #f8f9fa, 90%)};
+
+    // 超链接
+    --hpyer-link-color: #{mix($hpyer-link-color, white, 80%)};
+
+    // 按钮
+    --button-color: #{mix($hpyer-link-color, white, 80%)};
+    --button-hover-bg-color: #{mix($bg-color-dark, white, 85%)};
+    --button-actived-bg-color: #{mix($bg-color-dark, white, 90%)};
+}
+
+// warm theme
+[page-theme='warm'] {
+    --bg-color: #{$bg-color-warm};
+    --border-color: #{mix($bg-color-warm, $text-color, 50%)};
+    --text-block-bg-color: #{mix($bg-color-warm, $text-color, 85%)};
+
+    // 按钮
+    --button-hover-bg-color: #{mix($bg-color-warm, black, 90%)};
+    --button-actived-bg-color: #{mix($bg-color-warm, black, 85%)};
+}

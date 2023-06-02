@@ -41,7 +41,7 @@
             margin-left: 0.25em;
             outline: none;
             border: none;
-            border-bottom: 2px solid $border-color;
+            border-bottom: 2px solid var(--border-color);
         }
     }
 

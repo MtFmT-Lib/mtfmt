@@ -26,9 +26,6 @@
     @import '../../themes/common/stylevars.scss';
 
     .header-father {
-        border: none;
-        border-bottom: 1px solid $border-color;
-        margin-bottom: 1em;
         display: flex;
         flex-direction: column;
         flex-wrap: nowrap;
@@ -72,10 +69,10 @@
 
         a {
             text-decoration: none;
-            color: $hpyer-link-color;
+            color: var(--hpyer-link-color);
 
             &:hover {
-                color: mix($hpyer-link-color, $bg-color, 50%);
+                color: var(--hpyer-link-color-hover);
             }
 
             &::before {

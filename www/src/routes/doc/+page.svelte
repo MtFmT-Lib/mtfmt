@@ -4,7 +4,13 @@
 <script lang="ts">
     import Header from '@comp/Header.svelte'
     import Markdown from '@comp/Markdown.svelte'
-    import { toc, html } from '@text/DOCUMENT.md'
+    import * as EnPage from '@text/en/DOCUMENT.md'
+
+    const contents = {
+        en: { toc: EnPage.toc, html: EnPage.html },
+    }
+
+    const language = Object.keys(contents)
 </script>
 
 <svelte:head>
@@ -14,5 +20,5 @@
 
 <div>
     <Header />
-    <Markdown {html} {toc} />
+    <Markdown {language} {contents} />
 </div>
