@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0
-import type { SystemTheme, ThemeInfo } from './theme_storager'
-import { STRONGE_THEME_KEY, AVALIABLE_THEMES } from './theme_storager'
-import { THEME_MEDIA, update_system_theme } from './theme_storager'
+import { THEME_MEDIA, update_system_theme, } from './theme_storager'
+import { get_storager_theme } from './theme_storager'
+import type { SystemTheme, ThemeInfo, Theme } from './theme_storager'
 
 /**
  * 主题的属性名
@@ -12,25 +12,19 @@ const THEME_ATTRIBUTE = 'page-theme'
  * 更改theme
  */
 export function change_theme(doc: Document, new_theme: ThemeInfo) {
-    const theme_name = new_theme.following
+    const theme = new_theme.following
         ? new_theme.system_theme
         : new_theme.cur_theme
     // 设置属性
-    const root_element = doc.documentElement
-    root_element.setAttribute(THEME_ATTRIBUTE, theme_name)
-    root_element.style.setProperty('color-scheme', theme_name)
+    set_theme_attr(doc, theme)
 }
 
 /**
  * 设置默认主题
  */
 export function set_default_theme(doc: Document, new_theme: ThemeInfo) {
-    const theme = localStorage.getItem(STRONGE_THEME_KEY) ?? new_theme.system_theme
-    if (theme in AVALIABLE_THEMES) {
-        const root_element = doc.documentElement
-        root_element.setAttribute(THEME_ATTRIBUTE, theme)
-        root_element.style.setProperty('color-scheme', theme)
-    }
+    const theme = get_storager_theme(new_theme)
+    set_theme_attr(doc, theme)
 }
 
 /**
@@ -76,4 +70,13 @@ function update_current_system_theme(media_match: boolean) {
  */
 function handle_media_query(earg: MediaQueryListEvent) {
     update_current_system_theme(earg.matches)
+}
+
+/**
+ * 设置主题的属性
+ */
+function set_theme_attr(doc: Document, theme: Theme) {
+    const root_element = doc.documentElement
+    root_element.setAttribute(THEME_ATTRIBUTE, theme)
+    root_element.style.setProperty('color-scheme', theme)
 }

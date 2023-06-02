@@ -4,7 +4,7 @@ import { type Optional, Some, None } from '$lib/fp/result'
 /**
  * 读取local storager
  */
-export function read_local_storager<T>(key: string): Optional<T> {
+export function read_local_storager<T = string>(key: string): Optional<T> {
     if (typeof localStorage === 'undefined') {
         return None<T>()
     } else {

@@ -4,8 +4,8 @@
 <script lang="ts">
     import { writable } from 'svelte/store'
     import generate_toc from './markdown_toc'
-    import theme_info from './theme_storager'
-    import { type Theme, set_theme, DEFAULT_THEME } from './theme_storager'
+    import { set_theme, type Theme } from './theme_storager'
+    import theme_info, { get_storager_theme } from './theme_storager'
 
     /**
      * 内容
@@ -31,7 +31,7 @@
     /**
      * 当前的主题名
      */
-    let cur_theme: Theme | 'default' = DEFAULT_THEME
+    let cur_theme: Theme = get_storager_theme()
 
     /**
      * 是否开启bio-reader
@@ -56,11 +56,7 @@
      * 更新选中的主题
      */
     function update_cur_theme() {
-        if (cur_theme === 'default') {
-            set_theme()
-        } else {
-            set_theme(cur_theme)
-        }
+        set_theme(cur_theme)
     }
 </script>
 
@@ -79,6 +75,8 @@
                     </button>
                 {/if}
             {/if}
+        </div>
+        <div class="reader-language">
             <!-- 主题 -->
             <select bind:value={cur_theme} on:change={update_cur_theme}>
                 {#each $theme_info.themes as t}
@@ -86,16 +84,15 @@
                         {t.toUpperCase()}
                     </option>
                 {/each}
-                <!-- system -->
-                <option value="default">SYS</option>
             </select>
-        </div>
-        <div class="reader-language">
+            <!-- 语言 -->
             {#each language as lang}
                 <button on:click={() => set_language(lang)}>
                     {lang.toUpperCase()}
                 </button>
             {/each}
+            <!-- 翻译 -->
+            <button>ADD</button>
         </div>
     </div>
     <div class="markdown-box">
@@ -128,10 +125,26 @@
         border-top: 1px solid var(--border-color);
     }
 
+    .reader-tools,
+    .reader-language {
+        display: flex;
+
+        flex-direction: row;
+        align-items: baseline;
+    }
+
     .reader-tools button,
-    .reader-tools select,
+    .reader-language select,
     .reader-language button {
         outline: 0;
+        display: block;
+
+        // 边距
+        margin: 0;
+        padding-top: 0.08em;
+        padding-bottom: 0.08em;
+        padding-left: 0.6em;
+        padding-right: 0.6em;
 
         // 边框
         border: none;
@@ -141,20 +154,10 @@
         color: var(--button-color);
         background: none;
 
-        // 边距
-        margin: 0;
-        padding-top: 0.1em;
-        padding-bottom: 0.1em;
-        padding-left: 0.5em;
-        padding-right: 0.5em;
-
         &:first-child {
             border: none;
         }
-    }
 
-    .reader-tools button,
-    .reader-language button {
         &:hover {
             background-color: var(--button-hover-bg-color);
         }
@@ -164,7 +167,7 @@
         }
     }
 
-    .reader-tools select {
+    .reader-language select {
         text-align: center;
         appearance: none;
         -moz-appearance: none;
