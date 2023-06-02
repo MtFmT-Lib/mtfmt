@@ -277,13 +277,12 @@ static mstr_result_t format_array(
             result, convert(&buff, parser_result, &element)
         );
         // 增加分隔符
-        result = MSTR_AND_THEN(
-            result, ({
-                const char* split_beg = parser_result->array_split_beg;
-                const char* split_end = parser_result->array_split_end;
+        if (MSTR_SUCC(result)) {
+            const char* split_beg = parser_result->array_split_beg;
+            const char* split_end = parser_result->array_split_end;
+            result =
                 mstr_concat_cstr_slice(&buff, split_beg, split_end);
-            })
-        );
+        }
         // 失败的break在下次循环开始时
         array_index += 1;
     }
@@ -311,51 +310,57 @@ static iptr_t array_get_item(
     MStrFmtArgType type =
         (MStrFmtArgType)((u32_t)(array->type) &
                          (u32_t)(MStrFmtArgType_Array_Bit - 1));
+    size_t ele_size = 0;
+    switch (type) {
+    case MStrFmtArgType_Int8: ele_size = sizeof(i8_t); break;
+    case MStrFmtArgType_Int16: ele_size = sizeof(i16_t); break;
+    case MStrFmtArgType_Int32: ele_size = sizeof(i32_t); break;
+    case MStrFmtArgType_Uint8: ele_size = sizeof(u8_t); break;
+    case MStrFmtArgType_Uint16: ele_size = sizeof(u16_t); break;
+    case MStrFmtArgType_Uint32: ele_size = sizeof(u32_t); break;
+    case MStrFmtArgType_CString: ele_size = sizeof(const char*); break;
+    case MStrFmtArgType_Time:
+        ele_size = sizeof(const sys_time_t*);
+        break;
+    case MStrFmtArgType_QuantizedValue: ele_size = sizeof(i32_t); break;
+    case MStrFmtArgType_QuantizedUnsignedValue:
+        ele_size = sizeof(u32_t);
+        break;
+    default: system_unreachable(); break;
+    }
+    // 取得值
     iptr_t element_ptr = (iptr_t)NULL;
+    const void* ptr = (const void*)(index * ele_size + array->value);
     switch (type) {
     case MStrFmtArgType_Int8:
-        element_ptr = (iptr_t) * (const i8_t*)(index * sizeof(i8_t) +
-                                               array->value);
+        element_ptr = (iptr_t)(*(const i8_t*)ptr);
         break;
     case MStrFmtArgType_Int16:
-        element_ptr = (iptr_t) * (const i16_t*)(index * sizeof(i16_t) +
-                                                array->value);
+        element_ptr = (iptr_t)(*(const i16_t*)ptr);
         break;
     case MStrFmtArgType_Int32:
-        element_ptr = (iptr_t) * (const i32_t*)(index * sizeof(i32_t) +
-                                                array->value);
+        element_ptr = (iptr_t)(*(const i32_t*)ptr);
         break;
     case MStrFmtArgType_Uint8:
-        element_ptr = (iptr_t) * (const u8_t*)(index * sizeof(u8_t) +
-                                               array->value);
+        element_ptr = (iptr_t)(*(const u8_t*)ptr);
         break;
     case MStrFmtArgType_Uint16:
-        element_ptr = (iptr_t) * (const u16_t*)(index * sizeof(u16_t) +
-                                                array->value);
+        element_ptr = (iptr_t)(*(const u16_t*)ptr);
         break;
     case MStrFmtArgType_Uint32:
-        element_ptr = (iptr_t) * (const u32_t*)(index * sizeof(u32_t) +
-                                                array->value);
+        element_ptr = (iptr_t)(*(const u32_t*)ptr);
         break;
     case MStrFmtArgType_CString:
-        element_ptr = (iptr_t) *
-                      (const char* const*)(index * sizeof(const char*) +
-                                           array->value);
+        element_ptr = (iptr_t)(*(const char* const*)ptr);
         break;
     case MStrFmtArgType_Time:
-        element_ptr =
-            (iptr_t) *
-            (const sys_time_t* const*)(index *
-                                           sizeof(const sys_time_t*) +
-                                       array->value);
+        element_ptr = (iptr_t)(*(const sys_time_t* const*)ptr);
         break;
     case MStrFmtArgType_QuantizedValue:
-        element_ptr = (iptr_t) * (const i32_t*)(index * sizeof(i32_t) +
-                                                array->value);
+        element_ptr = (iptr_t)(*(const i32_t*)ptr);
         break;
     case MStrFmtArgType_QuantizedUnsignedValue:
-        element_ptr = (iptr_t) * (const i32_t*)(index * sizeof(u32_t) +
-                                                array->value);
+        element_ptr = (iptr_t)(*(const i32_t*)ptr);
         break;
     default: system_unreachable(); break;
     }

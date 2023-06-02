@@ -74,6 +74,7 @@ typedef enum tagMStrResult
 #define MSTR_FAILED(s) ((s) != MStr_Ok)
 
 // AND_THEN
+#if __GNUC__
 #define MSTR_AND_THEN(e, then) \
     ({                         \
         mstr_result_t r = (e); \
@@ -83,5 +84,8 @@ typedef enum tagMStrResult
         }) :                   \
                          (r);  \
     })
+#else
+#define MSTR_AND_THEN(e, then) ((MSTR_SUCC(e)) ? (then) : (e))
+#endif
 
 #endif // _INCLUDE_MM_RESULT_H_
