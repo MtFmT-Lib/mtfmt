@@ -277,13 +277,12 @@ static mstr_result_t format_array(
             result, convert(&buff, parser_result, &element)
         );
         // 增加分隔符
-        result = MSTR_AND_THEN(
-            result, ({
-                const char* split_beg = parser_result->array_split_beg;
-                const char* split_end = parser_result->array_split_end;
+        if (MSTR_SUCC(result)) {
+            const char* split_beg = parser_result->array_split_beg;
+            const char* split_end = parser_result->array_split_end;
+            result =
                 mstr_concat_cstr_slice(&buff, split_beg, split_end);
-            })
-        );
+        }
         // 失败的break在下次循环开始时
         array_index += 1;
     }
