@@ -61,9 +61,13 @@ export const DEFAULT_THEME: SystemTheme = 'light'
  * 
  * @param cur_theme: 主题名, 留空选择system_theme
  */
-export function set_theme(cur_theme: Theme): void {
-    localStorage.setItem(STRONGE_THEME_KEY, cur_theme)
-    return theme_info.update((store) => ({ ...store, cur_theme }))
+export function set_theme(cur_theme?: Theme): void {
+    if (cur_theme) {
+        localStorage.setItem(STRONGE_THEME_KEY, cur_theme)
+        return theme_info.update((store) => ({ ...store, cur_theme, following: false }))
+    } else {
+        return theme_info.update((store) => ({ ...store, following: true }))
+    }
 }
 
 /**
@@ -73,15 +77,6 @@ export function set_theme(cur_theme: Theme): void {
  */
 export function update_system_theme(theme: SystemTheme): void {
     return theme_info.update((store) => ({ ...store, system_theme: theme }))
-}
-
-/**
- * 是否跟随当前theme
- * 
- * @param theme: 主题名
- */
-export function set_theme_following(following: boolean): void {
-    return theme_info.update((store) => ({ ...store, following }))
 }
 
 /**

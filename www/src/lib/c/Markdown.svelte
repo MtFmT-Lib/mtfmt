@@ -4,7 +4,8 @@
 <script lang="ts">
     import { writable } from 'svelte/store'
     import generate_toc from './markdown_toc'
-    import theme_info, { type Theme, set_theme } from './theme_storager'
+    import theme_info from './theme_storager'
+    import { type Theme, set_theme, DEFAULT_THEME } from './theme_storager'
 
     /**
      * 内容
@@ -28,6 +29,16 @@
     let cur_language = writable(language[0])
 
     /**
+     * 当前的主题名
+     */
+    let cur_theme: Theme | 'default' = DEFAULT_THEME
+
+    /**
+     * 是否开启bio-reader
+     */
+    let enable_bio_reader = writable(false)
+
+    /**
      * 设置语言
      */
     function set_language(lang: string) {
@@ -35,10 +46,21 @@
     }
 
     /**
-     * 设置主题
+     * 切换bio reading
      */
-    function set_current_theme(theme: Theme) {
-        set_theme(theme)
+    function toggle_bio_mode() {
+        enable_bio_reader.set(!$enable_bio_reader)
+    }
+
+    /**
+     * 更新选中的主题
+     */
+    function update_cur_theme() {
+        if (cur_theme === 'default') {
+            set_theme()
+        } else {
+            set_theme(cur_theme)
+        }
     }
 </script>
 
@@ -47,20 +69,26 @@
         <div class="reader-tools">
             <!-- bio 阅读 -->
             {#if $cur_language === 'en'}
-                <button>BIO</button>
-            {/if}
-            <!-- 主题 -->
-            {#each $theme_info.themes as t}
-                {#if $theme_info.cur_theme === t}
-                    <button id="actived-button">
-                        {t.toUpperCase()}
+                {#if $enable_bio_reader}
+                    <button id="actived-button" on:click={toggle_bio_mode}>
+                        <span>B</span>
                     </button>
                 {:else}
-                    <button on:click={() => set_current_theme(t)}>
-                        {t.toUpperCase()}
+                    <button on:click={toggle_bio_mode}>
+                        <span>B</span>
                     </button>
                 {/if}
-            {/each}
+            {/if}
+            <!-- 主题 -->
+            <select bind:value={cur_theme} on:change={update_cur_theme}>
+                {#each $theme_info.themes as t}
+                    <option value={t}>
+                        {t.toUpperCase()}
+                    </option>
+                {/each}
+                <!-- system -->
+                <option value="default">SYS</option>
+            </select>
         </div>
         <div class="reader-language">
             {#each language as lang}
@@ -97,20 +125,21 @@
         padding-bottom: 0.5em;
 
         // 边框
-        border-top: 1px solid $border-color;
+        border-top: 1px solid var(--border-color);
     }
 
     .reader-tools button,
+    .reader-tools select,
     .reader-language button {
         outline: 0;
 
         // 边框
         border: none;
-        border-left: 2px solid $border-color;
+        border-left: 2px solid var(--border-color);
 
         // 颜色和背景色
-        color: $hpyer-link-color;
-        background-color: $bg-color;
+        color: var(--button-color);
+        background: none;
 
         // 边距
         margin: 0;
@@ -119,21 +148,40 @@
         padding-left: 0.5em;
         padding-right: 0.5em;
 
-        &:hover {
-            background-color: mix($text-color, $bg-color, 15%);
-        }
-
-        &:active {
-            background-color: mix($text-color, $bg-color, 40%);
-        }
-
         &:first-child {
             border: none;
         }
     }
 
+    .reader-tools button,
+    .reader-language button {
+        &:hover {
+            background-color: var(--button-hover-bg-color);
+        }
+
+        &:active {
+            background-color: var(--button-actived-bg-color);
+        }
+    }
+
+    .reader-tools select {
+        text-align: center;
+        appearance: none;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+
+        option {
+            background-color: var(--bg-color);
+        }
+
+        &:hover,
+        &:focus {
+            background-color: var(--button-hover-bg-color);
+        }
+    }
+
     .reader-tools button[id='actived-button'] {
-        color: mix($hpyer-link-color, black, 40%);
+        background-color: var(--button-actived-bg-color);
     }
 
     .markdown-box {

@@ -11,12 +11,15 @@ body {
     padding: 0;
     min-width: 240px;
     color: var(--text-color);
+    background-color: var(--bg-color);
 }
 
-// a, button样式
+// a, button,select样式
 a,
-button {
-    color: $hpyer-link-color;
+button,
+select,
+option {
+    color: var(--hpyer-link-color);
     transition: color 0.2s, background-color 0.1s, transform 0.25s;
     transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
 }

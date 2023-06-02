@@ -17,7 +17,7 @@
 
     .app {
         border-radius: 2px;
-        border: 1px solid $border-color;
+        border: 1px solid var(--border-color);
         max-width: 800px;
         width: 80%;
         margin: 0 auto;

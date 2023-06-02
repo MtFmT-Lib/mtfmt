@@ -10,11 +10,6 @@
     import { change_theme, set_default_theme } from './theme_logic'
 
     /**
-     * 主题的属性名
-     */
-    const THEME_ATTR = 'page-theme'
-
-    /**
      * 需要用到window.XXX的东东
      */
     function on_window(window: Window) {

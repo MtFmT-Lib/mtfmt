@@ -69,10 +69,10 @@
 
         a {
             text-decoration: none;
-            color: $hpyer-link-color;
+            color: var(--hpyer-link-color);
 
             &:hover {
-                color: mix($hpyer-link-color, $bg-color, 50%);
+                color: var(--hpyer-link-color-hover);
             }
 
             &::before {

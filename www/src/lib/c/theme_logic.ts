@@ -47,7 +47,7 @@ export function register_window_event(window: Window) {
         media.addEventListener('change', handle_media_query)
     } catch {
         select_new = false
-        media.addListener(handle_media_old)
+        media.addListener(handle_media_query)
     }
     // 刷新系统当前的theme
     update_current_system_theme(media.matches)
@@ -57,7 +57,7 @@ export function register_window_event(window: Window) {
             if (select_new) {
                 media.removeEventListener('change', handle_media_query)
             } else {
-                media.removeListener(handle_media_old)
+                media.removeListener(handle_media_query)
             }
         },
     }
@@ -76,11 +76,4 @@ function update_current_system_theme(media_match: boolean) {
  */
 function handle_media_query(earg: MediaQueryListEvent) {
     update_current_system_theme(earg.matches)
-}
-
-/**
- * 兼容老版本的media handler
- */
-function handle_media_old(...args: any) {
-    return handle_media_query(args)
 }

@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0
 $bg-color: #fff;
+$bg-color-dark: #2d3138;
+$bg-color-warm: #f1e3d3;
 
 // 跨儿旗
 $transflag-blue: #5bcefa;
@@ -13,6 +15,10 @@ $border-color: #f0f0f0;
 // 超链接颜色
 $hpyer-link-color: #198619;
 
+// 按钮颜色
+$button-color: #198619;
+$button-bg-color: $bg-color;
+
 // 文本字体
 $text-font: "Overpass", -apple-system,
     blinkmacsystemfont, "Segoe UI", roboto, oxygen,
@@ -23,7 +29,3 @@ $mono-text-font: 'Cascadia Mono', consolas, 'Courier New', monospace;
 
 // 文本颜色
 $text-color: #2c2f31;
-
-*[page-theme='dark'] {
-    $text-color: red;
-}

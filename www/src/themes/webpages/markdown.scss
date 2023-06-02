@@ -23,7 +23,7 @@
         code {
             padding-left: 0.1em;
             padding-right: 0.1em;
-            background-color: mix($bg-color, #f8f9fa, 20%);
+            background-color: var(--text-block-bg-color)
         }
     }
 
@@ -57,7 +57,7 @@
         text-decoration: none;
 
         &:hover {
-            color: mix($hpyer-link-color, $bg-color, 50%);
+            color: var(--hpyer-link-color-hover);
         }
 
         .bio-reading-bold {
@@ -93,7 +93,7 @@
     }
 
     .toc-hyper-link:hover {
-        color: mix($hpyer-link-color, black, 50%);
+        color: var(--hpyer-link-color-hover);
     }
 
     .toc-level1-content {
