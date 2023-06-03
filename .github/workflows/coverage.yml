@@ -2,6 +2,7 @@ name: "Code coverage"
 
 on:
   push:
+    branches: [master]
     paths:
       - "src/**.c"
       - "inc/**.h"
@@ -57,3 +58,6 @@ jobs:
           root: '.'
           coveralls-send: true
           github-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          excludes: |
+            tests/*
+            thirds/*
