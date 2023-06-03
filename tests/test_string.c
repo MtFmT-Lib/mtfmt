@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    string.c
+ * @file    test_string.c
  * @author  向阳 (hinata.hoshino@foxmail.com)
  * @brief   字符串测试
  * @version 1.0
@@ -10,27 +10,11 @@
  *
  */
 #include "helper.h"
+#include "main.h"
 #include "mm_heap.h"
 #include "mm_string.h"
 #include "unity.h"
 #include <stdio.h>
-
-#define RUNTIME_HEAP_SIZE 2048
-
-/**
- * @brief 堆
- *
- */
-static byte_t heap[RUNTIME_HEAP_SIZE];
-
-void setUp(void)
-{
-    mstr_heap_init(heap, RUNTIME_HEAP_SIZE);
-}
-
-void tearDown(void)
-{
-}
 
 void equal_string(void)
 {
@@ -84,14 +68,4 @@ void reverse_self(void)
     EVAL(mstr_reverse_self(&src2));
     ASSERT_EQUAL_STRING(&src2, "987654321");
     mstr_free(&src2);
-}
-
-int main()
-{
-    UNITY_BEGIN();
-    RUN_TEST(append_char);
-    RUN_TEST(equal_string);
-    RUN_TEST(reverse_self);
-    RUN_TEST(repeat_append_char);
-    return UNITY_END();
 }

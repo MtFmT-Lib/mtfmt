@@ -16,4 +16,5 @@ lib
 
 !*.h
 !*.c
+!*.cpp
 !Makefile

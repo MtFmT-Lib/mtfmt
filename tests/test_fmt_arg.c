@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    fmt_arg.c
+ * @file    test_fmt_arg.c
  * @author  向阳 (hinata.hoshino@foxmail.com)
  * @brief   不同格式化参数下的测试
  * @version 1.0
@@ -10,28 +10,12 @@
  *
  */
 #include "helper.h"
+#include "main.h"
 #include "mm_fmt.h"
 #include "mm_heap.h"
 #include "unity.h"
 #include <stddef.h>
 #include <stdio.h>
-
-#define RUNTIME_HEAP_SIZE 2048
-
-/**
- * @brief 堆
- *
- */
-static byte_t heap[RUNTIME_HEAP_SIZE];
-
-void setUp(void)
-{
-    mstr_heap_init(heap, RUNTIME_HEAP_SIZE);
-}
-
-void tearDown(void)
-{
-}
 
 void fmt_seq_arg_id(void)
 {
@@ -61,12 +45,4 @@ void fmt_seq_arg_id_err(void)
     mstr_clear(&s);
     // free
     mstr_free(&s);
-}
-
-int main()
-{
-    UNITY_BEGIN();
-    RUN_TEST(fmt_seq_arg_id);
-    RUN_TEST(fmt_seq_arg_id_err);
-    return UNITY_END();
 }
