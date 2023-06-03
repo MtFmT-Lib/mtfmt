@@ -36,6 +36,9 @@ void tearDown(void)
 int main()
 {
     UNITY_BEGIN();
+
+    printf("Build configure: 0x%08x\n", mstr_configure());
+
     RUN_TEST(allocate_then_free);
 
     RUN_TEST(fmt_align_left);
@@ -76,6 +79,19 @@ int main()
     RUN_TEST(fmt_array);
     RUN_TEST(fmt_array_element_style);
     RUN_TEST(fmt_array_userdefind_split);
+
+    RUN_TEST(fmt_chrono_default_f);
+    RUN_TEST(fmt_chrono_default_g);
+    RUN_TEST(fmt_chrono_userdef_year);
+    RUN_TEST(fmt_chrono_userdef_month);
+    RUN_TEST(fmt_chrono_userdef_day);
+    RUN_TEST(fmt_chrono_userdef_hour);
+    RUN_TEST(fmt_chrono_userdef_minute);
+    RUN_TEST(fmt_chrono_userdef_second);
+    RUN_TEST(fmt_chrono_userdef_subsecond);
+    RUN_TEST(fmt_chrono_userdef_week);
+
+    RUN_TEST(fmt_escape_bracket);
 
     RUN_TEST(cpp_string_equal);
 

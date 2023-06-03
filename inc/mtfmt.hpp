@@ -11,11 +11,7 @@
  */
 #if !defined(_INCLUDE_MTFMT_HPP_)
 #define _INCLUDE_MTFMT_HPP_
-#include "mm_cfg.h"
-#include "mm_fmt.h"
-#include "mm_heap.h"
-#include "mm_result.h"
-#include "mm_string.h"
+#include "mtfmt.h"
 #include <cstddef>
 #include <type_traits>
 #include <utility>

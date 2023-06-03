@@ -58,6 +58,19 @@ extern "C"
     void fmt_array_element_style(void);
     void fmt_array_userdefind_split(void);
 
+    void fmt_chrono_default_f(void);
+    void fmt_chrono_default_g(void);
+    void fmt_chrono_userdef_year(void);
+    void fmt_chrono_userdef_month(void);
+    void fmt_chrono_userdef_day(void);
+    void fmt_chrono_userdef_hour(void);
+    void fmt_chrono_userdef_minute(void);
+    void fmt_chrono_userdef_second(void);
+    void fmt_chrono_userdef_subsecond(void);
+    void fmt_chrono_userdef_week(void);
+
+    void fmt_escape_bracket(void);
+
     void cpp_string_equal(void);
 #if __cplusplus
 }
