@@ -11,7 +11,6 @@
  */
 #include "mm_fmt.h"
 #include "mm_typedef.h"
-// #include "runtime_system.h"
 #include <stddef.h>
 
 //! peek一个字符
@@ -443,18 +442,16 @@ static mstr_result_t parse_replacement_field(
         mstr_result_t result = MStr_Ok;
         parser_result->arg_class = MStrFmtArgClass_Value;
         // '{'
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result,
             parse_one_token(
                 state, TokenType_LeftBrace, MStr_Err_MissingReplacement
             )
         );
         // simple_field
-        result = MSTR_AND_THEN(
-            result, parse_simple_field(state, parser_result)
-        );
+        MSTR_AND_THEN(result, parse_simple_field(state, parser_result));
         // 闭合: '}'
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result,
             parse_end_token(
                 state, TokenType_RightBrace, MStr_Err_MissingRightBrace
@@ -467,7 +464,7 @@ static mstr_result_t parse_replacement_field(
         mstr_result_t result = MStr_Ok;
         parser_result->arg_class = MStrFmtArgClass_Array;
         // '{['
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result,
             parse_one_token(
                 state,
@@ -476,11 +473,9 @@ static mstr_result_t parse_replacement_field(
             )
         );
         // array_field
-        result = MSTR_AND_THEN(
-            result, parse_array_field(state, parser_result)
-        );
+        MSTR_AND_THEN(result, parse_array_field(state, parser_result));
         // 闭合: ']}'
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result,
             parse_end_token(
                 state,
@@ -508,24 +503,22 @@ static mstr_result_t parse_array_field(
     mstr_result_t result = MStr_Ok;
     // Arg ID
     u32_t arg_id = 0;
-    result = MSTR_AND_THEN(result, parse_arg_id(state, &arg_id));
+    MSTR_AND_THEN(result, parse_arg_id(state, &arg_id));
     // `:` arg_type
     // 为了方便lex这两个作为1个token被match
     // 需要格式化的值类型
     MStrFmtArgType arg_type;
     MStrFmtArgProperty arg_prop;
-    result = MSTR_AND_THEN(
-        result, parse_arg_type(state, &arg_type, &arg_prop)
-    );
+    MSTR_AND_THEN(result, parse_arg_type(state, &arg_type, &arg_prop));
     // 可选的 `|:` split_ch
     const char* split_beg = NULL;
     const char* split_end = NULL;
-    result = MSTR_AND_THEN(
+    MSTR_AND_THEN(
         result, parse_opt_split_chars(state, &split_beg, &split_end)
     );
     // 可选的format_spec
     MStrFmtFormatDescript format_spec;
-    result = MSTR_AND_THEN(
+    MSTR_AND_THEN(
         result,
         parse_opt_formatfield_spec(state, arg_type, &format_spec)
     );
@@ -555,7 +548,7 @@ static mstr_result_t parse_opt_split_chars(
         // `|:`
         // 该分支不会返回 `MStr_Err_UndefinedParserError`,
         // 因为已经做了判断了
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result,
             parse_one_token(
                 state,
@@ -564,9 +557,7 @@ static mstr_result_t parse_opt_split_chars(
             )
         );
         // split chars
-        result = MSTR_AND_THEN(
-            result, parse_split_chars(state, ppbeg, ppend)
-        );
+        MSTR_AND_THEN(result, parse_split_chars(state, ppbeg, ppend));
     }
     else {
         // 给定默认值
@@ -619,18 +610,16 @@ static mstr_result_t parse_simple_field(
         PARSER_STAGE_BEGIN(state->stage, ParserStage_NeedEnd);
     // Arg ID
     u32_t arg_id = 0;
-    result = MSTR_AND_THEN(result, parse_arg_id(state, &arg_id));
+    MSTR_AND_THEN(result, parse_arg_id(state, &arg_id));
     // `:` arg_type
     // 为了方便lex这两个作为1个token被match
     // 需要格式化的值类型
     MStrFmtArgType arg_type;
     MStrFmtArgProperty arg_prop;
-    result = MSTR_AND_THEN(
-        result, parse_arg_type(state, &arg_type, &arg_prop)
-    );
+    MSTR_AND_THEN(result, parse_arg_type(state, &arg_type, &arg_prop));
     // 可选的 `:` format_spec
     MStrFmtFormatDescript format_spec;
-    result = MSTR_AND_THEN(
+    MSTR_AND_THEN(
         result,
         parse_opt_formatfield_spec(state, arg_type, &format_spec)
     );
@@ -668,7 +657,7 @@ static mstr_result_t parse_opt_formatfield_spec(
         // `:`
         // 该分支不会返回 `MStr_Err_UndefinedParserError`,
         // 因为已经做了判断了
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result,
             parse_one_token(
                 state, TokenType_Colon, MStr_Err_UndefinedParserError
@@ -678,7 +667,7 @@ static mstr_result_t parse_opt_formatfield_spec(
         // fmt type,
         // sign_display在这里也进行了解析是因为这个文法在这里需要判断一下first
         // set, 然后对应着2个不同的rule, 做了点ad-hoc的事情
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result,
             parse_opt_items(
                 state, &fill_char, &align, &fmt_spec, &sign_display
@@ -687,14 +676,11 @@ static mstr_result_t parse_opt_formatfield_spec(
         if (MSTR_SUCC(result) &&
             fmt_spec.fmt_type == MStrFmtFormatType_UnSpec) {
             // 可选的sign
-            result = MSTR_AND_THEN(
-                result, parse_opt_sign(state, &sign_display)
-            );
+            MSTR_AND_THEN(result, parse_opt_sign(state, &sign_display));
             // 可选的width
-            result =
-                MSTR_AND_THEN(result, parse_opt_width(state, &width));
+            MSTR_AND_THEN(result, parse_opt_width(state, &width));
             // 可选的进行格式化的方式
-            result = MSTR_AND_THEN(
+            MSTR_AND_THEN(
                 result, parse_opt_format_chrono_spec(state, &fmt_spec)
             );
         }
@@ -808,7 +794,7 @@ static mstr_result_t parse_chrono_spec(
     MStrFmtChronoFormatSpec* chrono_spec = &spec->chrono_spec;
     // 默认值的lut
     // 它依赖于 MStrFmtChronoValueType 的顺序
-    static const u8_t packed_lut[][4] = {
+    const u8_t packed_lut[][4] = {
         // MStrFmtChronoValueType_Year:
         {(u8_t)MStrFmtChronoValueType_Year,
          (u8_t)True,
@@ -901,7 +887,7 @@ static mstr_result_t parse_chrono_spec(
             chrono_spec->items[6] = r;
             chrono_spec->item_cnt = 7;
         }
-        result = MSTR_AND_THEN(result, parser_next_token(state));
+        MSTR_AND_THEN(result, parser_next_token(state));
         break;
     default:
         // 其余情况当成用户自定义的格式化内容
@@ -998,7 +984,7 @@ static mstr_result_t parse_chrono_spec_item(
         result = MStr_Err_MissingChronoItemType;
     }
     // 取得下一个token
-    result = MSTR_AND_THEN(result, parser_next_token(state));
+    MSTR_AND_THEN(result, parser_next_token(state));
     // 解析可选的分隔符
     cur_token = &LEX_CURRENT_TOKEN(state);
     // 指向一块空的区域
@@ -1012,7 +998,7 @@ static mstr_result_t parse_chrono_spec_item(
            cur_token->type != TokenType_EOF) {
         // 取得下一个token
         // 只要不是}, ]}等结束符号均认为是分割字符
-        result = MSTR_AND_THEN(result, parser_next_token(state));
+        MSTR_AND_THEN(result, parser_next_token(state));
         item->split_end = cur_token->beg;
     }
     return result;
@@ -1124,7 +1110,8 @@ static mstr_result_t parse_opt_items(
                 *ch = *cur_token->beg;
                 // parse对齐描述
                 res = parser_next_token(state);
-                return MSTR_AND_THEN(res, parse_align(state, align));
+                MSTR_AND_THEN(res, parse_align(state, align));
+                return res;
             }
             else {
                 // 后面应该是format_type或者sign
@@ -1180,7 +1167,7 @@ static mstr_result_t parse_align(
         break;
     }
     *align = matched;
-    res = MSTR_AND_THEN(res, parser_next_token(state));
+    MSTR_AND_THEN(res, parser_next_token(state));
     return res;
 }
 

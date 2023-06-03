@@ -84,7 +84,7 @@ mstr_repeat_append(MString* str, char ch, usize_t cnt)
     if (str->length + cnt + 1 >= str->cap_size) {
         // 保证length < cap_size + 1
         // 且有足够的空间存放下一个字符
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result,
             mstr_expand_size(str, str->cap_size + MSTR_CAP_SIZE_STEP)
         );
@@ -104,7 +104,7 @@ mstr_concat(MString* str, const MString* other)
     mstr_result_t result = MStr_Ok;
     if (str->length + other->length >= str->cap_size) {
         // 且有足够的空间存放
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result,
             mstr_expand_size(
                 str, str->cap_size + other->length + MSTR_CAP_SIZE_STEP
