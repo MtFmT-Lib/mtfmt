@@ -11,7 +11,6 @@
  */
 #include "mm_fmt.h"
 #include "mm_typedef.h"
-// #include "runtime_system.h"
 
 static void div_mod_10(u32_t, u32_t*, u32_t*);
 static void div_mod_10_u64(u64_t, u64_t*, u32_t*);
@@ -113,7 +112,7 @@ mstr_fmt_ttoa(
         default: system_unreachable(); break;
         }
         // 格式化单个的项
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result,
             bcdtoa(
                 res_str,
@@ -125,7 +124,7 @@ mstr_fmt_ttoa(
         );
         // 放入分隔符
         if (item->split_beg != item->split_end) {
-            result = MSTR_AND_THEN(
+            MSTR_AND_THEN(
                 result,
                 mstr_concat_cstr_slice(
                     res_str, item->split_beg, item->split_end
@@ -145,7 +144,7 @@ static mstr_result_t utoa_impl_10base(MString* str, u32_t value)
     mstr_result_t result = MStr_Ok;
     if (value == 0) {
         // 值是0
-        result = MSTR_AND_THEN(result, mstr_append(str, '0'));
+        MSTR_AND_THEN(result, mstr_append(str, '0'));
     }
     else {
         // 转换
@@ -156,13 +155,13 @@ static mstr_result_t utoa_impl_10base(MString* str, u32_t value)
             // 转换为字符
             char ch = (char)('0' + digit);
             // push char
-            result = MSTR_AND_THEN(result, mstr_append(str, ch));
+            MSTR_AND_THEN(result, mstr_append(str, ch));
             if (MSTR_FAILED(result)) {
                 break;
             }
         }
         // 翻转转换结果
-        result = MSTR_AND_THEN(result, mstr_reverse_self(str));
+        MSTR_AND_THEN(result, mstr_reverse_self(str));
     }
     return result;
 }
@@ -179,7 +178,7 @@ static mstr_result_t utoa_impl_2base(
     mstr_result_t result = MStr_Ok;
     if (value == 0) {
         // 值是0
-        result = MSTR_AND_THEN(result, mstr_append(str, '0'));
+        MSTR_AND_THEN(result, mstr_append(str, '0'));
     }
     else {
         // ilog2
@@ -197,13 +196,13 @@ static mstr_result_t utoa_impl_2base(
                 ch = (char)('0' + digit);
             }
             // push char
-            result = MSTR_AND_THEN(result, mstr_append(str, ch));
+            MSTR_AND_THEN(result, mstr_append(str, ch));
             if (MSTR_FAILED(result)) {
                 break;
             }
         }
         // 翻转转换结果
-        result = MSTR_AND_THEN(result, mstr_reverse_self(str));
+        MSTR_AND_THEN(result, mstr_reverse_self(str));
     }
     return result;
 }
@@ -218,21 +217,19 @@ static mstr_result_t uqtoa_impl(MString* str, u32_t value, u32_t quat)
     mstr_result_t result = MStr_Ok;
     if (value == 0) {
         // 值是0
-        result = MSTR_AND_THEN(result, mstr_append(str, '0'));
+        MSTR_AND_THEN(result, mstr_append(str, '0'));
     }
     else {
         u32_t ipart = value >> quat;
         u32_t dpart = value & ((1 << quat) - 1);
         // 转换整数部分
-        result = MSTR_AND_THEN(result, utoa_impl_10base(str, ipart));
+        MSTR_AND_THEN(result, utoa_impl_10base(str, ipart));
         // 转换小数部分
         if (dpart > 0) {
             // 小数点
-            result = MSTR_AND_THEN(result, mstr_append(str, '.'));
+            MSTR_AND_THEN(result, mstr_append(str, '.'));
             // 小数部分
-            result = MSTR_AND_THEN(
-                result, uqtoa_helper_dpart(str, dpart, quat)
-            );
+            MSTR_AND_THEN(result, uqtoa_helper_dpart(str, dpart, quat));
         }
     }
     return result;
@@ -251,7 +248,7 @@ static mstr_result_t uqtoa_helper_dpart(
     result = mstr_create_empty(&buff);
     if (value == 0) {
         // 值是0
-        result = MSTR_AND_THEN(result, mstr_append(&buff, '0'));
+        MSTR_AND_THEN(result, mstr_append(&buff, '0'));
     }
     else {
         // 转换值
@@ -283,7 +280,7 @@ static mstr_result_t uqtoa_helper_dpart(
             // 消除后缀多余的0, 然后push char
             if (digit != 0 || !tail_0) {
                 // push char
-                result = MSTR_AND_THEN(result, mstr_append(&buff, ch));
+                MSTR_AND_THEN(result, mstr_append(&buff, ch));
                 if (MSTR_FAILED(result)) {
                     break;
                 }
@@ -296,17 +293,17 @@ static mstr_result_t uqtoa_helper_dpart(
         // 补全前导0
         usize_t fill_len = quat - cv_sz;
         while (fill_len > 0) {
-            result = MSTR_AND_THEN(result, mstr_append(&buff, '0'));
+            MSTR_AND_THEN(result, mstr_append(&buff, '0'));
             fill_len -= 1;
             if (MSTR_FAILED(result)) {
                 break;
             }
         }
         // 翻转结果
-        result = MSTR_AND_THEN(result, mstr_reverse_self(&buff));
+        MSTR_AND_THEN(result, mstr_reverse_self(&buff));
     }
     // copy到输出
-    result = MSTR_AND_THEN(result, mstr_concat(str, &buff));
+    MSTR_AND_THEN(result, mstr_concat(str, &buff));
     return result;
 }
 
@@ -337,10 +334,10 @@ static mstr_result_t bcdtoa(
         u32_t dec_val = (bcd >> (4 * cur_pos)) & 0xf;
         if (dec_val > 0) {
             ch = (char)(dec_val + '0');
-            result = MSTR_AND_THEN(result, mstr_append(str, ch));
+            MSTR_AND_THEN(result, mstr_append(str, ch));
         }
         else if (fixed || len > cur_pos) {
-            result = MSTR_AND_THEN(result, mstr_append(str, '0'));
+            MSTR_AND_THEN(result, mstr_append(str, '0'));
         }
     }
     return result;
