@@ -31,6 +31,7 @@ extern "C"
     void fmt_seq_arg_id(void);
     void fmt_seq_arg_id_err(void);
 
+    void fmt_quat_value_sign(void);
     void fmt_quat_value_dualprec(void);
     void fmt_quat_value_singprec(void);
 

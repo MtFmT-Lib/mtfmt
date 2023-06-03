@@ -53,6 +53,7 @@ int main()
     RUN_TEST(fmt_seq_arg_id);
     RUN_TEST(fmt_seq_arg_id_err);
 
+    RUN_TEST(fmt_quat_value_sign);
     RUN_TEST(fmt_quat_value_dualprec);
     RUN_TEST(fmt_quat_value_singprec);
 
