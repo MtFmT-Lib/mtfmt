@@ -23,7 +23,7 @@ static mstr_result_t utoa_impl_10base(MString*, u32_t);
 MSTR_EXPORT_API(mstr_result_t)
 mstr_fmt_uqtoa(MString* res_str, u32_t value, u32_t quat)
 {
-    if (quat > 31) {
+    if (quat > 31 || quat == 0) {
         // 最高支持q31
         return MStr_Err_UnsupportQuantBits;
     }

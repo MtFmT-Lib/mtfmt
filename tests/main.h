@@ -31,6 +31,10 @@ extern "C"
     void fmt_seq_arg_id(void);
     void fmt_seq_arg_id_err(void);
 
+    void fmt_quat_value_sign(void);
+    void fmt_quat_value_dualprec(void);
+    void fmt_quat_value_singprec(void);
+
     void fmt_behav_signed_bin(void);
     void fmt_behav_signed_oct(void);
     void fmt_behav_signed_dec(void);
@@ -50,6 +54,23 @@ extern "C"
     void equal_string(void);
     void reverse_self(void);
     void repeat_append_char(void);
+
+    void fmt_array(void);
+    void fmt_array_element_style(void);
+    void fmt_array_userdefind_split(void);
+
+    void fmt_chrono_default_f(void);
+    void fmt_chrono_default_g(void);
+    void fmt_chrono_userdef_year(void);
+    void fmt_chrono_userdef_month(void);
+    void fmt_chrono_userdef_day(void);
+    void fmt_chrono_userdef_hour(void);
+    void fmt_chrono_userdef_minute(void);
+    void fmt_chrono_userdef_second(void);
+    void fmt_chrono_userdef_subsecond(void);
+    void fmt_chrono_userdef_week(void);
+
+    void fmt_escape_bracket(void);
 
     void cpp_string_equal(void);
 #if __cplusplus

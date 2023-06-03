@@ -36,6 +36,9 @@ void tearDown(void)
 int main()
 {
     UNITY_BEGIN();
+
+    printf("Build configure: 0x%08x\n", mstr_configure());
+
     RUN_TEST(allocate_then_free);
 
     RUN_TEST(fmt_align_left);
@@ -49,6 +52,10 @@ int main()
     RUN_TEST(fmt_align_middle_long);
     RUN_TEST(fmt_seq_arg_id);
     RUN_TEST(fmt_seq_arg_id_err);
+
+    RUN_TEST(fmt_quat_value_sign);
+    RUN_TEST(fmt_quat_value_dualprec);
+    RUN_TEST(fmt_quat_value_singprec);
 
     RUN_TEST(fmt_behav_signed_bin);
     RUN_TEST(fmt_behav_signed_oct);
@@ -69,6 +76,23 @@ int main()
     RUN_TEST(equal_string);
     RUN_TEST(reverse_self);
     RUN_TEST(repeat_append_char);
+
+    RUN_TEST(fmt_array);
+    RUN_TEST(fmt_array_element_style);
+    RUN_TEST(fmt_array_userdefind_split);
+
+    RUN_TEST(fmt_chrono_default_f);
+    RUN_TEST(fmt_chrono_default_g);
+    RUN_TEST(fmt_chrono_userdef_year);
+    RUN_TEST(fmt_chrono_userdef_month);
+    RUN_TEST(fmt_chrono_userdef_day);
+    RUN_TEST(fmt_chrono_userdef_hour);
+    RUN_TEST(fmt_chrono_userdef_minute);
+    RUN_TEST(fmt_chrono_userdef_second);
+    RUN_TEST(fmt_chrono_userdef_subsecond);
+    RUN_TEST(fmt_chrono_userdef_week);
+
+    RUN_TEST(fmt_escape_bracket);
 
     RUN_TEST(cpp_string_equal);
 

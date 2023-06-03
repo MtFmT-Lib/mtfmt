@@ -1663,7 +1663,7 @@ chrono_percentage:
     case 'm': goto chrono_userdef_m; break;
     case 's': goto chrono_userdef_s; break;
     case 'x': goto chrono_userdef_x; break;
-    case 'W': goto chrono_userdef_W; break;
+    case 'w': goto chrono_userdef_W; break;
     case '>':
     case '<':
     case '=':

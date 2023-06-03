@@ -275,7 +275,7 @@ static mstr_result_t format_array(
         // 格式化元素的值到 internal_buff
         MSTR_AND_THEN(result, convert(&buff, parser_result, &element));
         // 增加分隔符
-        if (MSTR_SUCC(result)) {
+        if (MSTR_SUCC(result) && array_index + 1 < array_len) {
             const char* split_beg = parser_result->array_split_beg;
             const char* split_end = parser_result->array_split_end;
             result =
