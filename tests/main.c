@@ -50,6 +50,9 @@ int main()
     RUN_TEST(fmt_seq_arg_id);
     RUN_TEST(fmt_seq_arg_id_err);
 
+    RUN_TEST(fmt_quat_value_dualprec);
+    RUN_TEST(fmt_quat_value_singprec);
+
     RUN_TEST(fmt_behav_signed_bin);
     RUN_TEST(fmt_behav_signed_oct);
     RUN_TEST(fmt_behav_signed_dec);
@@ -69,6 +72,10 @@ int main()
     RUN_TEST(equal_string);
     RUN_TEST(reverse_self);
     RUN_TEST(repeat_append_char);
+
+    RUN_TEST(fmt_array);
+    RUN_TEST(fmt_array_element_style);
+    RUN_TEST(fmt_array_userdefind_split);
 
     RUN_TEST(cpp_string_equal);
 
