@@ -4,7 +4,7 @@ MtFmT
 ![AUTHOR](https://img.shields.io/badge/Author-XiangYang%20%26%20HalfSweet-blue)
 ![LICENSE](https://img.shields.io/badge/License-LGPL--V3-green)
 ![LANGUAGE](https://img.shields.io/badge/Language-100%25%20C-yellowgreen)
-[![Coverage Status](https://coveralls.io/repos/github/MtFmT-Lib/mtfmt/badge.svg?branch=better_test)](https://coveralls.io/github/MtFmT-Lib/mtfmt?branch=better_test)
+[![Coverage Status](https://coveralls.io/repos/github/MtFmT-Lib/mtfmt/badge.svg?branch=master)](https://coveralls.io/github/MtFmT-Lib/mtfmt?branch=master)
 
 
 [![DOCUMENT](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/document.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/document.yml)
