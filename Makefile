@@ -12,6 +12,7 @@
 # MTFMT_BUILD_DEBUG					是否以DEBUG构建
 # MTFMT_BUILD_ARCH					体系结构标记
 # MTFMT_BUILD_USE_LTO				使用LTO
+# MTFMT_BUILD_COVERAGE				代码测试覆盖率
 
 ifdef MTFMT_BUILD_TARGET_NAME
 TARGET_NAME = $(MTFMT_BUILD_TARGET_NAME)
@@ -57,8 +58,8 @@ AR_DISPLAY = AR output :
 # 测试时显示的内容
 TEST_DISPLAY = Running test :
 
-# Table generator
-TBGEN_DISPLAY = TB:
+# 生成覆盖率报告时显示的内容
+GCOV_REPORT_DISPLAY = Gernerate ode coverage report ...
 
 # Build path
 BUILD_DIR = build
@@ -72,6 +73,8 @@ OUTPUT_DIR = $(MTFMT_BUILD_OUTPUT_DIR)
 else
 OUTPUT_DIR = target
 endif
+
+COVERAGE_DIR = target_coverage
 
 # C sources
 C_SOURCES =  \
@@ -96,10 +99,13 @@ endif
 ifdef GCC_PATH
 CC = $(GCC_PATH)/$(PREFIX)gcc
 AR = $(GCC_PATH)/$(PREFIX)ar
+COV = $(GCC_PATH)/$(PREFIX)gcov
 else
 CC = $(PREFIX)gcc
 AR = $(PREFIX)ar
+COV = $(GCC_PATH)gcov
 endif
+COV_REPORT = gcovr
 
 # arch opt
 ifdef MTFMT_BUILD_ARCH
@@ -118,6 +124,9 @@ endif
 
 # 选项
 OPT = -fpic
+ifeq ($(MTFMT_BUILD_COVERAGE),1)
+OPT += -fprofile-arcs -ftest-coverage
+endif
 
 # C defines
 C_DEFS =
@@ -169,6 +178,10 @@ ifneq ($(MTFMT_BUILD_DEBUG), 1)
 TEST_LD_OPTS += $(LTO_OPT)
 endif
 
+ifeq ($(MTFMT_BUILD_COVERAGE),1)
+TEST_LD_OPTS += -lgcov
+endif
+
 # 回收不需要的段
 DYLIB_LD_OPTS += -Wl,--gc-sections
 
@@ -201,6 +214,12 @@ test: $(OUTPUT_DIR)/$(TEST_TARGET)
 	@echo $(TEST_DISPLAY) $<
 	@"$(addprefix ./$(OUTPUT_DIR)/,$(notdir $<))"
 
+# 测试覆盖率
+coverage: test | $(COVERAGE_DIR)
+	@echo $(GCOV_REPORT_DISPLAY)
+	@$(COV_REPORT) --root . --html --html-details --output "$(COVERAGE_DIR)/index.html"
+	@echo $(GCOV_REPORT_DISPLAY) completed.
+
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
 	@echo $(CC_DISPLAY) $<
 	@$(CC) -c $(C_STANDARD) $(CFLAGS) -MMD -MP -MF"$(@:%.o=%.d)" $< -o $@
@@ -225,6 +244,9 @@ $(BUILD_DIR):
 	mkdir $@
 
 $(OUTPUT_DIR):
+	mkdir $@
+
+$(COVERAGE_DIR):
 	mkdir $@
 
 # 依赖

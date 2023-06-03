@@ -3,9 +3,10 @@
 
 .pyenv
 .vscode
+lib
 build
 target
-lib
+target_coverage
 
 !*.md
 !LICENSE
