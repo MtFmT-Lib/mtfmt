@@ -5,6 +5,7 @@ on:
     paths:
       - "src/**.c"
       - "inc/**.h"
+      - "inc/**.hpp"
       - "tests/**.c"
       - "tests/**.h"
       - "**.clang-format"
@@ -14,6 +15,7 @@ on:
     paths:
       - "src/**.c"
       - "inc/**.h"
+      - "inc/**.hpp"
       - "tests/**.c"
       - "tests/**.h"
       - "**.clang-format"
