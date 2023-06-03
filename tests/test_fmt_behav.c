@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    fmt_behav.c
+ * @file    test_fmt_behav.c
  * @author  向阳 (hinata.hoshino@foxmail.com)
  * @brief   格式化行为
  * @version 1.0
@@ -10,28 +10,12 @@
  *
  */
 #include "helper.h"
+#include "main.h"
 #include "mm_fmt.h"
 #include "mm_heap.h"
 #include "unity.h"
 #include <stddef.h>
 #include <stdio.h>
-
-#define RUNTIME_HEAP_SIZE 2048
-
-/**
- * @brief 堆
- *
- */
-static byte_t heap[RUNTIME_HEAP_SIZE];
-
-void setUp(void)
-{
-    mstr_heap_init(heap, RUNTIME_HEAP_SIZE);
-}
-
-void tearDown(void)
-{
-}
 
 void fmt_behav_signed_bin(void)
 {
@@ -67,14 +51,4 @@ void fmt_behav_signed_hex(void)
     EVAL(mstr_format("@{0:i32:h}@{1:i32:h}@", &s, 2, 10, -10));
     ASSERT_EQUAL_STRING(&s, "@a@-a@");
     mstr_free(&s);
-}
-
-int main()
-{
-    UNITY_BEGIN();
-    RUN_TEST(fmt_behav_signed_bin);
-    RUN_TEST(fmt_behav_signed_oct);
-    RUN_TEST(fmt_behav_signed_dec);
-    RUN_TEST(fmt_behav_signed_hex);
-    return UNITY_END();
 }

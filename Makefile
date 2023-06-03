@@ -39,13 +39,11 @@ endif
 
 LIB_TARGET = lib$(TARGET_NAME)$(LIB_EXT)
 
-TESTLIB_TARGET_NAME = $(TARGET_NAME)_test
-
-TESTLIB_TARGET = lib$(TESTLIB_TARGET_NAME)$(LIB_EXT)
-
 DYLIB_TARGET = lib$(TARGET_NAME)_dy$(DYLIB_EXT)
 
 DYLIB_IMPLIB_TARGET = lib$(TARGET_NAME)_dy$(LIB_EXT)
+
+TEST_TARGET = $(TARGET_NAME)_run$(EXE_EXT)
 
 # 编译时显示的内容
 CC_DISPLAY = CC:
@@ -80,18 +78,10 @@ C_SOURCES =  \
 $(wildcard ./src/*.c) \
 $(wildcard ./src/**/*.c)
 
-# 测试框架的源
-TEST_C_STAB_INC = \
--Ithirds/unity/src \
--Itests
-
-TEST_C_STAB_SOURCES = \
-$(wildcard ./thirds/unity/src/*.c)
-
-
 # 测试源
 TEST_C_SOURCES = \
-$(wildcard ./tests/*.c)
+$(wildcard ./tests/*.c) \
+$(wildcard ./thirds/unity/src/*.c)
 
 # 编译器
 ifdef MTFMT_BUILD_GCC_PREFIX
@@ -134,7 +124,9 @@ endif
 
 # C includes
 C_INCLUDES = \
--Iinc
+-Iinc \
+-Ithirds/unity/src \
+-Itests
 
 # Standard
 C_STANDARD = --std=c11
@@ -174,11 +166,8 @@ OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(C_SOURCES)))
 
 # list of objects for tests
-TEST_OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(TEST_C_STAB_SOURCES:.c=.o)))
-vpath %.c $(sort $(dir $(TEST_C_STAB_SOURCES)))
-
-# 测试的target
-TEST_TARGETS = $(addprefix $(TEST_DIR)/,$(notdir $(TEST_C_SOURCES:.c=)))
+TEST_OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(TEST_C_SOURCES:.c=.o)))
+vpath %.c $(sort $(dir $(TEST_C_SOURCES)))
 
 # build all
 all: lib dylib alltests
@@ -192,17 +181,10 @@ lib: $(OUTPUT_DIR)/$(LIB_TARGET)
 dylib: $(OUTPUT_DIR)/$(DYLIB_TARGET)
 	@echo Link completed.
 
-# 所有测试
-alltests: $(TEST_TARGETS)
-	@echo Test completed.
-
-$(TEST_DIR)/%: $(TEST_OBJECTS) $(OBJECTS) Makefile | $(OUTPUT_DIR)
-	@echo $(CC_DISPLAY) $@.c
-	@gcc -c $@.c $(TEST_C_STAB_INC) $(CFLAGS) -MMD -MP -MF"$(addprefix $(BUILD_DIR)/,$(notdir $@.d))" -o "$(addprefix $(BUILD_DIR)/,$(notdir $@.o))"
-	@echo $(LD_DISPLAY) $@
-	@gcc "$(addprefix $(BUILD_DIR)/,$(notdir $@.o))" $(TEST_C_STAB_SOURCES) $(OBJECTS) $(TEST_LD_OPTS) -o "$(addprefix $(OUTPUT_DIR)/,$(notdir $@$(EXE_EXT)))"
-	@echo $(TEST_DISPLAY) $@
-	@"$(addprefix ./$(OUTPUT_DIR)/,$(notdir $@$(EXE_EXT)))"
+# 测试
+test: $(OUTPUT_DIR)/$(TEST_TARGET)
+	@echo $(TEST_DISPLAY) $<
+	@"$(addprefix ./$(OUTPUT_DIR)/,$(notdir $<))"
 
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
 	@echo $(CC_DISPLAY) $<
@@ -215,6 +197,10 @@ $(OUTPUT_DIR)/$(LIB_TARGET): $(OBJECTS) Makefile | $(OUTPUT_DIR)
 $(OUTPUT_DIR)/$(DYLIB_TARGET): $(OBJECTS) Makefile | $(OUTPUT_DIR)
 	@echo $(LD_DISPLAY) $@
 	@$(CC) -shared $(OBJECTS) -o $@ $(DYLIB_LD_OPTS)
+
+$(OUTPUT_DIR)/$(TEST_TARGET): $(OBJECTS) $(TEST_OBJECTS) | $(OUTPUT_DIR)
+	@echo $(LD_DISPLAY) $@
+	@gcc $(OBJECTS) $(TEST_OBJECTS) $(TEST_LD_OPTS) -o $@
 
 $(BUILD_DIR):
 	mkdir $@
