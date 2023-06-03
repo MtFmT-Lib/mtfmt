@@ -16,47 +16,11 @@
 #include "mm_heap.h"
 #include "mm_result.h"
 #include "mm_string.h"
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 namespace mtfmt
 {
-/**
- * @brief 单位类型
- *
- */
-struct unit_t
-{
-    constexpr bool operator==(unit_t) const noexcept
-    {
-        return true;
-    }
-
-    constexpr bool operator!=(unit_t) const noexcept
-    {
-        return false;
-    }
-
-    constexpr bool operator<(unit_t) const noexcept
-    {
-        return false;
-    }
-
-    constexpr bool operator>(unit_t) const noexcept
-    {
-        return false;
-    }
-
-    constexpr bool operator<=(unit_t) const noexcept
-    {
-        return true;
-    }
-
-    constexpr bool operator>=(unit_t) const noexcept
-    {
-        return true;
-    }
-};
-
 /**
  * @brief 返回值的错误结果
  *
@@ -193,6 +157,27 @@ public:
         mstr_clear(&this_obj);
         mstr_concat(&this_obj, &str.this_obj);
         return *this;
+    }
+
+    /**
+     * @brief 相等
+     *
+     */
+    inline bool operator==(const string& str) const noexcept
+    {
+        return !!mstr_equal(&this_obj, &str.this_obj);
+    }
+
+    /**
+     * @brief 相等(cstr)
+     *
+     */
+    template <std::size_t N>
+    inline bool operator==(const char_t (&str)[N]) const noexcept
+    {
+        MString obj;
+        mstr_create(&obj, str);
+        return !!mstr_equal(&this_obj, &obj);
     }
 
     /**
