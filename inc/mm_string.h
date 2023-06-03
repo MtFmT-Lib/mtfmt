@@ -63,6 +63,24 @@ mstr_create(MString* str, const char* content);
 #define mstr_create_empty(s) (mstr_create((s), "\0"))
 
 /**
+ * @brief 移动字符串来创建
+ *
+ * @param[out] str: 需要创建的字符串结构
+ * @param[inout] other: 需要移动的字符串
+ */
+MSTR_EXPORT_API(void)
+mstr_move_create(MString* str, MString* other);
+
+/**
+ * @brief 复制字符串来创建
+ *
+ * @param[out] str: 需要创建的字符串结构
+ * @param[in] other: 需要移动的字符串
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_copy_create(MString* str, const MString* other);
+
+/**
  * @brief 清空字符串
  *
  * @param[inout] str: 需要清空的字符串
