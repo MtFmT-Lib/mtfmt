@@ -59,7 +59,7 @@ AR_DISPLAY = AR output :
 TEST_DISPLAY = Running test :
 
 # 生成覆盖率报告时显示的内容
-GCOV_REPORT_DISPLAY = Gernerate ode coverage report ...
+GCOV_REPORT_DISPLAY = Gernerate code coverage report ...
 
 # Build path
 BUILD_DIR = build
@@ -215,9 +215,13 @@ test: $(OUTPUT_DIR)/$(TEST_TARGET)
 	@"$(addprefix ./$(OUTPUT_DIR)/,$(notdir $<))"
 
 # 测试覆盖率
-coverage: test | $(COVERAGE_DIR)
+coverage: test
+	@echo Completed.
+
+# 测试覆盖率, 并携带报告
+coverage_report: coverage | $(COVERAGE_DIR)
 	@echo $(GCOV_REPORT_DISPLAY)
-	@$(COV_REPORT) --root . --html --html-details --output "$(COVERAGE_DIR)/index.html"
+	@$(COV_REPORT) --exclude "test_*" --exclude "thirds/*" --html --html-details --output "$(COVERAGE_DIR)/index.html"
 	@echo $(GCOV_REPORT_DISPLAY) completed.
 
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
