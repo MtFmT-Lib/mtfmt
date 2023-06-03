@@ -50,6 +50,8 @@ extern "C"
     void equal_string(void);
     void reverse_self(void);
     void repeat_append_char(void);
+
+    void cpp_string_equal(void);
 #if __cplusplus
 }
 #endif

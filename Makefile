@@ -83,6 +83,10 @@ TEST_C_SOURCES = \
 $(wildcard ./tests/*.c) \
 $(wildcard ./thirds/unity/src/*.c)
 
+# 测试源 ( C++ )
+TEST_CPP_SOURCES= \
+$(wildcard ./tests/*.cpp)
+
 # 编译器
 ifdef MTFMT_BUILD_GCC_PREFIX
 PREFIX = $(MTFMT_BUILD_GCC_PREFIX)
@@ -131,11 +135,18 @@ C_INCLUDES = \
 # Standard
 C_STANDARD = --std=c11
 
+# Standard
+CXX_STANDARD = --std=c++11
+
 ifeq ($(MTFMT_BUILD_DEBUG), 1)
-CFLAGS = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) -D_DEBUG -Wall -fdata-sections -ffunction-sections -g -gdwarf-2
+CFLAGS = $(ARCH) $(C_DEFS) $(C_INCLUDES) $(OPT) -D_DEBUG -Wall -fdata-sections -ffunction-sections -g -gdwarf-2
 else
-CFLAGS = $(ARCH) $(C_STANDARD) $(C_DEFS) $(C_INCLUDES) $(OPT) $(LTO_OPT) -Wall -fdata-sections -ffunction-sections
+CFLAGS = $(ARCH) $(C_DEFS) $(C_INCLUDES) $(OPT) $(LTO_OPT) -Wall -fdata-sections -ffunction-sections
 endif
+
+# C++
+# 不使用RTTI, 异常
+CXX_FLAGS = $(CFLAGS) -fno-rtti -fno-exceptions --std=c++11
 
 # 动态链接库的链接选项
 DYLIB_LD_OPTS =	
@@ -169,8 +180,12 @@ vpath %.c $(sort $(dir $(C_SOURCES)))
 TEST_OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(TEST_C_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(TEST_C_SOURCES)))
 
+# list of cpp objects
+TEST_OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(TEST_CPP_SOURCES:.cpp=.o)))
+vpath %.cpp $(sort $(dir $(TEST_CPP_SOURCES)))
+
 # build all
-all: lib dylib alltests
+all: lib dylib test
 	@echo Build completed.
 
 # build static lib
@@ -188,7 +203,11 @@ test: $(OUTPUT_DIR)/$(TEST_TARGET)
 
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
 	@echo $(CC_DISPLAY) $<
-	@$(CC) -c $(CFLAGS) -MMD -MP -MF"$(@:%.o=%.d)" $< -o $@
+	@$(CC) -c $(C_STANDARD) $(CFLAGS) -MMD -MP -MF"$(@:%.o=%.d)" $< -o $@
+
+$(BUILD_DIR)/%.o: %.cpp Makefile | $(BUILD_DIR) 
+	@echo $(CC_DISPLAY) $<
+	@$(CC) -c $(CXX_STANDARD) $(CXX_FLAGS) $< -o $@
 
 $(OUTPUT_DIR)/$(LIB_TARGET): $(OBJECTS) Makefile | $(OUTPUT_DIR)
 	@echo $(AR_DISPLAY) $@

@@ -29,6 +29,7 @@ lib
 
 !.clang-format
 !*.hpp
+!*.cpp
 !*.h
 !*.c
 !Makefile

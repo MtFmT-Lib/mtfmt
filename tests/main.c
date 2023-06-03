@@ -68,7 +68,9 @@ int main()
     RUN_TEST(append_char);
     RUN_TEST(equal_string);
     RUN_TEST(reverse_self);
-
     RUN_TEST(repeat_append_char);
+
+    RUN_TEST(cpp_string_equal);
+
     return UNITY_END();
 }
