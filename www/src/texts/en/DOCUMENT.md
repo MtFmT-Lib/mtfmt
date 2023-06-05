@@ -42,7 +42,7 @@ As you see, the implementation has four properties mainly. The first one, `buff`
 
 ### 2.2.1 Allocator
 
-The allocator is fixed and can be selected by macro `_MSTR_USE_MALLOC`. For the short string, which length is less than `MSTR_STACK_REGION_SIZE`,  the string will be allocated into the stack region. Otherwise, it will be allocated into the heap. The macro `_MSTR_USE_MALLOC` indicated which allocator should be used. When it's equal to 0, the built-in heap manager will be selected. Otherwise, the allocator is malloc, in `stdlib`. Normally, use the macro functions as follows to replace the malloc in your application. Those will be switched by the macro `_MSTR_USE_MALLOC`. See more details in [section 2.5](#section_2_5_Build_in_heap_manager).
+The allocator is fixed and can be selected by macro `_MSTR_USE_MALLOC`. For the short string, which length is less than `MSTR_STACK_REGION_SIZE`,  the string will be allocated into the stack region. Otherwise, it will be allocated into the heap. The macro `_MSTR_USE_MALLOC` indicated which allocator should be used. When it's equal to 0, the built-in heap manager will be selected. Otherwise, the allocator is malloc, in `stdlib`. Use the macro functions as follows to replace the malloc in your application. Those will be switched by the macro `_MSTR_USE_MALLOC`. See more details in [section 2.5](#section_2_5_Build_in_heap_manager).
 
 * `mstr_heap_init`: Initialize the heap
 * `mstr_heap_alloc`: Allocate memory
@@ -69,17 +69,73 @@ mstr_reverse_self(&str);
 
 The clear function `mstr_clear` sets the `length` property to zero simply. It will make this object seem empty after this function is called.
 
-For a string holds length $N$, this function implementation has $O(1)$ time complexity and spatial complexity.
+For a string that holds length $N$, this function implementation has $O(1)$ time complexity and spatial complexity.
 
 #### 2.2.2.1 Reverse string
 
 The reverse function `mstr_reverse_self` reverses all characters in the original string. This function will reverse one by one character rather than just reverse byte.
 
-For a string holds length $N$, this function implementation has $O(N)$ time complexity and $O(1)$ spatial complexity.
+For a string that holds length $N$, this function implementation has $\Theta(N)$ time complexity and $O(1)$ spatial complexity.
 
-### 2.2.3 Concatenating
+### 2.2.3 Concatenation
 
-The concatenating operator for string means that push one or more characters into the source string. 
+The concatenating operator for string means that push one or more characters into the source string. The library provides three functions as follows.
+
+* Pushing functions: `mstr_append` and `mstr_repeat_append`
+* Concatenating functions: `mstr_concat` , `mstr_concat_cstr_slice` and `mstr_concat_cstr`
+
+#### 2.2.3.1 Push
+
+The push function means append one character to the string. For example, the following code shows how to use `mstr_append` and the result.
+
+```c
+MString str;
+mstr_create(&str, "Example");
+mstr_append(&str, '@');
+// now, str == 'Example@'
+```
+
+The `mstr_repeat_append` is a specific version for the `mstr_append`, which means repeat push $N$ characters. In the implementation, the string has a property called `cap_size`, that determined the allocated memory size of this object. The usage of memory will increase when continuing to push the character into that. The increasing step is fixed or selected by some tactics. So that it will trigger heap allocating once and once, causing performance degradation. A suitable solution is that allocated enough memory before operating. The function  `mstr_repeat_append` includes a parameter that indicates the count of the input characters that make specifying the count of characters feasible. Here is an example that shows how to push three `#` characters.
+
+```c
+MString str;
+mstr_create(&str, "Example");
+mstr_repeat_append(&str, '#', 3);
+// now, str == 'Example###'
+```
+
+For $N$ characters and the $L$ length of a string, both two functions have $\Theta(N)$ time complexity.
+
+#### 2.2.3.2 Concatenation
+
+The concatenating function concatenates the string arguments to the calling string and returns the result code. The library provides three different specific versions.
+
+* `mstr_concat`: concatenate one string to another string
+* `mstr_concat_cstr`: concatenate one C-style string pointer to a string object
+* `mstr_concat_cstr_slice`: concatenate a C-style string pointer between two addresses to a string object
+
+The following shows how to use those function.
+
+```c
+MString str;
+mstr_create(&str, "Example");
+// Concatate another string object
+MString another;
+mstr_create(&another, "-concat");
+mstr_concat(&str, &another);
+// now, str is "Example-concat" and the other is "-concat"
+const char* c_style_str = "#1#";
+mstr_concat_cstr(&str, c_style_str);
+// now, str is "Example-concat#1#"
+const char* c_style_point = "0123456789";
+const char* begin = c_style_point + 1;
+const char* end = begin + 5;
+mstr_concat_cstr_slice(&str, begin, end);
+// now, str is "Example-concat#1#1234"
+// "1234" -> [begin, end)
+```
+
+For the $N$ length source string aka. `str` in the code and the $M$ length right side string, those operators have $\Theta(M)$ time complexity.
 
 ### 2.2.4 Equal operator
 
@@ -119,7 +175,7 @@ TODO
 
 ## 2.5 Build-in heap manager
 
-The build-in heap manager is an optional part and it will be compiled when the macro `_MSTR_USE_MALLOC` is zero.
+The built-in heap manager is optional and will be compiled when the macro `_MSTR_USE_MALLOC` is zero.
 
 ### 2.5.1 Allocator functions
 
@@ -133,9 +189,21 @@ TODO
 
 TODO
 
+### 2.6.1 Encoding of character
+
+TODO
+
+### 2.6.2 Monadic result
+
+TODO
+
+### 2.6.3 C++ Wrapper
+
+TODO
+
 # 3 Syntax
 
-The syntax is not context-free syntax, but it can be parsed by a top-down parser easily. For the input of the formatting string, the parser will match the replacement field. The replacement field describes how to process arguments. Consider the input as follows, it shows how to format `input_tm` into `output`.
+The syntax is not context-free syntax, but it can be parsed by a top-down parser easily. The parser will match the replacement field for the input of the formatting string. The replacement field describes how to process arguments. Consider the input as follows, it shows how to format `input_tm` into `output`.
 
 ```c
 mstr_result_t result_code = mstr_format(
