@@ -135,6 +135,8 @@ if (NOT WIN32)
     target_link_options(${DYLIB_TARGET_NAME} PRIVATE ${DYLIB_LINK_FLAGS})
 endif()
 
+install(TARGETS mtfmt)
+
 # 测试
 # enable_testing()
 
