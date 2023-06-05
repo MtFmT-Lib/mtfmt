@@ -32,3 +32,6 @@ lib
 !*.c
 !Makefile
 !Doxyfile
+
+cmake-build-debug/
+.idea/

@@ -110,11 +110,11 @@ target_include_directories(${LIB_TARGET_NAME} PUBLIC inc)
 
 if (WIN32)
     set(DYLIB_EXT .dll)
-    set(DYLIB_IMPLIB_TARGET lib${LIB_TARGET_NAME}.a)
 else()
     set(DYLIB_EXT .so)
-    set(DYLIB_IMPLIB_TARGET lib${LIB_TARGET_NAME}.a)
 endif()
+
+set(DYLIB_IMPLIB_TARGET lib${LIB_TARGET_NAME}_dy${DYLIB_EXT})
 
 set(DYLIB_TARGET_NAME ${LIB_TARGET_NAME}_dy)
 
@@ -123,7 +123,7 @@ set_target_properties(${DYLIB_TARGET_NAME} PROPERTIES OUTPUT_NAME ${DYLIB_TARGET
 target_include_directories(${DYLIB_TARGET_NAME} PUBLIC inc)
 
 if (MTFMT_BUILD_DEBUG)
-  target_compile_definitions(${DYLIB_TARGET_NAME} PRIVATE _DEBUG)
+    target_compile_definitions(${DYLIB_TARGET_NAME} PRIVATE _DEBUG)
 endif()
 
 # 对于非 Windows 平台，设置动态库的额外链接选项
