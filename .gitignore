@@ -25,9 +25,6 @@ target_coverage
 !*.svg
 !*.drawio
 
-*/internal/*
-
-
 !.clang-format
 !*.hpp
 !*.cpp
@@ -35,3 +32,6 @@ target_coverage
 !*.c
 !Makefile
 !Doxyfile
+
+*/internal/*
+
