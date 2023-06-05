@@ -133,7 +133,8 @@ struct function_trait_impl
  *
  */
 template <typename F>
-struct function_trait : public function_trait_impl<std::decay_t<F>>
+struct function_trait
+    : public function_trait_impl<typename std::decay<F>::type>
 {
 };
 
@@ -214,20 +215,20 @@ public:
      *
      */
     template <typename F>
-    std::enable_if_t<
+    typename std::enable_if<
         // 参数个数必须是1个
         details::function_arg_count<F>::N == 1 &&
             // 第一个参数的类型应当和 类型E 一致
             std::is_same<
-                std::tuple_element_t<
+                typename std::tuple_element<
                     0,
-                    details::function_arg_tuple_t<F>>,
+                    details::function_arg_tuple_t<F>>::type,
                 E>::value &&
             // 异常应该继承自std::exception
             std::is_base_of<
                 std::exception,
                 details::function_return_type_t<F>>::value,
-        T>
+        T>::type
         or_exception(F cont) const
     {
         if (base_t::type_tag == base_t::TypeTag::SuccTag) {
