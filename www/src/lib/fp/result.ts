@@ -54,3 +54,22 @@ export default class Result<T, E>{
         return new Result<T, E>(value, ResultTag.Err)
     }
 }
+
+/**
+ * Optional
+ */
+export type Optional<T> = Result<T, void>
+
+/**
+ * 表示某些值
+ */
+export function Some<T>(value: T): Optional<T> {
+    return Result.Ok<T, void>(value)
+}
+
+/**
+ * 表示没有值
+ */
+export function None<T>(): Optional<T> {
+    return Result.Err<T, void>(undefined)
+}

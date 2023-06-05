@@ -5,7 +5,13 @@
     import Viewer from '@comp/Viewer.svelte'
     import Header from '@comp/Header.svelte'
     import Markdown from '@comp/Markdown.svelte'
-    import { toc, html } from '@text/HOMEPAGE.md'
+    import * as EnPage from '@text/en/HOMEPAGE.md'
+
+    const contents = {
+        en: { toc: EnPage.toc, html: EnPage.html },
+    }
+
+    const language = Object.keys(contents)
 </script>
 
 <svelte:head>
@@ -15,7 +21,7 @@
 
 <section>
     <Header />
-    <Markdown {html} {toc} />
+    <Markdown {language} {contents} />
     <div class="active">
         <Viewer />
     </div>

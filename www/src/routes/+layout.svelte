@@ -3,27 +3,21 @@
 -->
 <script>
     import '@style/style.scss'
+    import ThemeProvider from '@comp/ThemeProvider.svelte'
 </script>
 
-<div class="outter">
+<ThemeProvider>
     <div class="app">
-        <main>
-            <slot />
-        </main>
+        <slot />
     </div>
-</div>
+</ThemeProvider>
 
 <style lang="scss">
     @import '@theme/stylevars.scss';
 
-    .outter {
-        width: 100%;
-        height: 100%;
-    }
-
     .app {
         border-radius: 2px;
-        border: 1px solid $border-color;
+        border: 1px solid var(--border-color);
         max-width: 800px;
         width: 80%;
         margin: 0 auto;

@@ -74,14 +74,13 @@ typedef enum tagMStrResult
 #define MSTR_FAILED(s) ((s) != MStr_Ok)
 
 // AND_THEN
-#define MSTR_AND_THEN(e, then) \
-    ({                         \
-        mstr_result_t r = (e); \
-        (MSTR_SUCC(r)) ? ({    \
-            r = (then);        \
-            r;                 \
-        }) :                   \
-                         (r);  \
-    })
+#define MSTR_AND_THEN(res, then) \
+    do {                         \
+        mstr_result_t r = (res); \
+        if (MSTR_SUCC(r)) {      \
+            r = (then);          \
+        }                        \
+        (res) = r;               \
+    } while (0)
 
 #endif // _INCLUDE_MM_RESULT_H_

@@ -5,6 +5,8 @@ BasedOnStyle: Microsoft
 ColumnLimit: 72
 # 缩进宽度
 IndentWidth: 4
+# 访问说明符偏移
+AccessModifierOffset: -4
 # 大括号的换行规则
 BreakBeforeBraces: Custom
 BraceWrapping:

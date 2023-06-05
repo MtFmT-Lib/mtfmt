@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    fmt_sign.c
+ * @file    test_fmt_sign.c
  * @author  向阳 (hinata.hoshino@foxmail.com)
  * @brief   不同符号设置下的测试
  * @version 1.0
@@ -10,28 +10,12 @@
  *
  */
 #include "helper.h"
+#include "main.h"
 #include "mm_fmt.h"
 #include "mm_heap.h"
 #include "unity.h"
 #include <stddef.h>
 #include <stdio.h>
-
-#define RUNTIME_HEAP_SIZE 2048
-
-/**
- * @brief 堆
- *
- */
-static byte_t heap[RUNTIME_HEAP_SIZE];
-
-void setUp(void)
-{
-    mstr_heap_init(heap, RUNTIME_HEAP_SIZE);
-}
-
-void tearDown(void)
-{
-}
 
 void fmt_sign_add(void)
 {
@@ -64,13 +48,4 @@ void fmt_sign_space(void)
     ));
     ASSERT_EQUAL_STRING(&s, "@ 123@-123@ 0@");
     mstr_free(&s);
-}
-
-int main()
-{
-    UNITY_BEGIN();
-    RUN_TEST(fmt_sign_add);
-    RUN_TEST(fmt_sign_sub);
-    RUN_TEST(fmt_sign_space);
-    return UNITY_END();
 }

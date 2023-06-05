@@ -17,7 +17,7 @@
 #include "mm_typedef.h"
 
 //! sizeof(MStrFmtParserState)
-#define MFMT_PARSER_STATE_SIZE    32
+#define MFMT_PARSER_STATE_SIZE    48
 
 //! 格式化最多支持的参数个数
 #define MFMT_PLACE_MAX_NUM        16

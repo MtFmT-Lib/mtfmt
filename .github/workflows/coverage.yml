@@ -1,0 +1,63 @@
+name: "Code coverage"
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "src/**.c"
+      - "inc/**.h"
+      - "inc/**.hpp"
+      - "Makefile"
+      - ".github/workflows/coverage.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "src/**.c"
+      - "inc/**.h"
+      - "inc/**.hpp"
+      - "Makefile"
+      - ".github/workflows/coverage.yml"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+
+# 保证权限合适
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  coverage:
+    runs-on: "ubuntu-latest"
+    name: "code coverage"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      # 设置GCC版本
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: latest
+      # 构建 (code coverage)
+      - name: Make coverage
+        run: |
+          make coverage
+        env:
+          MTFMT_BUILD_C_DEFS: "-D_MSTR_USE_MALLOC=0 -D_MSTR_USE_HARDWARE_DIV=0"
+          MTFMT_BUILD_USE_LTO: "1"
+          MTFMT_BUILD_COVERAGE: "1"
+      # 覆盖率报告
+      - name: Code coverage report
+        uses: threeal/gcovr-action@latest
+        with:
+          root: '.'
+          coveralls-send: true
+          github-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          excludes: |
+            test_*
+            thirds/*

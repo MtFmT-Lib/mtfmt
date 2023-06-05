@@ -113,7 +113,7 @@ enum
 typedef struct tagRTCTime
 {
     //! (BCD) 年份
-    u8_t year;
+    u16_t year;
 
     //! (BCD) 月
     u8_t month;
@@ -132,9 +132,6 @@ typedef struct tagRTCTime
 
     //! (BCD) 星期
     u8_t week;
-
-    //! 对齐项
-    u8_t reserved;
 
     //! (BCD) 亚秒值, 单位: x0.1ms
     u32_t sub_second;

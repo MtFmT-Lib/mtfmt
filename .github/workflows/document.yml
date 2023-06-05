@@ -6,6 +6,7 @@ on:
       - "**.md"
       - "src/**.c"
       - "inc/**.h"
+      - "inc/**.hpp"
       - ".github/workflows/document.yml"
       - "www/**.ts"
       - "www/**.js"
@@ -21,6 +22,7 @@ on:
       - "**.md"
       - "src/**.c"
       - "inc/**.h"
+      - "inc/**.hpp"
       - ".github/workflows/document.yml"
       - "www/**.ts"
       - "www/**.js"
@@ -69,13 +71,14 @@ jobs:
         with:
           working-directory: "./"
           doxyfile-path: "Doxyfile"
-      # WWW
+      # WASM
       - name: Setup emsdk
         uses: mymindstorm/setup-emsdk@v12
       - name: WASM build
         working-directory: "./www/wasm"
         run: |
           emmake make
+      # 网页
       - name: Yarn
         working-directory: "./www"
         run: |

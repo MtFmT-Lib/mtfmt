@@ -3,9 +3,10 @@
 
 .pyenv
 .vscode
+lib
 build
 target
-lib
+target_coverage
 
 !*.md
 !LICENSE
@@ -24,11 +25,16 @@ lib
 !*.svg
 !*.drawio
 
-*/internal/*
-
-
 !.clang-format
+!*.hpp
+!*.cpp
 !*.h
 !*.c
 !Makefile
 !Doxyfile
+
+cmake-build-debug/
+.idea/
+
+*/internal/*
+
