@@ -16,6 +16,8 @@
 #include "mm_string.h"
 #include "mm_typedef.h"
 
+#include <stdarg.h>
+
 //! sizeof(MStrFmtParserState)
 #define MFMT_PARSER_STATE_SIZE    48
 
@@ -423,7 +425,7 @@ mstr_format(const char* fmt, MString* res_str, usize_t fmt_place, ...);
  */
 MSTR_EXPORT_API(mstr_result_t)
 mstr_vformat(
-    const char* fmt, MString* res_str, usize_t fmt_place, isize_t ap_ptr
+    const char* fmt, MString* res_str, usize_t fmt_place, va_list* ap_ptr
 );
 
 /**

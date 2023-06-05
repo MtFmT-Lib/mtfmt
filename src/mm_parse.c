@@ -649,7 +649,8 @@ static mstr_result_t parse_opt_formatfield_spec(
     char fill_char = ' ';
     MStrFmtAlign align = MStrFmtAlign_Right;
     MStrFmtSignDisplay sign_display = MStrFmtSignDisplay_NegOnly;
-    MStrFmtFormatSpec fmt_spec = {MStrFmtFormatType_UnSpec};
+    MStrFmtFormatSpec fmt_spec = {};
+    fmt_spec.fmt_type = MStrFmtFormatType_UnSpec;
     mstr_result_t result = MStr_Ok;
     state->stage =
         PARSER_STAGE_BEGIN(state->stage, ParserStage_MatchChronoToken);
