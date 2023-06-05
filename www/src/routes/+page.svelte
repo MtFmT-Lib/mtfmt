@@ -6,9 +6,11 @@
     import Header from '@comp/Header.svelte'
     import Markdown from '@comp/Markdown.svelte'
     import * as EnPage from '@text/en/HOMEPAGE.md'
+    import * as ZhPage from '@text/zh/HOMEPAGE.md'
 
     const contents = {
         en: { toc: EnPage.toc, html: EnPage.html },
+        zh: { toc: ZhPage.toc, html: ZhPage.html },
     }
 
     const language = Object.keys(contents)
