@@ -63,6 +63,35 @@ mstr_create(MString* str, const char* content)
     }
 }
 
+MSTR_EXPORT_API(void)
+mstr_move_create(MString* str, MString* other)
+{
+    if (other->buff == other->stack_region) {
+        str->buff = str->stack_region;
+        str->length = other->length;
+        str->cap_size = MSTR_STACK_REGION_SIZE;
+        // 复制stack上的内容
+        memcpy(str->buff, other->buff, other->length);
+    }
+    else {
+        str->buff = other->buff;
+        str->length = other->length;
+        str->cap_size = other->cap_size;
+    }
+    other->buff = NULL;
+    other->length = 0;
+    other->cap_size = 0;
+}
+
+MSTR_EXPORT_API(mstr_result_t)
+mstr_copy_create(MString* str, const MString* other)
+{
+    mstr_result_t result = MStr_Ok;
+    MSTR_AND_THEN(result, mstr_create(str, ""));
+    MSTR_AND_THEN(result, mstr_concat(str, other));
+    return result;
+}
+
 MSTR_EXPORT_API(void) mstr_clear(MString* str)
 {
     str->length = 0;
@@ -84,7 +113,7 @@ mstr_repeat_append(MString* str, char ch, usize_t cnt)
     if (str->length + cnt + 1 >= str->cap_size) {
         // 保证length < cap_size + 1
         // 且有足够的空间存放下一个字符
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result,
             mstr_expand_size(str, str->cap_size + MSTR_CAP_SIZE_STEP)
         );
@@ -104,7 +133,7 @@ mstr_concat(MString* str, const MString* other)
     mstr_result_t result = MStr_Ok;
     if (str->length + other->length >= str->cap_size) {
         // 且有足够的空间存放
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result,
             mstr_expand_size(
                 str, str->cap_size + other->length + MSTR_CAP_SIZE_STEP
@@ -185,7 +214,7 @@ MSTR_EXPORT_API(bool_t) mstr_equal(const MString* a, const MString* b)
 
 MSTR_EXPORT_API(void) mstr_free(MString* str)
 {
-    if (str->buff != str->stack_region) {
+    if (str->buff != NULL && str->buff != str->stack_region) {
         mstr_heap_free(str->buff);
     }
     // else: stack上分配的, 不用管它

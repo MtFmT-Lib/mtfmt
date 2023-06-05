@@ -132,7 +132,7 @@ static mstr_result_t format_impl(
         else {
             // 解析格式化串
             MStrFmtParseResult parser_result;
-            result = MSTR_AND_THEN(
+            MSTR_AND_THEN(
                 result, process_replacement_field(&fmt, &parser_result)
             );
             // 处理结果
@@ -143,27 +143,27 @@ static mstr_result_t format_impl(
             switch (arg_class) {
             case MStrFmtArgClass_EscapeChar:
                 // 转义字符, 直接append
-                result = MSTR_AND_THEN(
+                MSTR_AND_THEN(
                     result,
                     mstr_append(res_str, parser_result.escape_char)
                 );
                 break;
             case MStrFmtArgClass_Value:
                 // 载入参数
-                result = MSTR_AND_THEN(
+                MSTR_AND_THEN(
                     result,
                     load_value(
                         &arg, ctx, arg_id, parser_result.arg_type
                     )
                 );
                 // 进行格式化
-                result = MSTR_AND_THEN(
+                MSTR_AND_THEN(
                     result, format_value(res_str, &parser_result, &arg)
                 );
                 break;
             case MStrFmtArgClass_Array:
                 // 载入参数
-                result = MSTR_AND_THEN(
+                MSTR_AND_THEN(
                     result,
                     load_value(
                         &arg,
@@ -173,7 +173,7 @@ static mstr_result_t format_impl(
                     )
                 );
                 // (数组长度)
-                result = MSTR_AND_THEN(
+                MSTR_AND_THEN(
                     result,
                     load_value(
                         &arg_attach,
@@ -183,7 +183,7 @@ static mstr_result_t format_impl(
                     )
                 );
                 // 格式化数组
-                result = MSTR_AND_THEN(
+                MSTR_AND_THEN(
                     result,
                     format_array(
                         res_str, &parser_result, &arg, &arg_attach
@@ -273,11 +273,9 @@ static mstr_result_t format_array(
         element.type = parser_result->array_ele_type;
         element.value = array_get_item(arg, array_index);
         // 格式化元素的值到 internal_buff
-        result = MSTR_AND_THEN(
-            result, convert(&buff, parser_result, &element)
-        );
+        MSTR_AND_THEN(result, convert(&buff, parser_result, &element));
         // 增加分隔符
-        if (MSTR_SUCC(result)) {
+        if (MSTR_SUCC(result) && array_index + 1 < array_len) {
             const char* split_beg = parser_result->array_split_beg;
             const char* split_end = parser_result->array_split_end;
             result =
@@ -287,7 +285,7 @@ static mstr_result_t format_array(
         array_index += 1;
     }
     // 处理对齐和填充
-    result = MSTR_AND_THEN(
+    MSTR_AND_THEN(
         result,
         copy_to_output(res_str, &parser_result->format_spec, &buff)
     );
@@ -389,12 +387,12 @@ static mstr_result_t format_value(
     // sign_display和fmt_type先格式化到mfmt_static_buff里面
     MString buff;
     mstr_result_t result = mstr_create_empty(&buff);
-    result = MSTR_AND_THEN(result, convert(&buff, parser_result, arg));
+    MSTR_AND_THEN(result, convert(&buff, parser_result, arg));
     if (result == MStr_Err_BufferTooSmall) {
         result = MStr_Err_InternalBufferTooSmall;
     }
     // 处理对齐和填充
-    result = MSTR_AND_THEN(
+    MSTR_AND_THEN(
         result,
         copy_to_output(res_str, &parser_result->format_spec, &buff)
     );
@@ -437,33 +435,33 @@ static mstr_result_t copy_to_output(
     switch (align) {
     case MStrFmtAlign_Left:
         // 复制开头的内容
-        result = MSTR_AND_THEN(result, mstr_concat(out_str, src_str));
+        MSTR_AND_THEN(result, mstr_concat(out_str, src_str));
         // 进行填充
         fill_len = fmt_spec->width - src_len;
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result, mstr_repeat_append(out_str, fill_char, fill_len)
         );
         break;
     case MStrFmtAlign_Right:
         fill_len = fmt_spec->width - src_len;
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result, mstr_repeat_append(out_str, fill_char, fill_len)
         );
         // 复制剩下的内容
-        result = MSTR_AND_THEN(result, mstr_concat(out_str, src_str));
+        MSTR_AND_THEN(result, mstr_concat(out_str, src_str));
         break;
     case MStrFmtAlign_Center:
         fill_len = (fmt_spec->width - src_len) / 2;
         // 左侧的填充
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result, mstr_repeat_append(out_str, fill_char, fill_len)
         );
         // 中间的内容
-        result = MSTR_AND_THEN(result, mstr_concat(out_str, src_str));
+        MSTR_AND_THEN(result, mstr_concat(out_str, src_str));
         // 右边的填充
         offset_len = fill_len + src_len;
         fill_len = fmt_spec->width - offset_len;
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result, mstr_repeat_append(out_str, fill_char, fill_len)
         );
         break;
@@ -578,11 +576,10 @@ static mstr_result_t convert_quat(
 {
     mstr_result_t result = MStr_Ok;
     // 转换符号
-    result =
-        MSTR_AND_THEN(result, convert_sign_helper(str, value, sign));
+    MSTR_AND_THEN(result, convert_sign_helper(str, value, sign));
     // 转换无符号值
     u32_t uvalue = value > 0 ? (u32_t)value : (u32_t)(-value);
-    result = MSTR_AND_THEN(result, convert_uquat(str, uvalue, qbits));
+    MSTR_AND_THEN(result, convert_uquat(str, uvalue, qbits));
     // 返回
     return result;
 }
@@ -611,11 +608,10 @@ static mstr_result_t convert_int(
 {
     mstr_result_t result = MStr_Ok;
     // 转换符号
-    result =
-        MSTR_AND_THEN(result, convert_sign_helper(str, value, sign));
+    MSTR_AND_THEN(result, convert_sign_helper(str, value, sign));
     // 转换无符号整数值
     u32_t uvalue = value > 0 ? (u32_t)value : (u32_t)(-value);
-    result = MSTR_AND_THEN(result, convert_uint(str, uvalue, ftyp));
+    MSTR_AND_THEN(result, convert_uint(str, uvalue, ftyp));
     // 返回
     return result;
 }
@@ -658,7 +654,7 @@ static mstr_result_t convert_uint(
 {
     mstr_result_t result = MStr_Ok;
     MString buff;
-    result = MSTR_AND_THEN(result, mstr_create_empty(&buff));
+    MSTR_AND_THEN(result, mstr_create_empty(&buff));
     switch (ftyp) {
     case MStrFmtFormatType_Binary:
         result = mstr_fmt_utoa(&buff, value, MStrFmtIntIndex_Bin);
@@ -678,17 +674,17 @@ static mstr_result_t convert_uint(
         break;
     case MStrFmtFormatType_Hex_WithPrefix:
         // 前面放0x
-        result = MSTR_AND_THEN(result, mstr_concat_cstr(str, "0x"));
+        MSTR_AND_THEN(result, mstr_concat_cstr(str, "0x"));
         // 格式化的内容
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result, mstr_fmt_utoa(&buff, value, MStrFmtIntIndex_Hex)
         );
         break;
     case MStrFmtFormatType_Hex_UpperCase_WithPrefix:
         // 前面放0x
-        result = MSTR_AND_THEN(result, mstr_concat_cstr(str, "0X"));
+        MSTR_AND_THEN(result, mstr_concat_cstr(str, "0X"));
         // 格式化的内容
-        result = MSTR_AND_THEN(
+        MSTR_AND_THEN(
             result,
             mstr_fmt_utoa(&buff, value, MStrFmtIntIndex_Hex_UpperCase)
         );
@@ -700,7 +696,7 @@ static mstr_result_t convert_uint(
     default: result = MStr_Err_UnsupportFormatType; break;
     }
     // 然后跟上格式化的内容
-    result = MSTR_AND_THEN(result, mstr_concat(str, &buff));
+    MSTR_AND_THEN(result, mstr_concat(str, &buff));
     return result;
 }
 
