@@ -95,6 +95,14 @@ int main()
     RUN_TEST(fmt_escape_bracket);
 
     RUN_TEST(cpp_string_equal);
+    RUN_TEST(cpp_string_not_equal);
+    RUN_TEST(cpp_string_push);
+    RUN_TEST(cpp_string_concat);
+
+    RUN_TEST(cpp_monadic_result_or_value);
+    RUN_TEST(cpp_monadic_result_or_exception);
+
+    RUN_TEST(cpp_wrap_fmt);
 
     return UNITY_END();
 }
