@@ -20,7 +20,7 @@
     <meta name="description" content="MtFmt library faq" />
 </svelte:head>
 
-<div>
+<div class="content-page">
     <Header />
     <Markdown {language} {contents} />
 </div>

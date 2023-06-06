@@ -43,8 +43,9 @@ function generate_toc_helper(toc: { level: string; content: string }[]): string 
             html_raw += '<ul class="toc-tree">'
         }
         // </ul>
-        if (last_level > level) {
+        while (last_level > level) {
             tag_count -= 1
+            last_level -= 1
             html_raw += '</ul>'
         }
         // 添加内容

@@ -4,6 +4,7 @@
 <script lang="ts">
     import { writable } from 'svelte/store'
     import generate_toc from './markdown_toc'
+    import * as Storager from '$lib/local_storager'
     import { set_theme, type Theme } from './theme_storager'
     import theme_info, { get_storager_theme } from './theme_storager'
 
@@ -24,9 +25,14 @@
     export let language: string[]
 
     /**
+     * 语言配置项
+     */
+    const LANGUAGE_ITEM_KEY = 'language'
+
+    /**
      * 当前的语言
      */
-    let cur_language = writable(language[0])
+    let cur_language = writable(get_default_language())
 
     /**
      * 当前的主题名
@@ -42,7 +48,9 @@
      * 设置语言
      */
     function set_language(lang: string) {
-        cur_language.set(lang.toLowerCase())
+        const language = lang.toLowerCase()
+        cur_language.set(language)
+        Storager.write_local_storager(LANGUAGE_ITEM_KEY, language)
     }
 
     /**
@@ -57,6 +65,27 @@
      */
     function update_cur_theme() {
         set_theme(cur_theme)
+    }
+
+    /**
+     * 取得默认的语言
+     */
+    function get_default_language(): string {
+        return Storager.read_local_storager(LANGUAGE_ITEM_KEY).or_map(() => {
+            let language: string
+            if (typeof navigator === 'undefined') {
+                language = 'en'
+            } else {
+                const lut = new Map([
+                    ['en', 'en'],
+                    ['en-US', 'en'],
+                    ['zh-CN', 'zh'],
+                ])
+                language = lut.get(navigator.language) ?? 'en'
+            }
+            Storager.write_local_storager(LANGUAGE_ITEM_KEY, language)
+            return language
+        })
     }
 </script>
 
