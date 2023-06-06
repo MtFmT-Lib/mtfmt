@@ -1,29 +1,27 @@
 <!-- 
 #  SPDX-License-Identifier: LGPL-3.0
 -->
+<script lang="ts">
+    import NavBar from './NavBar.svelte'
+    import TransText from './TransText.svelte'
+</script>
+
 <div class="header-father">
     <div class="header">
         <h1 class="title">
-            <span class="odd">M</span><span class="even">t</span><span
-                class="mid">F</span
-            ><span class="even">m</span><span class="odd">t</span>
+            <TransText text="MtFmt" />
         </h1>
         <div class="brief">
             A clean and efficient pure c language library for string formatting.
         </div>
     </div>
     <div class="seealso">
-        <a href="./">HOME</a>
-        <a href="./start">QUICK START</a>
-        <a href="./faq">FAQ</a>
-        <a href="./doc">DOC</a>
-        <a href="https://mtfmt-lib.github.io/mtfmt/doxygen/html/">CODE DOC</a>
-        <a href="https://github.com/MtFmT-Lib/mtfmt">GITHUB</a>
+        <NavBar />
     </div>
 </div>
 
 <style lang="scss">
-    @import '../../themes/common/stylevars.scss';
+    @import '@theme/stylevars.scss';
 
     .header-father {
         display: flex;
@@ -46,18 +44,6 @@
             margin-bottom: 0.25em;
         }
 
-        .odd {
-            color: $transflag-blue;
-        }
-
-        .even {
-            color: $transflag-pink;
-        }
-
-        .mid {
-            color: $transflag-gray;
-        }
-
         .brief {
             font-size: 0.9em;
         }
@@ -66,96 +52,15 @@
     .seealso {
         margin-top: 0.5em;
         margin-bottom: 1em;
-
-        a {
-            text-decoration: none;
-            color: var(--hpyer-link-color);
-
-            &:hover {
-                color: var(--hpyer-link-color-hover);
-            }
-
-            &::before {
-                content: '\00b7';
-                padding-left: 0.5em;
-                padding-right: 0.5em;
-            }
-
-            &:first-child:before {
-                content: '';
-                padding: 0;
-            }
-        }
     }
 
     @media screen and (max-width: 640px) {
-        .header-father {
-            flex-direction: row;
-            align-items: baseline;
-        }
-
         .header .brief {
             font-size: 0.85em;
         }
 
         .seealso {
-            a {
-                display: block;
-                white-space: nowrap;
-
-                &::before {
-                    padding: 0;
-                    padding-right: 0.4em;
-                }
-
-                &:first-child:before {
-                    content: '\00b7';
-                    padding-right: 0.4em;
-                }
-            }
-        }
-    }
-
-    @media screen and (max-width: 420px) {
-        .header {
-            text-align: center;
-        }
-    }
-
-    @media screen and (max-width: 320px) {
-        .header {
-            text-align: initial;
-
-            .title {
-                font-size: 1.5em;
-            }
-
-            .title span {
-                display: block;
-            }
-
-            .even {
-                margin-left: 0.5em;
-            }
-
-            .brief {
-                display: none;
-            }
-        }
-
-        .seealso {
-            a {
-                display: block;
-                white-space: nowrap;
-
-                &::before {
-                    content: '';
-                }
-
-                &:first-child:before {
-                    content: '';
-                }
-            }
+            font-size: 0.85em;
         }
     }
 </style>

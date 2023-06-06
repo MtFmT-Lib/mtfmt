@@ -114,7 +114,7 @@ The concatenating function concatenates the string arguments to the calling stri
 * `mstr_concat_cstr`: concatenate one C-style string pointer to a string object
 * `mstr_concat_cstr_slice`: concatenate a C-style string pointer between two addresses to a string object
 
-The following shows how to use those function.
+The following shows how to use those functions.
 
 ```c
 MString str;
@@ -123,23 +123,33 @@ mstr_create(&str, "Example");
 MString another;
 mstr_create(&another, "-concat");
 mstr_concat(&str, &another);
-// now, str is "Example-concat" and the other is "-concat"
+// Now, str is "Example-concat" and the other is "-concat"
 const char* c_style_str = "#1#";
 mstr_concat_cstr(&str, c_style_str);
-// now, str is "Example-concat#1#"
+// Now, str is "Example-concat#1#"
 const char* c_style_point = "0123456789";
 const char* begin = c_style_point + 1;
 const char* end = begin + 5;
 mstr_concat_cstr_slice(&str, begin, end);
-// now, str is "Example-concat#1#1234"
+// Now, str is "Example-concat#1#1234"
 // "1234" -> [begin, end)
 ```
 
 For the $N$ length source string aka. `str` in the code and the $M$ length right side string, those operators have $\Theta(M)$ time complexity.
 
-### 2.2.4 Equal operator
+### 2.2.4 Comparison operator
 
-Equal
+The comparison function provides a way to compare two strings. If that is the same this function will return `true` otherwise return `false`. The following code shows how to compare two string.
+
+```c
+MString str1, str2;
+mstr_create(&another, "str1");
+mstr_create(&another, "str2");
+bool res = mstr_equal(&str1, &str2);
+// res is false.
+```
+
+The function holds TODO.
 
 ### 2.2.5 Other functions
 
