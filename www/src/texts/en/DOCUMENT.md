@@ -1,4 +1,4 @@
-Mtfmt is a formatter library. It's another implementation for the dialect of PEP-3101 and written in pure C language and optimized for the embedded system.
+MtFmt is a formatter library. It's another implementation for the dialect of PEP-3101 and written in pure C language and optimized for the embedded system.
 
 [toc]
 
@@ -129,7 +129,7 @@ mstr_concat_cstr(&str, c_style_str);
 // Now, str is "Example-concat#1#"
 const char* c_style_point = "0123456789";
 const char* begin = c_style_point + 1;
-const char* end = begin + 5;
+const char* end = begin + 4;
 mstr_concat_cstr_slice(&str, begin, end);
 // Now, str is "Example-concat#1#1234"
 // "1234" -> [begin, end)
@@ -139,21 +139,87 @@ For the $N$ length source string aka. `str` in the code and the $M$ length right
 
 ### 2.2.4 Comparison operator
 
-The comparison function provides a way to compare two strings. If that is the same this function will return `true` otherwise return `false`. The following code shows how to compare two string.
+The comparison function provides a way to compare two strings. If that is the same this function will return `true` otherwise return `false`. The following code shows how to compare two strings.
 
 ```c
 MString str1, str2;
-mstr_create(&another, "str1");
-mstr_create(&another, "str2");
+mstr_create(&str1, "str1");
+mstr_create(&str2, "str2");
 bool res = mstr_equal(&str1, &str2);
 // res is false.
 ```
 
-The function holds TODO.
+The function holds two properties as follows where $S_1=S_2$ is `mstr_equal(&s1, &s2)` and all vaild strings $S\in\mathcal{S}$
+
+* Commutative: $\forall S_1,S_2\in\mathcal{S}$, then $S_1=S_2$ equal $S_2=S_1$
+* Associative: $\forall S_1,S_2,S_3\in\mathcal{S}$, then $S_1=(S_2=S_3)$ equal $(S_1=S_2)=S_3$
+
+For the $N$ length string and an $M$ length string, the comparison function has $\Theta\left(\min\left[N,M\right]\right)$ time complexity.
 
 ### 2.2.5 Other functions
 
-The other
+The other functions include three parts. The type converts function, the construct function, and the destruct function.
+
+#### 2.2.5.1 Convert to C-style string
+
+The function `mstr_as_cstr` provides a method that returns the c-style string pointer of the original string. Due to deliberate design reasons, the string capacity always contains one byte. That means the `cap_size` is greater than the `length` is true in all time. So that this function will append one byte in which the value is zero if necessary and return the c-style string pointer directly. The following code shows the usage.
+
+```c
+MString str;
+mstr_create(&str, "string");
+// Convert to c-style string
+const char* c_str = mstr_as_cstr(&str);
+// Now, c_str is pointing to "string" and terminated by '\0'
+```
+
+#### 2.2.5.2 Construct functions
+
+The construct functions of this object include three different versions. The first version, `mstr_create` is to create a string from a C-style string pointer directly. The second one, `mstr_copy_create` is to copy another string object to create. And the last one, `mstr_move_create` is to move memory from another object to create.
+
+The usage of `mstr_create` is simple and shows follow. After constructing from this function, the result must be called `mstr_free` by hand shown in [section 2.2.5.3](#section_2_2_5_3_Destruct_function)
+
+```c
+MString str;
+mstr_create(&str, "string");
+// str == "string"
+```
+
+The `mstr_copy_create` is designed for copying another object. The following shows how to copy the source string to the destination string. After constructing from this function, the result must be called `mstr_free` by hand and more details show in [section 2.2.5.3](#section_2_2_5_3_Destruct_function).
+
+```c
+MString str;
+mstr_create(&str, "string");
+// str == "string"
+MString another;
+mstr_copy_create(&str, &another);
+// another == "string"
+```
+
+The `mstr_move_create` means moving the memory from the other object. So that called `mstr_free`  is not necessary if constructed from this function. The following code shows how to move that.
+
+```c
+MString str;
+mstr_create(&str, "string");
+// str == "string"
+MString another;
+mstr_move_create(&str, &another);
+// another == "string"
+// And, str is empty now
+```
+
+ #### 2.2.5.3 Destruct function
+
+The destruct function will release memory simply like the following code.
+
+```c
+MString str;
+mstr_create(&str, "string");
+// str == "string"
+mstr_free(&str);
+// str is empty.
+```
+
+This function must be called by hand after calling the most of construct function. Otherwise, it will cause memory leak.
 
 ## 2.3 Formatter
 
@@ -189,7 +255,7 @@ The built-in heap manager is optional and will be compiled when the macro `_MSTR
 
 ### 2.5.1 Allocator functions
 
-The macro function `mstr_heap_init` 
+The macro function `mstr_heap_init`
 
 ### 2.5.2 Fragment counter
 
@@ -253,3 +319,18 @@ TODO
 # 6 See also
 
 TODO
+
+# Annex A: export functions
+
+This annex includes a summary of all export functions.
+
+
+
+# Annex B: syntax summary
+
+TODO
+
+# Annex C: macro options
+
+TODO
+
