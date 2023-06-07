@@ -54,7 +54,7 @@
         margin-bottom: 1em;
     }
 
-    @media screen and (max-width: 640px) {
+    @media screen and (width <= 640px) {
         .header .brief {
             font-size: 0.85em;
         }

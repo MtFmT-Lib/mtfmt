@@ -3,7 +3,6 @@
 -->
 <script>
     import '@style/style.scss'
-    import '@style/contentpage.scss'
     import ThemeProvider from '@comp/ThemeProvider.svelte'
 </script>
 

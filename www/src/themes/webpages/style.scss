@@ -28,3 +28,32 @@ option {
 .bio-reading-bold {
     color: var(--text-color);
 }
+
+// 页面内容
+.content-page {
+    border-radius: 2px;
+    border: 1px solid var(--border-color);
+    max-width: 800px;
+    width: 80%;
+    margin: 0 auto;
+    margin-top: 3em;
+    margin-bottom: 3em;
+    padding: 1em;
+}
+
+@media screen and (width < 720px) {
+    .content-page {
+        width: 90%;
+    }
+}
+
+@media screen and (width < 640px) {
+    .content-page {
+        width: initial;
+        border-left: none;
+        border-right: none;
+        padding: 0;
+        margin-left: 1em;
+        margin-right: 1em;
+    }
+}
