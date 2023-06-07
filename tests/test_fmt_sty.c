@@ -21,7 +21,7 @@ void fmt_sty_bin(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    EVAL(mstr_format("@{0:i32:b}@", &s, 1, 0xa5));
+    EVAL(mstr_format(&s, "@{0:i32:b}@", 1, 0xa5));
     ASSERT_EQUAL_STRING(&s, "@10100101@");
     mstr_free(&s);
 }
@@ -30,7 +30,7 @@ void fmt_sty_oct(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    EVAL(mstr_format("@{0:i32:o}@", &s, 1, 0xa5));
+    EVAL(mstr_format(&s, "@{0:i32:o}@", 1, 0xa5));
     ASSERT_EQUAL_STRING(&s, "@245@");
     mstr_free(&s);
 }
@@ -39,7 +39,7 @@ void fmt_sty_dec(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    EVAL(mstr_format("@{0:i32}@{0:i32:d}@", &s, 1, 0xa5));
+    EVAL(mstr_format(&s, "@{0:i32}@{0:i32:d}@", 1, 0xa5));
     ASSERT_EQUAL_STRING(&s, "@165@165@");
     mstr_free(&s);
 }
@@ -48,7 +48,7 @@ void fmt_sty_hex(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    EVAL(mstr_format("@{0:i32:h}@{0:i32:H}@", &s, 1, 0xa5));
+    EVAL(mstr_format(&s, "@{0:i32:h}@{0:i32:H}@", 1, 0xa5));
     ASSERT_EQUAL_STRING(&s, "@a5@A5@");
     mstr_free(&s);
 }
@@ -57,7 +57,7 @@ void fmt_sty_hex_prefix(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    EVAL(mstr_format("@{0:i32:x}@{0:i32:X}@", &s, 1, 0xa5));
+    EVAL(mstr_format(&s, "@{0:i32:x}@{0:i32:X}@", 1, 0xa5));
     ASSERT_EQUAL_STRING(&s, "@0xa5@0XA5@");
     mstr_free(&s);
 }

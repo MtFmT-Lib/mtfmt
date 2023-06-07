@@ -20,7 +20,7 @@ void fmt_escape_bracket(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    EVAL(mstr_format("@{{{0:i32}}}@", &s, 1, 1234));
+    EVAL(mstr_format(&s, "@{{{0:i32}}}@", 1, 1234));
     ASSERT_EQUAL_STRING(&s, "@{1234}@");
     mstr_free(&s);
 }

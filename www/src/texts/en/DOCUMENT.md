@@ -207,7 +207,7 @@ mstr_move_create(&str, &another);
 // And, str is empty now
 ```
 
- #### 2.2.5.3 Destruct function
+#### 2.2.5.3 Destruct function
 
 The destruct function will release memory simply like the following code.
 
@@ -283,8 +283,8 @@ The syntax is not context-free syntax, but it can be parsed by a top-down parser
 
 ```c
 mstr_result_t result_code = mstr_format(
-    "Today is {0:t:%yyyy-%MM-%dd}",
     &output,
+    "Today is {0:t:%yyyy-%MM-%dd}",
     1,
     &input_tm
 );
@@ -324,8 +324,6 @@ TODO
 
 This annex includes a summary of all export functions.
 
-
-
 # Annex B: syntax summary
 
 TODO
@@ -333,4 +331,3 @@ TODO
 # Annex C: macro options
 
 TODO
-

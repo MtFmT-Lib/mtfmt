@@ -409,7 +409,7 @@ typedef struct tagMStrFmtParseResult
  * @return minfmt_result_t: 格式化结果
  */
 MSTR_EXPORT_API(mstr_result_t)
-mstr_format(const char* fmt, MString* res_str, usize_t fmt_place, ...);
+mstr_format(MString* res_str, const char* fmt, usize_t fmt_place, ...);
 
 /**
  * @brief 格式化字符串
