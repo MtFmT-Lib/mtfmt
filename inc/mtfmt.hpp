@@ -496,8 +496,8 @@ inline result<string, error_code_t> format(
 {
     string str;
     error_code_t code = mstr_format(
-        fmt_str,
         &str.raw_object(),
+        fmt_str,
         sizeof...(args),
         std::forward<Args&&>(args)...
     );

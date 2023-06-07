@@ -21,7 +21,7 @@ void fmt_align_left(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    EVAL(mstr_format("@{0:i32:<8}@", &s, 1, 123));
+    EVAL(mstr_format(&s, "@{0:i32:<8}@", 1, 123));
     ASSERT_EQUAL_STRING(&s, "@123     @");
     mstr_free(&s);
 }
@@ -30,7 +30,7 @@ void fmt_align_left_fill(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    EVAL(mstr_format("@{0:i32:#<8}@", &s, 1, 123));
+    EVAL(mstr_format(&s, "@{0:i32:#<8}@", 1, 123));
     ASSERT_EQUAL_STRING(&s, "@123#####@");
     mstr_free(&s);
 }
@@ -39,7 +39,7 @@ void fmt_align_left_long(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    EVAL(mstr_format("@{0:i32:#<8}@", &s, 1, (int32_t)123456789l));
+    EVAL(mstr_format(&s, "@{0:i32:#<8}@", 1, (int32_t)123456789l));
     ASSERT_EQUAL_STRING(&s, "@123456789@");
     mstr_free(&s);
 }
@@ -48,7 +48,7 @@ void fmt_align_right(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    EVAL(mstr_format("@{0:i32:>8}@", &s, 1, 123));
+    EVAL(mstr_format(&s, "@{0:i32:>8}@", 1, 123));
     ASSERT_EQUAL_STRING(&s, "@     123@");
     mstr_free(&s);
 }
@@ -57,7 +57,7 @@ void fmt_align_right_fill(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    EVAL(mstr_format("@{0:i32:#>8}@", &s, 1, 123));
+    EVAL(mstr_format(&s, "@{0:i32:#>8}@", 1, 123));
     ASSERT_EQUAL_STRING(&s, "@#####123@");
     mstr_free(&s);
 }
@@ -66,7 +66,7 @@ void fmt_align_right_long(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    EVAL(mstr_format("@{0:i32:#>8}@", &s, 1, (int32_t)123456789l));
+    EVAL(mstr_format(&s, "@{0:i32:#>8}@", 1, (int32_t)123456789l));
     ASSERT_EQUAL_STRING(&s, "@123456789@");
     mstr_free(&s);
 }
@@ -75,7 +75,7 @@ void fmt_align_middle(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    EVAL(mstr_format("@{0:i32:=8}@", &s, 1, 123));
+    EVAL(mstr_format(&s, "@{0:i32:=8}@", 1, 123));
     ASSERT_EQUAL_STRING(&s, "@  123   @");
     mstr_free(&s);
 }
@@ -84,7 +84,7 @@ void fmt_align_middle_fill(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    EVAL(mstr_format("@{0:i32:#=8}@", &s, 1, 123));
+    EVAL(mstr_format(&s, "@{0:i32:#=8}@", 1, 123));
     ASSERT_EQUAL_STRING(&s, "@##123###@");
     mstr_free(&s);
 }
@@ -93,7 +93,7 @@ void fmt_align_middle_long(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    EVAL(mstr_format("@{0:i32:#=8}@", &s, 1, (int32_t)123456789l));
+    EVAL(mstr_format(&s, "@{0:i32:#=8}@", 1, (int32_t)123456789l));
     ASSERT_EQUAL_STRING(&s, "@123456789@");
     mstr_free(&s);
 }

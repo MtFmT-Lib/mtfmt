@@ -53,7 +53,7 @@ static mstr_result_t load_value(
     MStrFmtFormatArgument*, MStrFmtArgsContext*, usize_t, MStrFmtArgType
 );
 static mstr_result_t
-    format_impl(const char*, MString*, MStrFmtArgsContext*);
+    format_impl(MString*, const char*, MStrFmtArgsContext*);
 static mstr_result_t
     format_value(MString*, const MStrFmtParseResult*, const MStrFmtFormatArgument*);
 static mstr_result_t
@@ -84,15 +84,11 @@ static mstr_result_t convert_sign_helper(
 //
 
 MSTR_EXPORT_API(mstr_result_t)
-mstr_format(const char* fmt, MString* res_str, usize_t fmt_place, ...)
+mstr_format(MString* res_str, const char* fmt, usize_t fmt_place, ...)
 {
     va_list ap;
     va_start(ap, fmt_place);
-    mstr_result_t res;
-    MStrFmtArgsContext context = {NULL, 0, {{MStrFmtArgType_Unknown}}};
-    context.max_place = fmt_place;
-    context.p_ap = &ap;
-    res = format_impl(fmt, res_str, &context);
+    mstr_result_t res = mstr_vformat(fmt, res_str, fmt_place, &ap);
     va_end(ap);
     return res;
 }
@@ -108,7 +104,7 @@ mstr_vformat(
     MStrFmtArgsContext context = {NULL, 0, {{MStrFmtArgType_Unknown}}};
     context.max_place = fmt_place;
     context.p_ap = (va_list*)ap_ptr;
-    return format_impl(fmt, res_str, &context);
+    return format_impl(res_str, fmt, &context);
 }
 
 /**
@@ -116,7 +112,7 @@ mstr_vformat(
  *
  */
 static mstr_result_t format_impl(
-    const char* fmt, MString* res_str, MStrFmtArgsContext* ctx
+    MString* res_str, const char* fmt, MStrFmtArgsContext* ctx
 )
 {
     // 处理格式化串

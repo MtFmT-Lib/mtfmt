@@ -207,7 +207,7 @@ mstr_move_create(&str, &another);
 // And, str is empty now
 ```
 
- #### 2.2.5.3 Destruct function
+#### 2.2.5.3 Destruct function
 
 The destruct function will release memory simply like the following code.
 
@@ -219,11 +219,11 @@ mstr_free(&str);
 // str is empty.
 ```
 
-This function must be called by hand after calling the most of construct function. Otherwise, it will cause memory leak.
+This function must be called by hand after calling the most of construct function. Otherwise, it will cause a memory leak.
 
 ## 2.3 Formatter
 
-The formatter API includes two parts. The first part is the `mstr_format` function, which provides formatting inputs and appends the output into the string with variable arguments.
+The formatter API includes two parts. The first part is the `mstr_format` function, which provides formatting inputs and appends the output into the string with variable arguments. Notes that the function will append the output directly instead clear the string and append results.
 
 ### 2.3.1 Formatter function
 
@@ -283,8 +283,8 @@ The syntax is not context-free syntax, but it can be parsed by a top-down parser
 
 ```c
 mstr_result_t result_code = mstr_format(
-    "Today is {0:t:%yyyy-%MM-%dd}",
     &output,
+    "Today is {0:t:%yyyy-%MM-%dd}",
     1,
     &input_tm
 );
@@ -324,8 +324,6 @@ TODO
 
 This annex includes a summary of all export functions.
 
-
-
 # Annex B: syntax summary
 
 TODO
@@ -333,4 +331,3 @@ TODO
 # Annex C: macro options
 
 TODO
-
