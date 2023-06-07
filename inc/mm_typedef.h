@@ -17,6 +17,7 @@
 #if 0 // TODO
 
 #else
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

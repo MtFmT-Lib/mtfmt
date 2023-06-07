@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    mm_parse.c
+ * @file    mm_parser.c
  * @author  向阳 (hinata.hoshino@foxmail.com)
  * @brief   formatter parser实现
  * @version 1.0
@@ -9,9 +9,7 @@
  * @copyright Copyright (c) 向阳, all rights reserved.
  *
  */
-#include "mm_fmt.h"
-#include "mm_typedef.h"
-#include <stddef.h>
+#include "mm_parser.h"
 
 //! peek一个字符
 #define LEX_PEEK_CHAR(pstr) (*(pstr))
