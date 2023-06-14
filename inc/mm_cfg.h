@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LGPL-3.0
+﻿// SPDX-License-Identifier: LGPL-3.0
 /**
  * @file    mm_cfg.h
  * @author  向阳 (hinata.hoshino@foxmail.com)
@@ -11,8 +11,13 @@
  */
 #if !defined(_INCLUDE_MM_CFG_H_)
 #define _INCLUDE_MM_CFG_H_
-
 #include <stdint.h>
+
+#if _MSC_VER
+// "该文件包含不能在当前代码页(XXXX)中表示的字符"
+// unbengable (￣_￣|||)
+#pragma warning(disable : 4819)
+#endif // _MSC_VER
 
 #if !defined(_MSTR_USE_HARDWARE_DIV)
 /**
@@ -93,14 +98,16 @@
 // 定义导出定义
 //
 #if _MSTR_BUILD_DLL
+#if _MSC_VER
 #define MSTR_EXPORT_API(ret) \
     MSTR_EXPORT_MANGLE __declspec(dllexport) ret __stdcall
+#else
+#define MSTR_EXPORT_API(ret) \
+    MSTR_EXPORT_MANGLE __attribute__((visibility("default"))) ret
+#endif // _MSC_VER
 #elif _MSTR_IMPORT_FROM_DLL
 #define MSTR_EXPORT_API(ret) \
     MSTR_EXPORT_MANGLE __declspec(dllimport) ret __stdcall
-#elif _MSTR_BUILD_DYLIB
-#define MSTR_EXPORT_API(ret) \
-    MSTR_EXPORT_MANGLE __attribute__((visibility("default"))) ret
 #elif __EMSCRIPTEN__
 #include <emscripten.h>
 #define MSTR_EXPORT_API(ret) MSTR_EXPORT_MANGLE ret EMSCRIPTEN_KEEPALIVE

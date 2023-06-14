@@ -647,7 +647,7 @@ static mstr_result_t parse_opt_formatfield_spec(
     char fill_char = ' ';
     MStrFmtAlign align = MStrFmtAlign_Right;
     MStrFmtSignDisplay sign_display = MStrFmtSignDisplay_NegOnly;
-    MStrFmtFormatSpec fmt_spec = {};
+    MStrFmtFormatSpec fmt_spec;
     fmt_spec.fmt_type = MStrFmtFormatType_UnSpec;
     mstr_result_t result = MStr_Ok;
     state->stage =
