@@ -233,47 +233,31 @@ TODO
 
 TODO
 
-## 2.4 Scanner
-
-TODO
-
-### 2.4.1 Formatter function
-
-TODO
-
-### 2.4.2 Default value
-
-TODO
-
-### 2.4.3 Error report
-
-TODO
-
-## 2.5 Build-in heap manager
+## 2.4 Build-in heap manager
 
 The built-in heap manager is optional and will be compiled when the macro `_MSTR_USE_MALLOC` is zero.
 
-### 2.5.1 Allocator functions
+### 2.4.1 Allocator functions
 
 The macro function `mstr_heap_init`
 
-### 2.5.2 Fragment counter
+### 2.4.2 Fragment counter
 
 TODO
 
-## 2.6 Advanced topics
+## 2.5 Advanced topics
 
 TODO
 
-### 2.6.1 Encoding of character
+### 2.5.1 Encoding of character
 
 TODO
 
-### 2.6.2 Monadic result
+### 2.5.2 Monadic result
 
 TODO
 
-### 2.6.3 C++ Wrapper
+### 2.5.3 C++ Wrapper
 
 TODO
 
