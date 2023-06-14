@@ -5,7 +5,7 @@ project(mtfmt)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
 
-# debug版的前缀
+# debug版的后缀
 set(CMAKE_DEBUG_POSTFIX "_d")
 
 # 构建输出
@@ -27,12 +27,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${BUILD_OUTPUT_DIR}/target/bin)
 # 源文件
 aux_source_directory("${CMAKE_CURRENT_SOURCE_DIR}/src" LIB_SRCS)
 
+# 资源文件
+if(MSVC AND WIN32)
+    set(LIB_WIN_RC "${CMAKE_CURRENT_SOURCE_DIR}/src/win_resource.rc")
+else()
+    set(LIB_WIN_RC "")
+endif()
+
 # 目标名
 set(TARGET_NAME mtfmt)
 
 # 构建目标
 if (MTFMT_BUILD_SHARED)
-    add_library(${TARGET_NAME} SHARED ${LIB_SRCS})
+    add_library(${TARGET_NAME} SHARED ${LIB_SRCS} ${LIB_WIN_RC})
 else()
     add_library(${TARGET_NAME} STATIC ${LIB_SRCS})
 endif()
