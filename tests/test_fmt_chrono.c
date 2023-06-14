@@ -17,7 +17,7 @@
 #include <stdio.h>
 
 // 默认的日期时间
-static const RTCTime time_value = {
+static const MStrTime time_value = {
     .year = 0x2023,
     .month = 0x05,
     .day = 0x06,
@@ -53,8 +53,8 @@ void fmt_chrono_userdef_year(void)
 
 void fmt_chrono_userdef_month(void)
 {
-    const RTCTime time_value_sing = {.month = 0x01};
-    const RTCTime time_value_doub = {.month = 0x10};
+    const MStrTime time_value_sing = {.month = 0x01};
+    const MStrTime time_value_doub = {.month = 0x10};
     MString s;
     EVAL(mstr_create_empty(&s));
     // 1位~2位
@@ -77,8 +77,8 @@ void fmt_chrono_userdef_month(void)
 
 void fmt_chrono_userdef_day(void)
 {
-    const RTCTime time_value_sing = {.day = 0x01};
-    const RTCTime time_value_doub = {.day = 0x10};
+    const MStrTime time_value_sing = {.day = 0x01};
+    const MStrTime time_value_doub = {.day = 0x10};
     MString s;
     EVAL(mstr_create_empty(&s));
     // 1位~2位
@@ -101,8 +101,8 @@ void fmt_chrono_userdef_day(void)
 
 void fmt_chrono_userdef_hour(void)
 {
-    const RTCTime time_value_sing = {.hour = 0x01};
-    const RTCTime time_value_doub = {.hour = 0x10};
+    const MStrTime time_value_sing = {.hour = 0x01};
+    const MStrTime time_value_doub = {.hour = 0x10};
     MString s;
     EVAL(mstr_create_empty(&s));
     // 24h: 1位~2位
@@ -125,8 +125,8 @@ void fmt_chrono_userdef_hour(void)
 
 void fmt_chrono_userdef_minute(void)
 {
-    const RTCTime time_value_sing = {.minute = 0x01};
-    const RTCTime time_value_doub = {.minute = 0x10};
+    const MStrTime time_value_sing = {.minute = 0x01};
+    const MStrTime time_value_doub = {.minute = 0x10};
     MString s;
     EVAL(mstr_create_empty(&s));
     // 1位~2位
@@ -149,8 +149,8 @@ void fmt_chrono_userdef_minute(void)
 
 void fmt_chrono_userdef_second(void)
 {
-    const RTCTime time_value_sing = {.second = 0x01};
-    const RTCTime time_value_doub = {.second = 0x10};
+    const MStrTime time_value_sing = {.second = 0x01};
+    const MStrTime time_value_doub = {.second = 0x10};
     MString s;
     EVAL(mstr_create_empty(&s));
     // 1位~2位
