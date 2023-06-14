@@ -11,9 +11,6 @@
  */
 #include "mm_fmt.h"
 #include "mm_typedef.h"
-// #include "runtime_system.h"
-#include <stdarg.h>
-#include <string.h>
 
 /**
  * @brief 将元素类型T转换为对应的数组类型值

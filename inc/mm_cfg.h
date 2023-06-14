@@ -43,6 +43,18 @@
 #define _MSTR_RUNTIME_HEAP_ALIGN 4
 #endif // _MSTR_RUNTIME_HEAP_ALIGN
 
+#if !defined(_MSTR_USE_STD_IO)
+/**
+ * @brief 指定是否使用stdout这些标准io操作
+ *
+ */
+#define _MSTR_USE_STD_IO 0
+#endif // _MSTR_USE_STD_IO
+
+#if _MSTR_USE_STD_IO
+#include <stdio.h>
+#endif // _MSTR_USE_STD_IO
+
 #if !defined(_MSTR_RUNTIME_CTRLFLOW_MARKER)
 /**
  * @brief 指定是否使用unreachable等标记来标记控制流
@@ -121,10 +133,16 @@
 #define MSTRCFG_USE_WASM_BIT       0x08
 
 /**
- * @brief 指定是否使用了硬件除法
+ * @brief 标记是否使用了硬件除法
  *
  */
 #define MSTRCFG_BUILD_HARDWARE_DIV 0x10
+
+/**
+ * @brief 标记是否使用了stdio
+ *
+ */
+#define MSTRCFG_USE_STD_IO         0x20
 
 /**
  * @brief 取得构建配置
