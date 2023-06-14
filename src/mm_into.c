@@ -113,7 +113,7 @@ mstr_fmt_ttoa(
             value = tm->sub_second;
             max_len = 4;
             break;
-        default: system_unreachable(); break;
+        default: mstr_unreachable(); break;
         }
         // 格式化单个的项
         MSTR_AND_THEN(

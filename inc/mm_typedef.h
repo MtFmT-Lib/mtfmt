@@ -11,12 +11,9 @@
  *
  */
 
-#ifndef __MM_TYPEDEF_H__
-#define __MM_TYPEDEF_H__
+#if !defined(__MM_TYPEDEF_H__)
+#define __MM_TYPEDEF_H__ 1
 
-#if 0 // TODO
-
-#else
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -51,7 +48,6 @@ enum
     True = true,
     False = false,
 };
-#endif
 
 /**
  * @brief RTC时间
@@ -83,5 +79,4 @@ typedef struct tagMStrTime
     //! (BCD) 亚秒值, 单位: x0.1ms
     uint32_t sub_second;
 } MStrTime;
-
 #endif

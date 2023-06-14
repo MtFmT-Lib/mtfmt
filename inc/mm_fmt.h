@@ -87,16 +87,4 @@ mstr_fmt_ttoa(
     const MStrTime* tm,
     const MStrFmtChronoFormatSpec* spec
 );
-
-#if defined(USE_FULL_ASSERT)
-#include "stm32_assert.h"
-/**
- * @brief 标记不可达的分支
- *
- */
-#define system_unreachable() assert_param(0)
-#else
-#define system_unreachable() ((void)0U)
-#endif
-
 #endif // !_INCLUDE_MM_FMT_H_
