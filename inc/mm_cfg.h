@@ -42,6 +42,33 @@
  */
 #define _MSTR_RUNTIME_HEAP_ALIGN 4
 #endif // _MSTR_RUNTIME_HEAP_ALIGN
+
+#if !defined(_MSTR_RUNTIME_CTRLFLOW_MARKER)
+/**
+ * @brief 指定是否使用unreachable等标记来标记控制流
+ *
+ */
+#define _MSTR_RUNTIME_CTRLFLOW_MARKER 1
+#endif // _MSTR_RUNTIME_CTRLFLOW_MARKER
+
+#if _MSTR_RUNTIME_CTRLFLOW_MARKER
+#if defined(USE_FULL_ASSERT)
+#include "stm32_assert.h"
+/**
+ * @brief 标记不可达的分支
+ *
+ */
+#define mstr_unreachable() assert_param(0)
+#elif defined(_MSTR_RUNTIME_ASSERT)
+#include <assert.h>
+#define mstr_unreachable() assert(0)
+#else
+#define mstr_unreachable() ((void)0U)
+#endif
+#else
+#define mstr_unreachable() ((void)0U)
+#endif // _MSTR_RUNTIME_CTRLFLOW_MARKER
+
 //
 // 导出函数修辞
 //

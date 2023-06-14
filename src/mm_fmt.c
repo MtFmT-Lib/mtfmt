@@ -325,7 +325,7 @@ static iptr_t array_get_item(
     case MStrFmtArgType_QuantizedUnsignedValue:
         ele_size = sizeof(uint32_t);
         break;
-    default: system_unreachable(); break;
+    default: mstr_unreachable(); break;
     }
     // 取得值
     iptr_t element_ptr = (iptr_t)NULL;
@@ -361,7 +361,7 @@ static iptr_t array_get_item(
     case MStrFmtArgType_QuantizedUnsignedValue:
         element_ptr = (iptr_t)(*(const int32_t*)ptr);
         break;
-    default: system_unreachable(); break;
+    default: mstr_unreachable(); break;
     }
     return element_ptr;
 }
