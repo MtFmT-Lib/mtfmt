@@ -72,6 +72,8 @@ extern "C"
 
     void fmt_escape_bracket(void);
 
+    void sync_io_write(void);
+
     void cpp_string_equal(void);
     void cpp_string_not_equal(void);
     void cpp_string_push(void);

@@ -94,6 +94,8 @@ int main()
 
     RUN_TEST(fmt_escape_bracket);
 
+    RUN_TEST(sync_io_write);
+
     RUN_TEST(cpp_string_equal);
     RUN_TEST(cpp_string_not_equal);
     RUN_TEST(cpp_string_push);
