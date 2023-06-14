@@ -21,6 +21,8 @@ typedef enum tagMStrResult
     MStr_Ok = 0,
     // ERR: 内存错误: 内存分配失败
     MStr_Err_HeapTooSmall = -128,
+    // ERR: 未实现
+    MStr_Err_NoImplemention,
     // ERR: buff太短
     MStr_Err_BufferTooSmall,
     // ERR: 格式化: 索引太多

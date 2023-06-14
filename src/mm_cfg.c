@@ -30,5 +30,8 @@ MSTR_EXPORT_API(uint32_t) mstr_configure(void)
 #if _MSTR_USE_HARDWARE_DIV
     configure |= MSTRCFG_BUILD_HARDWARE_DIV;
 #endif // _MSTR_USE_HARDWARE_DIV
+#if _MSTR_USE_STD_IO
+    configure |= MSTRCFG_USE_STD_IO;
+#endif // _MSTR_USE_STD_IO
     return configure;
 }
