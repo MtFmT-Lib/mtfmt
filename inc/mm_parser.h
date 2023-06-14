@@ -97,22 +97,22 @@ typedef enum tagMStrFmtArgType
     //! Array type, 要和上面的值顺序一致
     MStrFmtArgType_Array_Bit = 0x1000,
 
-    //! 8位整数数组(`const i8_t*`)
+    //! 8位整数数组(`const int8_t*`)
     MStrFmtArgType_Array_Int8,
 
-    //! 16位整数数组(`const i16_t*`)
+    //! 16位整数数组(`const int16_t*`)
     MStrFmtArgType_Array_Int16,
 
-    //! 32位整数数组(`const i32_t*`)
+    //! 32位整数数组(`const int32_t*`)
     MStrFmtArgType_Array_Int32,
 
-    //! 无符号8位整数数组(`const u8_t*`)
+    //! 无符号8位整数数组(`const uint8_t*`)
     MStrFmtArgType_Array_Uint8,
 
-    //! 无符号16位整数数组(`const u16_t*`)
+    //! 无符号16位整数数组(`const uint16_t*`)
     MStrFmtArgType_Array_Uint16,
 
-    //! 无符号32位整数数组(`const u32_t*`)
+    //! 无符号32位整数数组(`const uint32_t*`)
     MStrFmtArgType_Array_Uint32,
 
     //! C字符串指针组成的数组
@@ -232,7 +232,7 @@ typedef struct tagMStrFmtChronoValueFormatSpec
     bool_t fixed_length;
 
     //! 进行格式化的长度
-    u8_t format_length;
+    uint8_t format_length;
 } MStrFmtChronoValueFormatSpec;
 
 /**
@@ -335,7 +335,7 @@ typedef struct tagMStrFmtFormatDescript
     MStrFmtSignDisplay sign_display;
 
     //! 格式化宽度, -1表示使用默认值
-    i32_t width;
+    int32_t width;
 
     //! 格式化标记
     MStrFmtFormatSpec fmt_spec;
@@ -349,7 +349,7 @@ typedef struct tagMStrFmtFormatDescript
  */
 typedef struct tagMStrFmtArgProperty
 {
-    u32_t a, b;
+    uint32_t a, b;
 } MStrFmtArgProperty;
 
 /**
@@ -367,7 +367,7 @@ typedef struct tagMStrFmtParseResult
         struct
         {
             //! 参数位置
-            u32_t arg_id;
+            uint32_t arg_id;
             //! 参数类型
             MStrFmtArgType arg_type;
             //! 附带参数
@@ -379,7 +379,7 @@ typedef struct tagMStrFmtParseResult
         struct
         {
             //! 参数位置
-            u32_t array_arg_id;
+            uint32_t array_arg_id;
             //! 参数类型
             MStrFmtArgType array_ele_type;
             //! 附带参数

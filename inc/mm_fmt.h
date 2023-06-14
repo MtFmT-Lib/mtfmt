@@ -60,7 +60,7 @@ mstr_vformat(
  *
  */
 MSTR_EXPORT_API(mstr_result_t)
-mstr_fmt_uqtoa(MString* res_str, u32_t value, u32_t quat);
+mstr_fmt_uqtoa(MString* res_str, uint32_t value, uint32_t quat);
 
 /**
  * @brief 将无符号整数转换为字符串
@@ -71,7 +71,7 @@ mstr_fmt_uqtoa(MString* res_str, u32_t value, u32_t quat);
  *
  */
 MSTR_EXPORT_API(mstr_result_t)
-mstr_fmt_utoa(MString* res_str, u32_t value, MStrFmtIntIndex index);
+mstr_fmt_utoa(MString* res_str, uint32_t value, MStrFmtIntIndex index);
 
 /**
  * @brief 将日期时间值转换为字符串
@@ -84,7 +84,7 @@ mstr_fmt_utoa(MString* res_str, u32_t value, MStrFmtIntIndex index);
 MSTR_EXPORT_API(mstr_result_t)
 mstr_fmt_ttoa(
     MString* res_str,
-    const sys_time_t* tm,
+    const MStrTime* tm,
     const MStrFmtChronoFormatSpec* spec
 );
 

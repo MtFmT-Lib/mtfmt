@@ -21,7 +21,7 @@
  * @brief 堆的size, 可以省个几bytes
  *
  */
-typedef u16_t heap_size_t;
+typedef uint16_t heap_size_t;
 
 /**
  * @brief 空闲块记录
@@ -82,13 +82,13 @@ typedef struct tagHeap
      * @brief 分配次数的统计
      *
      */
-    u32_t alloc_count;
+    uint32_t alloc_count;
 
     /**
      * @brief 释放次数的统计
      *
      */
-    u32_t free_count;
+    uint32_t free_count;
 } Heap;
 
 /**
