@@ -89,6 +89,12 @@ mstr_iovformat(
     va_list* ap_ptr
 );
 
+/**
+ * @brief 取得stdout的内部handler
+ *
+ */
+MSTR_EXPORT_API(MStrIOCallback*) mstr_get_stdout(void);
+
 #if _MSTR_USE_STD_IO
 /**
  * @brief 写到 stdout
@@ -96,8 +102,10 @@ mstr_iovformat(
  * @attention 宏 _MSTR_USE_STD_IO 为1时有效, 该宏假定格式化参数为最大值,
  *            可能会为坏坏刻意修改格式化串从而造成二进制安全问题
  */
-#define mstr_print(fmt, ...) \
-    (mstr_ioformat(&mstr_stdout, fmt, MFMT_PLACE_MAX_NUM, __VA_ARGS__))
+#define mstr_print(fmt, ...)                                    \
+    (mstr_ioformat(                                             \
+        mstr_get_stdout(), fmt, MFMT_PLACE_MAX_NUM, __VA_ARGS__ \
+    ))
 #else
 /**
  * @brief 写到 stdout (disable)
@@ -107,9 +115,4 @@ mstr_iovformat(
  */
 #define mstr_print(fmt, ...) ((void)(0))
 #endif // _MSTR_USE_STD_IO
-/**
- * @brief stdout的io buffer
- *
- */
-extern MStrIOCallback mstr_stdout;
 #endif // _INCLUDE_MM_IO_H_

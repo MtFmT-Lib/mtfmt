@@ -20,14 +20,18 @@
 
 static mstr_result_t stdio_callback(void*, const byte_t*, usize_t);
 
-//
-// public:
-//
-
-MStrIOCallback mstr_stdout = {
+/**
+ * @brief stdout IO
+ *
+ */
+static MStrIOCallback mstr_stdout = {
     .capture = NULL,
     .io_write = stdio_callback,
 };
+
+//
+// public:
+//
 
 MSTR_EXPORT_API(mstr_result_t)
 mstr_io_init(void* context, MStrIOCallback* obj, MStrIOWrite cb_write)
@@ -35,6 +39,11 @@ mstr_io_init(void* context, MStrIOCallback* obj, MStrIOWrite cb_write)
     obj->capture = context;
     obj->io_write = cb_write;
     return MStr_Ok;
+}
+
+MSTR_EXPORT_API(MStrIOCallback*) mstr_get_stdout(void)
+{
+    return &mstr_stdout;
 }
 
 MSTR_EXPORT_API(mstr_result_t)
