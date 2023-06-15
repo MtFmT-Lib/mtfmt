@@ -1,3 +1,7 @@
+---
+typora-root-url: ..\
+---
+
 This section shows how to add the `MtFmt` library to your project. In the latest version, we provide a CMake file in the repository. You can add the source files by hand or by git submodule.
 
 [toc]
@@ -23,7 +27,7 @@ The two folders should be included in the archive file. The `src` folder includi
 
 ## The Keil IDE
 
-Using the middleware package is an easy way to add to the Keil IDE. You can find them [here](#TODO). As an alternative option, you can add the sources and configure the including path manually.
+Using the middleware package is an easy way to add to the Keil IDE. You can find them here. As an alternative option, you can add the sources and configure the including path manually.
 
 ### Using the package
 
@@ -35,27 +39,27 @@ TODO
 
 Firstly, select the "Add existing file to Source Group" option like the following figure.
 
-![Add existing file to Source Group](../img/keil_add_ext_src_nlfs.png)
+![Add existing file to Source Group](./img/keil_add_ext_src_nlfs.png)
 
 Then, add all files in the folder `src` into your project.
 
-![Add existing file to Source Group - step2](../img/keil_add_ext_src_step2_nlfs.png)
+![Add existing file to Source Group - step2](./img/keil_add_ext_src_step2_nlfs.png)
 
 Now you add all source files succeeded. The next step is that add the including directory. The preprocessor must know where the file locates in that the preprocessor of the C compiler will copy the header into the source file simply. To add that to the project, click the "Options for Target" button in the toolbar.
 
-![Options for Target button](../img/keil_opt_for_target_btn.png)
+![Options for Target button](./img/keil_opt_for_target_btn.png)
 
 Then find the "C/C++" tab and click the "..." button on the right side of the edit box.
 
-![Including path in keil](../img/keil_cxx_opt_tab.png)
+![Including path in keil](./img/keil_cxx_opt_tab.png)
 
 And select the `inc` folder in the dialog.
 
-![Including path in keil step 2](../img/keil_cxx_add_inc_path_step2.png)
+![Including path in keil step 2](./img/keil_cxx_add_inc_path_step2.png)
 
 Finally, we must set the C99 standard.
 
-![Select C99 standard](../img/keil_c_standard.png)
+![Select C99 standard](./img/keil_c_standard.png)
 
 Now you completed this section! Click the "Build" button or press the `F7` key to build your project and check the output has not any errors.
 

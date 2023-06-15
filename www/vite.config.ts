@@ -8,6 +8,8 @@ import MarkdownIt from 'markdown-it'
 import { textVide } from 'text-vide'
 import { katex } from '@mdit/plugin-katex'
 import Token from 'markdown-it/lib/token'
+import * as fs from 'node:fs'
+import path from 'node:path'
 
 export default defineConfig({
     plugins: [
@@ -42,6 +44,8 @@ function markdown_preprocess(): MarkdownIt {
     })
     // katex
     markdown.use(katex)
+    // 嵌入图片
+    markdown.use(plugin_embed_image)
     // 超链接的addr
     markdown.use(plugin_section_id)
     // 断行
@@ -49,6 +53,34 @@ function markdown_preprocess(): MarkdownIt {
     // bionic reading
     markdown.use(plugin_bionic_reading)
     return markdown
+}
+
+/**
+ * 嵌入图片
+ */
+function plugin_embed_image(md: MarkdownIt): void {
+    md.core.ruler.push('embed-image', state => {
+        state.tokens.forEach(token => {
+            if (token.type === 'inline') {
+                if (token.children === null) {
+                    return
+                }
+                if (token.children.length !== 1) {
+                    return
+                }
+                if (token.children[0].type !== 'image') {
+                    return
+                }
+                const img_child = token.children[0]
+                const img_path = img_child.attrGet('src')
+                if (img_path !== null) {
+                    const img_base64 = readfile_as_base64(img_path)
+                    img_child.attrSet('src', img_base64)
+                }
+            }
+        })
+    })
+    md.enable(['embed-image'])
 }
 
 /**
@@ -232,6 +264,32 @@ function highlight_process(str: string, lang: string): string {
         return '<pre class="hljs"><code>' + html + '</code></pre>'
     } else {
         return str
+    }
+}
+
+/**
+ * 读取文件并转为base64
+ */
+function readfile_as_base64(file: string): string {
+    const src_path = path.resolve('./src/texts')
+    const full_path = path.resolve(src_path, file)
+    const file_ext_name = path.extname(full_path)
+    // 读取并转换base64
+    const fs_data = fs.readFileSync(full_path)
+    const base64 = fs_data.toString('base64')
+    // 转换mime type
+    const mime_lut = new Map([
+        ['.gif', 'image/gif'],
+        ['.png', 'image/png'],
+        ['.jpg', 'image/jpeg'],
+        ['.jpeg', 'image/jpeg'],
+        ['.webp', 'image/webp'],
+    ])
+    const mime_type = mime_lut.get(file_ext_name)
+    if (mime_type) {
+        return 'data:' + mime_type + ';base64,' + base64
+    } else {
+        throw `No mime type for extname ${file_ext_name}`
     }
 }
 
