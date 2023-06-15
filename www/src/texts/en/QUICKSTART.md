@@ -37,29 +37,29 @@ TODO
 
 ### Add sources by Manual
 
-Firstly, select the "Add existing file to Source Group" option like the following figure.
+Firstly, select the "Add existing file to Source Group" option like the figure 1.
 
-![Add existing file to Source Group](./img/keil_add_ext_src_nlfs.png)
+![Figure 1. Add existing file menu item](./img/keil_add_ext_src_nlfs.png)
 
 Then, add all files in the folder `src` into your project.
 
-![Add existing file to Source Group - step2](./img/keil_add_ext_src_step2_nlfs.png)
+![Figure 2. Add existing file to source group](./img/keil_add_ext_src_step2_nlfs.png)
 
 Now you add all source files succeeded. The next step is that add the including directory. The preprocessor must know where the file locates in that the preprocessor of the C compiler will copy the header into the source file simply. To add that to the project, click the "Options for Target" button in the toolbar.
 
-![Options for Target button](./img/keil_opt_for_target_btn.png)
+![Figure 3. The "Options for Target" button](./img/keil_opt_for_target_btn.png)
 
 Then find the "C/C++" tab and click the "..." button on the right side of the edit box.
 
-![Including path in keil](./img/keil_cxx_opt_tab.png)
+![Figure 4. Including path in keil](./img/keil_cxx_opt_tab.png)
 
 And select the `inc` folder in the dialog.
 
-![Including path in keil step 2](./img/keil_cxx_add_inc_path_step2.png)
+![Figure 5. Add an including path item](./img/keil_cxx_add_inc_path_step2.png)
 
 Finally, we must set the C99 standard.
 
-![Select C99 standard](./img/keil_c_standard.png)
+![Figure 6. Select C99 standard](./img/keil_c_standard.png)
 
 Now you completed this section! Click the "Build" button or press the `F7` key to build your project and check the output has not any errors.
 

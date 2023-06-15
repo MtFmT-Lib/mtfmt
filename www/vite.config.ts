@@ -71,12 +71,27 @@ function plugin_embed_image(md: MarkdownIt): void {
                 if (token.children[0].type !== 'image') {
                     return
                 }
+                // 图片转换为base64
                 const img_child = token.children[0]
                 const img_path = img_child.attrGet('src')
                 if (img_path !== null) {
                     const img_base64 = readfile_as_base64(img_path)
                     img_child.attrSet('src', img_base64)
                 }
+                // 添加图注
+                // 总而言之它以一种很奇怪的方式跑了起来...
+                const img_alt = img_child.attrGet('alt') ?? ''
+                let img_alt_content: string
+                if (img_alt.length > 0) {
+                    img_alt_content = img_alt
+                }
+                else {
+                    img_alt_content = img_child.content
+                }
+                const text_token = make_html_token(img_alt_content)
+                token.children.push(make_html_token('<div class="img-info">'))
+                token.children.push(text_token)
+                token.children.push(make_html_token('</div>'))
             }
         })
     })
@@ -308,8 +323,6 @@ function make_text_token(str: string): Token {
     token.markup = ''
     token.info = ''
     token.meta = null
-    token.block = false
-    token.hidden = false
     return token
 }
 
