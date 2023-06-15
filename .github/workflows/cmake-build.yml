@@ -1,0 +1,51 @@
+name: "Cmake build"
+
+on:
+  push:
+    paths:
+      - "src/**.c"
+      - "inc/**.h"
+      - "CMakeLists.txt"
+      - ".github/workflows/build-cmake.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "src/**.c"
+      - "inc/**.h"
+      - "CMakeLists.txt"
+      - ".github/workflows/build-cmake.yml"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+
+jobs:
+  cmake-build:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: "${{ matrix.os }}"
+    name: "cmake build: ${{ matrix.os }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: mkdir
+        run: |
+          mkdir build
+      # 配置和构建
+      - name: cmake
+        working-directory: "./build"
+        run: |
+          cmake . -DMTFMT_RT_USE_MALLOC=ON -DMTFMT_RT_USE_DIV=ON -DMTFMT_RT_USE_STDOUT=ON -DMTFMT_BUILD_SHARED=ON
+          cmake --build .
+      # 打包
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cmake-artifact
+          path: build/target/*

@@ -12,16 +12,20 @@
 #include "mm_fmt.h"
 #include "mm_typedef.h"
 
-static void div_mod_10(u32_t, u32_t*, u32_t*);
-static void div_mod_10_u64(u64_t, u64_t*, u32_t*);
-static mstr_result_t bcdtoa(MString*, u32_t, u32_t, u32_t, bool_t);
-static mstr_result_t uqtoa_impl(MString*, u32_t, u32_t);
-static mstr_result_t uqtoa_helper_dpart(MString*, u32_t, u32_t);
-static mstr_result_t utoa_impl_2base(MString*, u32_t, char, u32_t);
-static mstr_result_t utoa_impl_10base(MString*, u32_t);
+static void div_mod_10(uint32_t, uint32_t*, uint32_t*);
+static void div_mod_10_u64(uint64_t, uint64_t*, uint32_t*);
+static mstr_result_t bcdtoa(
+    MString*, uint32_t, uint32_t, uint32_t, bool_t
+);
+static mstr_result_t uqtoa_impl(MString*, uint32_t, uint32_t);
+static mstr_result_t uqtoa_helper_dpart(MString*, uint32_t, uint32_t);
+static mstr_result_t utoa_impl_2base(
+    MString*, uint32_t, char, uint32_t
+);
+static mstr_result_t utoa_impl_10base(MString*, uint32_t);
 
 MSTR_EXPORT_API(mstr_result_t)
-mstr_fmt_uqtoa(MString* res_str, u32_t value, u32_t quat)
+mstr_fmt_uqtoa(MString* res_str, uint32_t value, uint32_t quat)
 {
     if (quat > 31 || quat == 0) {
         // 最高支持q31
@@ -33,7 +37,7 @@ mstr_fmt_uqtoa(MString* res_str, u32_t value, u32_t quat)
 }
 
 MSTR_EXPORT_API(mstr_result_t)
-mstr_fmt_utoa(MString* res_str, u32_t value, MStrFmtIntIndex index)
+mstr_fmt_utoa(MString* res_str, uint32_t value, MStrFmtIntIndex index)
 {
     mstr_result_t result = MStr_Ok;
     switch (index) {
@@ -59,7 +63,7 @@ mstr_fmt_utoa(MString* res_str, u32_t value, MStrFmtIntIndex index)
 MSTR_EXPORT_API(mstr_result_t)
 mstr_fmt_ttoa(
     MString* res_str,
-    const sys_time_t* tm,
+    const MStrTime* tm,
     const MStrFmtChronoFormatSpec* spec
 )
 {
@@ -68,8 +72,8 @@ mstr_fmt_ttoa(
     for (; i < spec->item_cnt && MSTR_SUCC(result); i += 1) {
         const MStrFmtChronoItemFormatSpec* item = &spec->items[i];
         // 取得日期和时间的值
-        u32_t value = 0;
-        u32_t max_len = 0;
+        uint32_t value = 0;
+        uint32_t max_len = 0;
         switch (item->value_type) {
         case MStrFmtChronoValueType_Day:
             value = tm->day;
@@ -109,7 +113,7 @@ mstr_fmt_ttoa(
             value = tm->sub_second;
             max_len = 4;
             break;
-        default: system_unreachable(); break;
+        default: mstr_unreachable(); break;
         }
         // 格式化单个的项
         MSTR_AND_THEN(
@@ -139,7 +143,7 @@ mstr_fmt_ttoa(
  * @brief utoa在index等于10的时候的实现
  *
  */
-static mstr_result_t utoa_impl_10base(MString* str, u32_t value)
+static mstr_result_t utoa_impl_10base(MString* str, uint32_t value)
 {
     mstr_result_t result = MStr_Ok;
     if (value == 0) {
@@ -149,7 +153,7 @@ static mstr_result_t utoa_impl_10base(MString* str, u32_t value)
     else {
         // 转换
         while (value > 0) {
-            u32_t digit, next_value;
+            uint32_t digit, next_value;
             div_mod_10(value, &next_value, &digit);
             value = next_value;
             // 转换为字符
@@ -172,7 +176,7 @@ static mstr_result_t utoa_impl_10base(MString* str, u32_t value)
  * @note 使用 hex_base 来指定是从 'a' 开始序列化还是 'A' 开始
  */
 static mstr_result_t utoa_impl_2base(
-    MString* str, u32_t index, char hex_base, u32_t value
+    MString* str, uint32_t index, char hex_base, uint32_t value
 )
 {
     mstr_result_t result = MStr_Ok;
@@ -182,10 +186,10 @@ static mstr_result_t utoa_impl_2base(
     }
     else {
         // ilog2
-        u32_t shift = index == 2 ? 1 : index == 8 ? 3 : 4;
+        uint32_t shift = index == 2 ? 1 : index == 8 ? 3 : 4;
         // 转换
         while (value > 0) {
-            u32_t digit = value & (index - 1);
+            uint32_t digit = value & (index - 1);
             value = value >> shift;
             // 转换为字符
             char ch;
@@ -212,7 +216,9 @@ static mstr_result_t utoa_impl_2base(
  *
  * @attention 最大支持的quat值是31, 外部需要保证参数正确
  */
-static mstr_result_t uqtoa_impl(MString* str, u32_t value, u32_t quat)
+static mstr_result_t uqtoa_impl(
+    MString* str, uint32_t value, uint32_t quat
+)
 {
     mstr_result_t result = MStr_Ok;
     if (value == 0) {
@@ -220,8 +226,8 @@ static mstr_result_t uqtoa_impl(MString* str, u32_t value, u32_t quat)
         MSTR_AND_THEN(result, mstr_append(str, '0'));
     }
     else {
-        u32_t ipart = value >> quat;
-        u32_t dpart = value & ((1 << quat) - 1);
+        uint32_t ipart = value >> quat;
+        uint32_t dpart = value & ((1 << quat) - 1);
         // 转换整数部分
         MSTR_AND_THEN(result, utoa_impl_10base(str, ipart));
         // 转换小数部分
@@ -240,7 +246,7 @@ static mstr_result_t uqtoa_impl(MString* str, u32_t value, u32_t quat)
  *
  */
 static mstr_result_t uqtoa_helper_dpart(
-    MString* str, u32_t value, u32_t quat
+    MString* str, uint32_t value, uint32_t quat
 )
 {
     MString buff;
@@ -256,9 +262,9 @@ static mstr_result_t uqtoa_helper_dpart(
         // 也就是5, 25, 125 ...
         // 即5的幂次, 因此这尝试用5的幂次来完成计算
         // 这样子的话, 就可以避免 / 4096 什么的啦
-        u32_t p5 = 1;
-        u64_t acc = 0;
-        u32_t mask = 1 << (quat - 1);
+        uint32_t p5 = 1;
+        uint64_t acc = 0;
+        uint32_t mask = 1 << (quat - 1);
         while (mask > 0) {
             p5 *= 5;
             acc *= 10;
@@ -270,10 +276,10 @@ static mstr_result_t uqtoa_helper_dpart(
         // 把累加出来的值变成字符串
         usize_t cv_sz = 0;
         bool_t tail_0 = True;
-        u64_t dpart_value = acc;
+        uint64_t dpart_value = acc;
         while (dpart_value > 0) {
-            u32_t digit;
-            u64_t next_value;
+            uint32_t digit;
+            uint64_t next_value;
             div_mod_10_u64(dpart_value, &next_value, &digit);
             // 转换为字符
             char ch = (char)('0' + digit);
@@ -317,7 +323,11 @@ static mstr_result_t uqtoa_helper_dpart(
  * @param[in] fixed: 是否补0
  */
 static mstr_result_t bcdtoa(
-    MString* str, u32_t bcd, u32_t len, u32_t max_len, bool_t fixed
+    MString* str,
+    uint32_t bcd,
+    uint32_t len,
+    uint32_t max_len,
+    bool_t fixed
 )
 {
     usize_t counter = max_len;
@@ -331,7 +341,7 @@ static mstr_result_t bcdtoa(
         }
         // 转换当前位
         char ch;
-        u32_t dec_val = (bcd >> (4 * cur_pos)) & 0xf;
+        uint32_t dec_val = (bcd >> (4 * cur_pos)) & 0xf;
         if (dec_val > 0) {
             ch = (char)(dec_val + '0');
             MSTR_AND_THEN(result, mstr_append(str, ch));
@@ -347,20 +357,20 @@ static mstr_result_t bcdtoa(
  * @brief 返回: div = x / 10; rem = x % 10
  *
  */
-static void div_mod_10(u32_t x, u32_t* div, u32_t* rem)
+static void div_mod_10(uint32_t x, uint32_t* div, uint32_t* rem)
 {
 #if _MSTR_USE_HARDWARE_DIV
     *div = x / 10;
     *rem = x % 10;
 #else
-    u32_t q = (x >> 1) + (x >> 2);
+    uint32_t q = (x >> 1) + (x >> 2);
     q += (q >> 4);
     q += (q >> 8);
     q += (q >> 16);
     // q = x * 0.8, 现在计算q / 8, 得到x * 0.1
     q >>= 3;
     // 计算结果
-    u32_t r = x - (q * 10);
+    uint32_t r = x - (q * 10);
     if (r > 9) {
         *div = q + 1;
         *rem = r - 10;
@@ -376,13 +386,13 @@ static void div_mod_10(u32_t x, u32_t* div, u32_t* rem)
  * @brief 返回: div = x / 10; rem = x % 10
  *
  */
-static void div_mod_10_u64(u64_t x, u64_t* div, u32_t* rem)
+static void div_mod_10_u64(uint64_t x, uint64_t* div, uint32_t* rem)
 {
 #if _MSTR_USE_HARDWARE_DIV
-    *div = (u64_t)(x / 10);
-    *rem = (u32_t)(x % 10);
+    *div = (uint64_t)(x / 10);
+    *rem = (uint32_t)(x % 10);
 #else
-    u64_t q = (x >> 1) + (x >> 2);
+    uint64_t q = (x >> 1) + (x >> 2);
     q += (q >> 4);
     q += (q >> 8);
     q += (q >> 16);
@@ -390,14 +400,14 @@ static void div_mod_10_u64(u64_t x, u64_t* div, u32_t* rem)
     // q = x * 0.8, 现在计算q / 8, 得到x * 0.1
     q >>= 3;
     // 计算结果
-    u64_t r = x - (q * 10);
+    uint64_t r = x - (q * 10);
     if (r > 9) {
         *div = q + 1;
-        *rem = (u32_t)((r - 10) & 0xffffffff);
+        *rem = (uint32_t)((r - 10) & 0xffffffff);
     }
     else {
         *div = q;
-        *rem = (u32_t)(r & 0xffffffff);
+        *rem = (uint32_t)(r & 0xffffffff);
     }
 #endif // _MSTR_USE_HARDWARE_DIV
 }

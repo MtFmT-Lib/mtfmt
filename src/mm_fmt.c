@@ -11,16 +11,13 @@
  */
 #include "mm_fmt.h"
 #include "mm_typedef.h"
-// #include "runtime_system.h"
-#include <stdarg.h>
-#include <string.h>
 
 /**
  * @brief 将元素类型T转换为对应的数组类型值
  *
  */
 #define AS_ARRAY_TYPE(t) \
-    ((MStrFmtArgType)((u32_t)(t) | MStrFmtArgType_Array_Bit))
+    ((MStrFmtArgType)((uint32_t)(t) | MStrFmtArgType_Array_Bit))
 
 /**
  * @brief 格式化参数
@@ -53,7 +50,7 @@ static mstr_result_t load_value(
     MStrFmtFormatArgument*, MStrFmtArgsContext*, usize_t, MStrFmtArgType
 );
 static mstr_result_t
-    format_impl(const char*, MString*, MStrFmtArgsContext*);
+    format_impl(MString*, const char*, MStrFmtArgsContext*);
 static mstr_result_t
     format_value(MString*, const MStrFmtParseResult*, const MStrFmtFormatArgument*);
 static mstr_result_t
@@ -68,15 +65,17 @@ static mstr_result_t
 static mstr_result_t
     convert_time(MString*, iptr_t, const MStrFmtFormatSpec*);
 static mstr_result_t convert_int(
-    MString*, i32_t, MStrFmtSignDisplay, MStrFmtFormatType
+    MString*, int32_t, MStrFmtSignDisplay, MStrFmtFormatType
 );
 static mstr_result_t convert_quat(
-    MString*, i32_t, u32_t, MStrFmtSignDisplay
+    MString*, int32_t, uint32_t, MStrFmtSignDisplay
 );
-static mstr_result_t convert_uquat(MString*, u32_t, u32_t);
-static mstr_result_t convert_uint(MString*, u32_t, MStrFmtFormatType);
+static mstr_result_t convert_uquat(MString*, uint32_t, uint32_t);
+static mstr_result_t convert_uint(
+    MString*, uint32_t, MStrFmtFormatType
+);
 static mstr_result_t convert_sign_helper(
-    MString*, i32_t, MStrFmtSignDisplay
+    MString*, int32_t, MStrFmtSignDisplay
 );
 
 //
@@ -84,28 +83,27 @@ static mstr_result_t convert_sign_helper(
 //
 
 MSTR_EXPORT_API(mstr_result_t)
-mstr_format(const char* fmt, MString* res_str, usize_t fmt_place, ...)
+mstr_format(MString* res_str, const char* fmt, usize_t fmt_place, ...)
 {
     va_list ap;
     va_start(ap, fmt_place);
-    mstr_result_t res;
-    MStrFmtArgsContext context = {NULL, 0, {{MStrFmtArgType_Unknown}}};
-    context.max_place = fmt_place;
-    context.p_ap = &ap;
-    res = format_impl(fmt, res_str, &context);
+    mstr_result_t res = mstr_vformat(fmt, res_str, fmt_place, &ap);
     va_end(ap);
     return res;
 }
 
 MSTR_EXPORT_API(mstr_result_t)
 mstr_vformat(
-    const char* fmt, MString* res_str, usize_t fmt_place, isize_t ap_ptr
+    const char* fmt,
+    MString* res_str,
+    usize_t fmt_place,
+    va_list* ap_ptr
 )
 {
     MStrFmtArgsContext context = {NULL, 0, {{MStrFmtArgType_Unknown}}};
     context.max_place = fmt_place;
     context.p_ap = (va_list*)ap_ptr;
-    return format_impl(fmt, res_str, &context);
+    return format_impl(res_str, fmt, &context);
 }
 
 /**
@@ -113,7 +111,7 @@ mstr_vformat(
  *
  */
 static mstr_result_t format_impl(
-    const char* fmt, MString* res_str, MStrFmtArgsContext* ctx
+    MString* res_str, const char* fmt, MStrFmtArgsContext* ctx
 )
 {
     // 处理格式化串
@@ -136,7 +134,7 @@ static mstr_result_t format_impl(
                 result, process_replacement_field(&fmt, &parser_result)
             );
             // 处理结果
-            u32_t arg_id = parser_result.arg_id;
+            uint32_t arg_id = parser_result.arg_id;
             MStrFmtArgClass arg_class = parser_result.arg_class;
             MStrFmtFormatArgument arg = {0};
             MStrFmtFormatArgument arg_attach = {0};
@@ -211,7 +209,7 @@ static mstr_result_t load_value(
     MStrFmtArgType spec_type
 )
 {
-    u32_t max_place = ctx->max_place;
+    uint32_t max_place = (uint32_t)ctx->max_place;
     mstr_result_t result = MStr_Ok;
     MStrFmtFormatArgument* cache = ctx->cache;
     if (arg_id >= max_place) {
@@ -306,61 +304,61 @@ static iptr_t array_get_item(
 )
 {
     MStrFmtArgType type =
-        (MStrFmtArgType)((u32_t)(array->type) &
-                         (u32_t)(MStrFmtArgType_Array_Bit - 1));
+        (MStrFmtArgType)((uint32_t)(array->type) &
+                         (uint32_t)(MStrFmtArgType_Array_Bit - 1));
     size_t ele_size = 0;
     switch (type) {
-    case MStrFmtArgType_Int8: ele_size = sizeof(i8_t); break;
-    case MStrFmtArgType_Int16: ele_size = sizeof(i16_t); break;
-    case MStrFmtArgType_Int32: ele_size = sizeof(i32_t); break;
-    case MStrFmtArgType_Uint8: ele_size = sizeof(u8_t); break;
-    case MStrFmtArgType_Uint16: ele_size = sizeof(u16_t); break;
-    case MStrFmtArgType_Uint32: ele_size = sizeof(u32_t); break;
+    case MStrFmtArgType_Int8: ele_size = sizeof(int8_t); break;
+    case MStrFmtArgType_Int16: ele_size = sizeof(int16_t); break;
+    case MStrFmtArgType_Int32: ele_size = sizeof(int32_t); break;
+    case MStrFmtArgType_Uint8: ele_size = sizeof(uint8_t); break;
+    case MStrFmtArgType_Uint16: ele_size = sizeof(uint16_t); break;
+    case MStrFmtArgType_Uint32: ele_size = sizeof(uint32_t); break;
     case MStrFmtArgType_CString: ele_size = sizeof(const char*); break;
-    case MStrFmtArgType_Time:
-        ele_size = sizeof(const sys_time_t*);
+    case MStrFmtArgType_Time: ele_size = sizeof(const MStrTime*); break;
+    case MStrFmtArgType_QuantizedValue:
+        ele_size = sizeof(int32_t);
         break;
-    case MStrFmtArgType_QuantizedValue: ele_size = sizeof(i32_t); break;
     case MStrFmtArgType_QuantizedUnsignedValue:
-        ele_size = sizeof(u32_t);
+        ele_size = sizeof(uint32_t);
         break;
-    default: system_unreachable(); break;
+    default: mstr_unreachable(); break;
     }
     // 取得值
     iptr_t element_ptr = (iptr_t)NULL;
     const void* ptr = (const void*)(index * ele_size + array->value);
     switch (type) {
     case MStrFmtArgType_Int8:
-        element_ptr = (iptr_t)(*(const i8_t*)ptr);
+        element_ptr = (iptr_t)(*(const int8_t*)ptr);
         break;
     case MStrFmtArgType_Int16:
-        element_ptr = (iptr_t)(*(const i16_t*)ptr);
+        element_ptr = (iptr_t)(*(const int16_t*)ptr);
         break;
     case MStrFmtArgType_Int32:
-        element_ptr = (iptr_t)(*(const i32_t*)ptr);
+        element_ptr = (iptr_t)(*(const int32_t*)ptr);
         break;
     case MStrFmtArgType_Uint8:
-        element_ptr = (iptr_t)(*(const u8_t*)ptr);
+        element_ptr = (iptr_t)(*(const uint8_t*)ptr);
         break;
     case MStrFmtArgType_Uint16:
-        element_ptr = (iptr_t)(*(const u16_t*)ptr);
+        element_ptr = (iptr_t)(*(const uint16_t*)ptr);
         break;
     case MStrFmtArgType_Uint32:
-        element_ptr = (iptr_t)(*(const u32_t*)ptr);
+        element_ptr = (iptr_t)(*(const uint32_t*)ptr);
         break;
     case MStrFmtArgType_CString:
         element_ptr = (iptr_t)(*(const char* const*)ptr);
         break;
     case MStrFmtArgType_Time:
-        element_ptr = (iptr_t)(*(const sys_time_t* const*)ptr);
+        element_ptr = (iptr_t)(*(const MStrTime* const*)ptr);
         break;
     case MStrFmtArgType_QuantizedValue:
-        element_ptr = (iptr_t)(*(const i32_t*)ptr);
+        element_ptr = (iptr_t)(*(const int32_t*)ptr);
         break;
     case MStrFmtArgType_QuantizedUnsignedValue:
-        element_ptr = (iptr_t)(*(const i32_t*)ptr);
+        element_ptr = (iptr_t)(*(const int32_t*)ptr);
         break;
-    default: system_unreachable(); break;
+    default: mstr_unreachable(); break;
     }
     return element_ptr;
 }
@@ -491,7 +489,7 @@ static mstr_result_t convert(
     case MStrFmtArgType_Uint32:
         return convert_uint(
             str,
-            (u32_t)value,
+            (uint32_t)value,
             parser_result->format_spec.fmt_spec.fmt_type
         );
         break;
@@ -500,7 +498,7 @@ static mstr_result_t convert(
     case MStrFmtArgType_Int32:
         return convert_int(
             str,
-            (i32_t)value,
+            (int32_t)value,
             parser_result->format_spec.sign_display,
             parser_result->format_spec.fmt_spec.fmt_type
         );
@@ -518,14 +516,14 @@ static mstr_result_t convert(
     case MStrFmtArgType_QuantizedValue:
         return convert_quat(
             str,
-            (i32_t)value,
+            (int32_t)value,
             parser_result->arg_prop.a,
             parser_result->format_spec.sign_display
         );
         break;
     case MStrFmtArgType_QuantizedUnsignedValue:
         return convert_uquat(
-            str, (u32_t)value, parser_result->arg_prop.a
+            str, (uint32_t)value, parser_result->arg_prop.a
         );
         break;
     default: return MStr_Err_UnsupportType; break;
@@ -561,7 +559,7 @@ static mstr_result_t convert_time(
         return MStr_Err_UnsupportFormatType;
     }
     else {
-        const sys_time_t* tm = (const sys_time_t*)value;
+        const MStrTime* tm = (const MStrTime*)value;
         return mstr_fmt_ttoa(str, tm, &spec->chrono_spec);
     }
 }
@@ -571,14 +569,14 @@ static mstr_result_t convert_time(
  *
  */
 static mstr_result_t convert_quat(
-    MString* str, i32_t value, u32_t qbits, MStrFmtSignDisplay sign
+    MString* str, int32_t value, uint32_t qbits, MStrFmtSignDisplay sign
 )
 {
     mstr_result_t result = MStr_Ok;
     // 转换符号
     MSTR_AND_THEN(result, convert_sign_helper(str, value, sign));
     // 转换无符号值
-    u32_t uvalue = value > 0 ? (u32_t)value : (u32_t)(-value);
+    uint32_t uvalue = value > 0 ? (uint32_t)value : (uint32_t)(-value);
     MSTR_AND_THEN(result, convert_uquat(str, uvalue, qbits));
     // 返回
     return result;
@@ -589,7 +587,7 @@ static mstr_result_t convert_quat(
  *
  */
 static mstr_result_t convert_uquat(
-    MString* str, u32_t value, u32_t qbits
+    MString* str, uint32_t value, uint32_t qbits
 )
 {
     return mstr_fmt_uqtoa(str, value, qbits);
@@ -601,7 +599,7 @@ static mstr_result_t convert_uquat(
  */
 static mstr_result_t convert_int(
     MString* str,
-    i32_t value,
+    int32_t value,
     MStrFmtSignDisplay sign,
     MStrFmtFormatType ftyp
 )
@@ -610,7 +608,7 @@ static mstr_result_t convert_int(
     // 转换符号
     MSTR_AND_THEN(result, convert_sign_helper(str, value, sign));
     // 转换无符号整数值
-    u32_t uvalue = value > 0 ? (u32_t)value : (u32_t)(-value);
+    uint32_t uvalue = value > 0 ? (uint32_t)value : (uint32_t)(-value);
     MSTR_AND_THEN(result, convert_uint(str, uvalue, ftyp));
     // 返回
     return result;
@@ -621,7 +619,7 @@ static mstr_result_t convert_int(
  *
  */
 static mstr_result_t convert_sign_helper(
-    MString* str, i32_t value, MStrFmtSignDisplay sign
+    MString* str, int32_t value, MStrFmtSignDisplay sign
 )
 {
     char sign_ch = '\0';
@@ -649,7 +647,7 @@ static mstr_result_t convert_sign_helper(
  *
  */
 static mstr_result_t convert_uint(
-    MString* str, u32_t value, MStrFmtFormatType ftyp
+    MString* str, uint32_t value, MStrFmtFormatType ftyp
 )
 {
     mstr_result_t result = MStr_Ok;

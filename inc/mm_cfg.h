@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LGPL-3.0
+﻿// SPDX-License-Identifier: LGPL-3.0
 /**
  * @file    mm_cfg.h
  * @author  向阳 (hinata.hoshino@foxmail.com)
@@ -11,8 +11,13 @@
  */
 #if !defined(_INCLUDE_MM_CFG_H_)
 #define _INCLUDE_MM_CFG_H_
-
 #include <stdint.h>
+
+#if _MSC_VER
+// "该文件包含不能在当前代码页(XXXX)中表示的字符"
+// unbengable (￣_￣|||)
+#pragma warning(disable : 4819)
+#endif // _MSC_VER
 
 #if !defined(_MSTR_USE_HARDWARE_DIV)
 /**
@@ -42,6 +47,45 @@
  */
 #define _MSTR_RUNTIME_HEAP_ALIGN 4
 #endif // _MSTR_RUNTIME_HEAP_ALIGN
+
+#if !defined(_MSTR_USE_STD_IO)
+/**
+ * @brief 指定是否使用stdout这些标准io操作
+ *
+ */
+#define _MSTR_USE_STD_IO 0
+#endif // _MSTR_USE_STD_IO
+
+#if _MSTR_USE_STD_IO
+#include <stdio.h>
+#endif // _MSTR_USE_STD_IO
+
+#if !defined(_MSTR_RUNTIME_CTRLFLOW_MARKER)
+/**
+ * @brief 指定是否使用unreachable等标记来标记控制流
+ *
+ */
+#define _MSTR_RUNTIME_CTRLFLOW_MARKER 1
+#endif // _MSTR_RUNTIME_CTRLFLOW_MARKER
+
+#if _MSTR_RUNTIME_CTRLFLOW_MARKER
+#if defined(USE_FULL_ASSERT)
+#include "stm32_assert.h"
+/**
+ * @brief 标记不可达的分支
+ *
+ */
+#define mstr_unreachable() assert_param(0)
+#elif defined(_MSTR_RUNTIME_ASSERT)
+#include <assert.h>
+#define mstr_unreachable() assert(0)
+#else
+#define mstr_unreachable() ((void)0U)
+#endif
+#else
+#define mstr_unreachable() ((void)0U)
+#endif // _MSTR_RUNTIME_CTRLFLOW_MARKER
+
 //
 // 导出函数修辞
 //
@@ -54,14 +98,16 @@
 // 定义导出定义
 //
 #if _MSTR_BUILD_DLL
+#if _MSC_VER
 #define MSTR_EXPORT_API(ret) \
     MSTR_EXPORT_MANGLE __declspec(dllexport) ret __stdcall
+#else
+#define MSTR_EXPORT_API(ret) \
+    MSTR_EXPORT_MANGLE __attribute__((visibility("default"))) ret
+#endif // _MSC_VER
 #elif _MSTR_IMPORT_FROM_DLL
 #define MSTR_EXPORT_API(ret) \
     MSTR_EXPORT_MANGLE __declspec(dllimport) ret __stdcall
-#elif _MSTR_BUILD_DYLIB
-#define MSTR_EXPORT_API(ret) \
-    MSTR_EXPORT_MANGLE __attribute__((visibility("default"))) ret
 #elif __EMSCRIPTEN__
 #include <emscripten.h>
 #define MSTR_EXPORT_API(ret) MSTR_EXPORT_MANGLE ret EMSCRIPTEN_KEEPALIVE
@@ -94,10 +140,16 @@
 #define MSTRCFG_USE_WASM_BIT       0x08
 
 /**
- * @brief 指定是否使用了硬件除法
+ * @brief 标记是否使用了硬件除法
  *
  */
 #define MSTRCFG_BUILD_HARDWARE_DIV 0x10
+
+/**
+ * @brief 标记是否使用了stdio
+ *
+ */
+#define MSTRCFG_USE_STD_IO         0x20
 
 /**
  * @brief 取得构建配置
