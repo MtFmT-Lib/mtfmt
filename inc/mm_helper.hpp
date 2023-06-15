@@ -110,6 +110,47 @@ template <typename F> struct function_arg_count
 {
     static constexpr std::size_t N = function_trait<F>::NArgs;
 };
+
+/**
+ * @brief 判断Ti是否为模板Tt的实例化
+ *
+ */
+template <template <typename...> typename Tt, typename Ti>
+struct is_instance_of
+{
+    static constexpr bool value = false;
+};
+
+// 判断Ti是否为模板Tt的实例化
+template <template <typename...> typename Tt, typename... Ti>
+struct is_instance_of<Tt, Tt<Ti...>>
+{
+    static constexpr bool value = true;
+};
+
+/**
+ * @brief 表示检查函数参数有多少个
+ *
+ */
+template <typename F, std::size_t N> struct function_has_n_args
+{
+    static constexpr bool value = function_arg_count<F>::N == N;
+};
+
+/**
+ * @brief 表示第n个参数应该拥有类型T
+ *
+ */
+template <typename F, std::size_t N, typename T>
+struct function_args_hold_type
+{
+    static constexpr bool value = std::is_same<
+        // 取得第n个参数
+        typename std::tuple_element<N, function_arg_tuple_t<F>>::type,
+        // 并检查其拥有的类型
+        T>::value;
+};
+
 } // namespace details
 } // namespace mtfmt
 #endif // _INCLUDE_MM_HELPER_HPP_

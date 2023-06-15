@@ -97,9 +97,82 @@ class result final : public details::result_base<T, E>
 {
 public:
     using succ_t = T;
-    using error_t = E;
+    using err_t = E;
     using base_t = details::result_base<T, E>;
     using base_t::base_t;
+
+    /**
+     * @brief 是否为succ?
+     *
+     */
+    bool is_succ() const noexcept
+    {
+        return base_t::type_tag == base_t::TypeTag::SuccTag;
+    }
+
+    /**
+     * @brief 是否为err?
+     *
+     */
+    bool is_err() const noexcept
+    {
+        return !is_succ();
+    }
+
+    /**
+     * @brief 取得succ的值
+     *
+     * @attention 只有在 is_succ() 返回 true 时才是有意义的
+     */
+    succ_t unsafe_get_succ_value() const noexcept
+    {
+        return base_t::t_val;
+    }
+
+    /**
+     * @brief 取得err的值
+     *
+     * @attention 只有在 is_err() 返回 true 时才是有意义的
+     */
+    err_t unsafe_get_err_value() const noexcept
+    {
+        return base_t::e_val;
+    }
+
+    /**
+     * @brief 在self是succ的时候执行then do, 否则返回err
+     *
+     * @param then_do: 接下来要做的事情, 拥有类型 T -> result<R, E>
+     */
+    template <
+        typename F,
+        typename R = typename std::enable_if<
+            true &&
+                // 返回值应该是result的实例
+                details::is_instance_of<
+                    result,
+                    details::function_return_type_t<F>>::value,
+            typename details::function_return_type_t<F>::succ_t>::type>
+    typename std::enable_if<
+        true &&
+            // 参数个数必须是1个
+            details::function_has_n_args<F, 1>::value &&
+            // 第一个参数的类型应当和 类型T 一致
+            details::function_args_hold_type<F, 0, T>::value &&
+            // 返回值类型的err_t应该和E一致
+            std::is_same<
+                typename details::function_return_type_t<F>::err_t,
+                E>::value,
+        result<R, E>>::type
+        and_then(F then_do) const
+    {
+        if (is_succ()) {
+            return then_do(base_t::t_val);
+        }
+        else {
+            return base_t::e_val;
+        }
+    }
 
     /**
      * @brief 如果为T则返回T, 不然返回or_val
@@ -107,7 +180,7 @@ public:
      */
     T or_value(T or_val) const noexcept
     {
-        if (base_t::type_tag == base_t::TypeTag::SuccTag) {
+        if (is_succ()) {
             return base_t::t_val;
         }
         else {
@@ -121,14 +194,11 @@ public:
      */
     template <typename F>
     typename std::enable_if<
-        // 参数个数必须是1个
-        details::function_arg_count<F>::N == 1 &&
+        true &&
+            // 参数个数必须是1个
+            details::function_has_n_args<F, 1>::value &&
             // 第一个参数的类型应当和 类型E 一致
-            std::is_same<
-                typename std::tuple_element<
-                    0,
-                    details::function_arg_tuple_t<F>>::type,
-                E>::value &&
+            details::function_args_hold_type<F, 0, E>::value &&
             // 异常应该继承自std::exception
             std::is_base_of<
                 std::exception,
@@ -136,7 +206,7 @@ public:
         T>::type
         or_exception(F cont) const
     {
-        if (base_t::type_tag == base_t::TypeTag::SuccTag) {
+        if (is_succ()) {
             return base_t::t_val;
         }
         else {

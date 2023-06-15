@@ -79,6 +79,7 @@ extern "C"
     void cpp_string_push(void);
     void cpp_string_concat(void);
 
+    void cpp_monadic_result_and_then(void);
     void cpp_monadic_result_or_value(void);
     void cpp_monadic_result_or_exception(void);
 

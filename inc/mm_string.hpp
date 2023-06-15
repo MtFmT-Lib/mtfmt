@@ -11,9 +11,11 @@
  */
 #if !defined(_INCLUDE_MM_STRING_HPP_)
 #define _INCLUDE_MM_STRING_HPP_ 1
+#include "mm_cfg.h"
 #include "mm_result.hpp"
 #include "mm_string.h"
 #include <cstddef>
+#include <string>
 namespace mtfmt
 {
 /**
@@ -50,6 +52,21 @@ public:
         mstr_create(&this_obj, c_str);
     }
 
+    /**
+     * @brief 从std::string创建
+     *
+     * @param str: str
+     */
+    explicit string(const std::string& str)
+    {
+        mstr_create(&this_obj, str.c_str());
+    }
+
+    /**
+     * @brief 从self创建
+     *
+     * @param str: str
+     */
     string(const string& str) noexcept
     {
         mstr_copy_create(&this_obj, &str.this_obj);
@@ -243,6 +260,15 @@ public:
     const char_t* as_cstr() noexcept
     {
         return mstr_as_cstr(&this_obj);
+    }
+
+    /**
+     * @brief 取得std::string
+     *
+     */
+    std::string as_std_string()
+    {
+        return std::string(this_obj.buff, this_obj.length);
     }
 
     /**

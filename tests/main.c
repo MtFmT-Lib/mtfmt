@@ -101,6 +101,7 @@ int main()
     RUN_TEST(cpp_string_push);
     RUN_TEST(cpp_string_concat);
 
+    RUN_TEST(cpp_monadic_result_and_then);
     RUN_TEST(cpp_monadic_result_or_value);
     RUN_TEST(cpp_monadic_result_or_exception);
 
