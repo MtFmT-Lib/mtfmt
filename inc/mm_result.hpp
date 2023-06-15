@@ -154,15 +154,8 @@ public:
                     details::function_return_type_t<F>>::value,
             typename details::function_return_type_t<F>::succ_t>::type>
     typename std::enable_if<
-        true &&
-            // 参数个数必须是1个
-            details::function_has_n_args<F, 1>::value &&
-            // 第一个参数的类型应当和 类型T 一致
-            details::function_args_hold_type<F, 0, T>::value &&
-            // 返回值类型的err_t应该和E一致
-            std::is_same<
-                typename details::function_return_type_t<F>::err_t,
-                E>::value,
+        // 函数拥有类型 T -> result<R, E>
+        details::holds_prototype<F, result<R, E>, T>::value,
         result<R, E>>::type
         and_then(F then_do) const
     {
@@ -191,18 +184,19 @@ public:
     /**
      * @brief 如果为T则返回T, 不然抛出异常
      *
+     * @attention 抛出的异常必须继承自 std::exception
      */
-    template <typename F>
-    typename std::enable_if<
-        true &&
-            // 参数个数必须是1个
-            details::function_has_n_args<F, 1>::value &&
-            // 第一个参数的类型应当和 类型E 一致
-            details::function_args_hold_type<F, 0, E>::value &&
-            // 异常应该继承自std::exception
+    template <
+        typename F,
+        typename R = typename std::enable_if<
+            // 抛出的异常继承自 std::exception
             std::is_base_of<
                 std::exception,
                 details::function_return_type_t<F>>::value,
+            details::function_return_type_t<F>>::type>
+    typename std::enable_if<
+        // 函数拥有类型 E -> Exception
+        details::holds_prototype<F, R, E>::value,
         T>::type
         or_exception(F cont) const
     {

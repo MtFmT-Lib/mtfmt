@@ -151,6 +151,21 @@ struct function_args_hold_type
         T>::value;
 };
 
+/**
+ * @brief 检查函数F的类型为 ( T1, T2 ...) -> R
+ *
+ */
+template <typename F, typename R, typename... T> struct holds_prototype
+{
+    using _Ret = details::function_return_type_t<F>;
+    using _Args = details::function_arg_tuple_t<F>;
+    using Targs = std::tuple<typename std::decay<T>::type...>;
+
+    static constexpr bool value =
+        function_has_n_args<F, sizeof...(T)>::value &&
+        std::is_same<_Ret, R>::value &&
+        std::is_same<_Args, Targs>::value;
+};
 } // namespace details
 } // namespace mtfmt
 #endif // _INCLUDE_MM_HELPER_HPP_
