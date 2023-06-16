@@ -17,8 +17,20 @@
 
     // 段落文本
     p {
+        margin: 0;
+        margin-top: 0.5em;
         text-indent: 2em;
         word-wrap: break-word;
+
+        img {
+            display: block;
+            margin: 0 auto;
+            padding-top: 0.8em;
+
+            // 宽高限制
+            max-width: 22em;
+            max-height: 17em;
+        }
 
         code {
             padding-left: 0.1em;
@@ -98,5 +110,12 @@
 
     .toc-level1-content {
         font-weight: 600;
+    }
+
+    .img-info {
+        font-size: 0.9em;
+        text-align: center;
+        margin-top: 0.4em;
+        margin-bottom: 1em;
     }
 }

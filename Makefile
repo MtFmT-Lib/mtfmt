@@ -222,7 +222,7 @@ coverage: test
 # 测试覆盖率, 并携带报告
 coverage_report: coverage | $(COVERAGE_DIR)
 	@echo $(GCOV_REPORT_DISPLAY)
-	@$(COV_REPORT) --exclude "test_*" --exclude "thirds/*" --html --html-details --output "$(COVERAGE_DIR)/index.html"
+	@$(COV_REPORT) --source-encoding=utf-8 --exclude "test_*" --exclude "thirds/*" --html --html-details --output "$(COVERAGE_DIR)/index.html"
 	@echo $(GCOV_REPORT_DISPLAY) completed.
 
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
