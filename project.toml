@@ -1,0 +1,47 @@
+[package]
+name = "MtFmt"
+version = "1.0.0"
+
+[project]
+dir-build = "./build"
+dir-target = "./target"
+files = ["./inc", "LICENSE", "*.md", "version.txt"]
+package = "zip"
+sources = ["./src"]
+
+[[build-target]]
+dir = "target/*.a"
+package = "static_library"
+
+[[build-target]]
+dir = "target/*.so"
+package = "dymatic_library"
+
+[[autogen]]
+mode = "pattern"
+pattern = """
+#if 1
+//! major version
+#define MSTR_VERSION_MAJOR {version:major}
+#endif
+#if 1
+//! minor version
+#define MSTR_VERSION_MINOR {version:minor}
+#endif
+#if 1
+//! release version
+#define MSTR_VERSION_RELEASE {version:release}
+#endif
+"""
+pattern-beg = "//@ <autogen:version>"
+pattern-end = "//@ </autogen:version>"
+target = "./inc/mm_cfg.h"
+
+[[autogen]]
+mode = "cmsis-pack"
+target = "cmsis-pack"
+
+[[autogen]]
+mode = "pattern"
+pattern = "{version:major}.{version:minor}.{version:release}"
+target = "./version.txt"

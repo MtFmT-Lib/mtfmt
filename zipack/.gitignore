@@ -1,0 +1,14 @@
+*
+!*/
+
+.pyenv
+.vscode
+lib
+build
+target
+target_coverage
+__pycache__
+
+!.gitignore
+!*.py
+!requirements.txt

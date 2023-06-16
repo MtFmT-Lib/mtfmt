@@ -30,6 +30,7 @@ target_coverage
 !*.cpp
 !*.h
 !*.c
+!*.toml
 !Makefile
 !Doxyfile
 !*_resource.rc

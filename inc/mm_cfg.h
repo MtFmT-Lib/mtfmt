@@ -248,6 +248,10 @@
  */
 #define MSTR_CONFIGURE_CFG_VAL(c)  ((c)&0xfff)
 
+//@ <autogen:version>
+
+//@ </autogen:version>
+
 /**
  * @brief 取得构建配置
  *
