@@ -88,9 +88,10 @@ static mstr_result_t convert_sign_helper(
 MSTR_EXPORT_API(mstr_result_t)
 mstr_format(MString* res_str, const char* fmt, usize_t fmt_place, ...)
 {
+    mstr_result_t res;
     va_list ap;
     va_start(ap, fmt_place);
-    mstr_result_t res = mstr_vformat(fmt, res_str, fmt_place, &ap);
+    res = mstr_vformat(fmt, res_str, fmt_place, &ap);
     va_end(ap);
     return res;
 }
@@ -103,7 +104,7 @@ mstr_vformat(
     va_list* ap_ptr
 )
 {
-    MStrFmtArgsContext context = {NULL, 0, {{MStrFmtArgType_Unknown}}};
+    MStrFmtArgsContext context = {0};
     context.max_place = fmt_place;
     context.p_ap = (va_list*)ap_ptr;
     return format_impl(res_str, fmt, &context);
@@ -117,12 +118,12 @@ static mstr_result_t format_impl(
     MString* res_str, const char* fmt, MStrFmtArgsContext* ctx
 )
 {
+    mstr_result_t result = MStr_Ok;
     // 处理格式化串
     if (ctx->max_place > MFMT_PLACE_MAX_NUM) {
         return MStr_Err_IndexTooLarge;
     }
     // else:
-    mstr_result_t result = MStr_Ok;
     while (!!*fmt && MSTR_SUCC(result)) {
         if (*fmt != '{' && *fmt != '}') {
             // 非格式化内容, 正常copy走
@@ -132,15 +133,17 @@ static mstr_result_t format_impl(
         }
         else {
             // 解析格式化串
+            uint32_t arg_id;
+            MStrFmtArgClass arg_class;
+            MStrFmtFormatArgument arg = {0};
+            MStrFmtFormatArgument arg_attach = {0};
             MStrFmtParseResult parser_result;
             MSTR_AND_THEN(
                 result, process_replacement_field(&fmt, &parser_result)
             );
             // 处理结果
-            uint32_t arg_id = parser_result.val.val.id;
-            MStrFmtArgClass arg_class = parser_result.arg_class;
-            MStrFmtFormatArgument arg = {0};
-            MStrFmtFormatArgument arg_attach = {0};
+            arg_id = parser_result.val.val.id;
+            arg_class = parser_result.arg_class;
             switch (arg_class) {
             case MStrFmtArgClass_EscapeChar:
                 // 转义字符, 直接append
@@ -255,6 +258,9 @@ static mstr_result_t format_array(
     const MStrFmtFormatArgument* sz_arg
 )
 {
+    MString buff;
+    mstr_result_t result;
+    usize_t array_len, array_index;
     if (arg->type !=
         (parser_result->val.arr.ele_typ | MStrFmtArgType_Array_Bit)) {
         return MStr_Err_InvaildArgumentType;
@@ -264,11 +270,10 @@ static mstr_result_t format_array(
     }
     // else:
     // 数组长度
-    usize_t array_len = (usize_t)sz_arg->value;
+    array_len = (usize_t)sz_arg->value;
     // 格式化数组中的每一个元素
-    usize_t array_index = 0;
-    MString buff;
-    mstr_result_t result = mstr_create_empty(&buff);
+    array_index = 0;
+    result = mstr_create_empty(&buff);
     while (MSTR_SUCC(result) && array_index < array_len) {
         MStrFmtFormatArgument element;
         element.type = parser_result->val.arr.ele_typ;
@@ -309,7 +314,9 @@ static iptr_t array_get_item(
     MStrFmtArgType type =
         (MStrFmtArgType)((uint32_t)(array->type) &
                          (uint32_t)(MStrFmtArgType_Array_Bit - 1));
-    size_t ele_size = 0;
+    usize_t ele_size = 0;
+    iptr_t element_ptr = (iptr_t)NULL;
+    const void* ptr = NULL;
     switch (type) {
     case MStrFmtArgType_Int8: ele_size = sizeof(int8_t); break;
     case MStrFmtArgType_Int16: ele_size = sizeof(int16_t); break;
@@ -328,8 +335,7 @@ static iptr_t array_get_item(
     default: mstr_unreachable(); break;
     }
     // 取得值
-    iptr_t element_ptr = (iptr_t)NULL;
-    const void* ptr = (const void*)(index * ele_size + array->value);
+    ptr = (const void*)(index * ele_size + (uptr_t)array->value);
     switch (type) {
     case MStrFmtArgType_Int8:
         element_ptr = (iptr_t)(*(const int8_t*)ptr);
@@ -380,14 +386,15 @@ static mstr_result_t format_value(
     const MStrFmtFormatArgument* arg
 )
 {
+    MString buff;
+    mstr_result_t result;
     if (arg->type != parser_result->val.val.typ) {
         return MStr_Err_InvaildArgumentType;
     }
     // else:
     // 按照value_type,
     // sign_display和fmt_type先格式化到mfmt_static_buff里面
-    MString buff;
-    mstr_result_t result = mstr_create_empty(&buff);
+    result = mstr_create_empty(&buff);
     MSTR_AND_THEN(result, convert(&buff, parser_result, arg));
     if (result == MStr_Err_BufferTooSmall) {
         result = MStr_Err_InternalBufferTooSmall;
@@ -417,34 +424,39 @@ static mstr_result_t copy_to_output(
     const MString* src_str
 )
 {
+    usize_t src_len = 0;
+    usize_t fill_len = 0;
+    usize_t offset_len = 0;
+    usize_t need_width = 0;
+    mstr_result_t result = MStr_Ok;
+    MStrFmtAlign align;
+    char fill_char;
     if (fmt_spec->width == -1) {
         // 压根没有指定宽度, 不管对齐了
         return mstr_concat(out_str, src_str);
     }
     // 计算宽度够不够
-    usize_t src_len = src_str->length;
-    if (src_len >= fmt_spec->width) {
+    src_len = src_str->length;
+    need_width = (usize_t)fmt_spec->width;
+    if (src_len >= need_width) {
         // 宽度太宽, 不管对齐了
         return mstr_concat(out_str, src_str);
     }
     // 宽度确定足够, 按照align去copy, 并且用fill_char填充
-    usize_t fill_len = 0;
-    usize_t offset_len = 0;
-    mstr_result_t result = MStr_Ok;
-    MStrFmtAlign align = fmt_spec->fmt_align;
-    char fill_char = fmt_spec->fill_char;
+    align = fmt_spec->fmt_align;
+    fill_char = fmt_spec->fill_char;
     switch (align) {
     case MStrFmtAlign_Left:
         // 复制开头的内容
         MSTR_AND_THEN(result, mstr_concat(out_str, src_str));
         // 进行填充
-        fill_len = fmt_spec->width - src_len;
+        fill_len = need_width - src_len;
         MSTR_AND_THEN(
             result, mstr_repeat_append(out_str, fill_char, fill_len)
         );
         break;
     case MStrFmtAlign_Right:
-        fill_len = fmt_spec->width - src_len;
+        fill_len = need_width - src_len;
         MSTR_AND_THEN(
             result, mstr_repeat_append(out_str, fill_char, fill_len)
         );
@@ -452,7 +464,7 @@ static mstr_result_t copy_to_output(
         MSTR_AND_THEN(result, mstr_concat(out_str, src_str));
         break;
     case MStrFmtAlign_Center:
-        fill_len = (fmt_spec->width - src_len) / 2;
+        fill_len = (need_width - src_len) / 2;
         // 左侧的填充
         MSTR_AND_THEN(
             result, mstr_repeat_append(out_str, fill_char, fill_len)
@@ -461,7 +473,7 @@ static mstr_result_t copy_to_output(
         MSTR_AND_THEN(result, mstr_concat(out_str, src_str));
         // 右边的填充
         offset_len = fill_len + src_len;
-        fill_len = fmt_spec->width - offset_len;
+        fill_len = need_width - offset_len;
         MSTR_AND_THEN(
             result, mstr_repeat_append(out_str, fill_char, fill_len)
         );
@@ -577,11 +589,12 @@ static mstr_result_t convert_quat(
     MString* str, int32_t value, uint32_t qbits, MStrFmtSignDisplay sign
 )
 {
+    uint32_t uvalue;
     mstr_result_t result = MStr_Ok;
     // 转换符号
     MSTR_AND_THEN(result, convert_sign_helper(str, value, sign));
     // 转换无符号值
-    uint32_t uvalue = value > 0 ? (uint32_t)value : (uint32_t)(-value);
+    uvalue = value > 0 ? (uint32_t)value : (uint32_t)(-value);
     MSTR_AND_THEN(result, convert_uquat(str, uvalue, qbits));
     // 返回
     return result;
@@ -609,11 +622,12 @@ static mstr_result_t convert_int(
     MStrFmtFormatType ftyp
 )
 {
+    uint32_t uvalue;
     mstr_result_t result = MStr_Ok;
     // 转换符号
     MSTR_AND_THEN(result, convert_sign_helper(str, value, sign));
     // 转换无符号整数值
-    uint32_t uvalue = value > 0 ? (uint32_t)value : (uint32_t)(-value);
+    uvalue = value > 0 ? (uint32_t)value : (uint32_t)(-value);
     MSTR_AND_THEN(result, convert_uint(str, uvalue, ftyp));
     // 返回
     return result;
@@ -696,7 +710,6 @@ static mstr_result_t convert_uint(
         // 默认是十进制
         result = mstr_fmt_utoa(&buff, value, MStrFmtIntIndex_Dec);
         break;
-    default: result = MStr_Err_UnsupportFormatType; break;
     }
     // 然后跟上格式化的内容
     MSTR_AND_THEN(result, mstr_concat(str, &buff));
@@ -715,12 +728,13 @@ static mstr_result_t process_replacement_field(
     char const** ppfmt, MStrFmtParseResult* parser_result
 )
 {
+    mstr_result_t result;
     const char* pfmt = *ppfmt;
     // 解析内容
     MStrFmtParserState* state;
     byte_t state_memory[MFMT_PARSER_STATE_SIZE];
     mstr_fmt_parser_init(state_memory, pfmt, &state);
-    mstr_result_t result = mstr_fmt_parse_goal(state, parser_result);
+    result = mstr_fmt_parse_goal(state, parser_result);
     // 增加offset
     if (MSTR_SUCC(result)) {
         pfmt += mstr_fmt_parser_end_position(state, pfmt);

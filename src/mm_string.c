@@ -111,23 +111,26 @@ mstr_repeat_append(MString* str, char ch, usize_t cnt)
     if (cnt == 0) {
         return MStr_Ok;
     }
-    // else:
-    mstr_result_t result = MStr_Ok;
-    if (str->length + cnt + 1 >= str->cap_size) {
-        // 保证length < cap_size + 1
-        // 且有足够的空间存放下一个字符
-        MSTR_AND_THEN(
-            result,
-            mstr_expand_size(str, str->cap_size + MSTR_CAP_SIZE_STEP)
-        );
-    }
-    if (MSTR_SUCC(result)) {
-        for (usize_t i = 0; i < cnt; i += 1) {
-            str->buff[str->length + i] = ch;
+    else {
+        mstr_result_t result = MStr_Ok;
+        if (str->length + cnt + 1 >= str->cap_size) {
+            // 保证length < cap_size + 1
+            // 且有足够的空间存放下一个字符
+            MSTR_AND_THEN(
+                result,
+                mstr_expand_size(
+                    str, str->cap_size + MSTR_CAP_SIZE_STEP
+                )
+            );
         }
-        str->length += cnt;
+        if (MSTR_SUCC(result)) {
+            for (usize_t i = 0; i < cnt; i += 1) {
+                str->buff[str->length + i] = ch;
+            }
+            str->length += cnt;
+        }
+        return result;
     }
-    return result;
 }
 
 MSTR_EXPORT_API(mstr_result_t)
@@ -159,7 +162,7 @@ mstr_concat_cstr(MString* str, const char* other)
 {
     MString lit;
     // const MString不会被修改, 所以可强转一下
-    lit.buff = (char*)other;
+    lit.buff = (char*)(iptr_t)other;
     lit.length = (usize_t)strlen(other);
     lit.cap_size = 0;
     return mstr_concat(str, &lit);
@@ -170,7 +173,7 @@ mstr_concat_cstr_slice(MString* str, const char* start, const char* end)
 {
     MString lit;
     // const MString不会被修改, 所以可强转一下
-    lit.buff = (char*)start;
+    lit.buff = (char*)(iptr_t)start;
     lit.length = (usize_t)(end - start);
     lit.cap_size = 0;
     return mstr_concat(str, &lit);

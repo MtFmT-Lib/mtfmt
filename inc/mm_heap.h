@@ -32,7 +32,7 @@
  * @param[in] heap_size: 堆内存区的大小
  */
 MSTR_EXPORT_API(void)
-mstr_heap_init_sym(intptr_t heap_memory, usize_t heap_size);
+mstr_heap_init_sym(iptr_t heap_memory, usize_t heap_size);
 
 /**
  * @brief 尝试从堆中分配size大小的内存

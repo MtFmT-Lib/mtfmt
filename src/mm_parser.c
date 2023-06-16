@@ -266,7 +266,7 @@ typedef enum tagParserStage
  * @brief 分析器状态
  *
  */
-typedef struct tagMStrFmtParserState
+struct tagMStrFmtParserState
 {
     /**
      * @brief 当前Token
@@ -285,7 +285,7 @@ typedef struct tagMStrFmtParserState
      *
      */
     ParserStage stage;
-} MStrFmtParserState;
+};
 
 //
 // parser:
@@ -385,13 +385,15 @@ mstr_fmt_parser_init(
 )
 {
     if (MFMT_PARSER_STATE_SIZE < sizeof(MStrFmtParserState)) {
-        // system_panic("Static memory is too small.");
+        mstr_unreachable();
     }
-    MStrFmtParserState* pstate = (MStrFmtParserState*)mem;
-    pstate->current = inp;
-    pstate->stage = ParserStage_Normal;
-    // ret
-    *ppstate = pstate;
+    else {
+        MStrFmtParserState* pstate = (MStrFmtParserState*)mem;
+        pstate->current = inp;
+        pstate->stage = ParserStage_Normal;
+        // ret
+        *ppstate = pstate;
+    }
 }
 
 MSTR_EXPORT_API(mstr_result_t)
