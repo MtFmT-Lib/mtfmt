@@ -22,13 +22,9 @@ on:
         default: "warning"
 
 jobs:
-  cmake-build:
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [ubuntu-latest]
-    runs-on: "${{ matrix.os }}"
-    name: "cmake build: ${{ matrix.os }}"
+  cmake-build-linux:
+    runs-on: ubuntu-latest
+    name: cmake build on ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -44,7 +40,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: cmake-artifact
+          name: cmake-linux-artifact
           path: |
             ./build/*.so
       # 构建静态库版本
@@ -59,6 +55,29 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: cmake-artifact
+          name: cmake-linux-artifact
           path: |
             ./build/*.a
+
+  cmake-build-windows:
+    runs-on: windows-latest
+    name: cmake build on windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: cmake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DMTFMT_RT_USE_MALLOC=ON -DMTFMT_RT_USE_DIV=ON -DMTFMT_RT_USE_STDOUT=ON -DMTFMT_BUILD_SHARED=ON
+          cmake --build .
+        shell: pwsh
+      # 打包动态库
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cmake-windows-artifact
+          path: |
+            ./build/*
