@@ -24,10 +24,10 @@
     } while (0)
 
 //! ACCEPT一个token, 注意这个macro不会跳转
-#define LEX_ACCEPT_TOKEN(tk, typ, at_pstr) \
-    do {                                   \
-        (tk)->type = (typ);                \
-        (tk)->len = (at_pstr) - (tk)->beg; \
+#define LEX_ACCEPT_TOKEN(tk, typ, at_pstr)            \
+    do {                                              \
+        (tk)->type = (typ);                           \
+        (tk)->len = (usize_t)((at_pstr) - (tk)->beg); \
     } while (0)
 
 //! 判断是否为一个number

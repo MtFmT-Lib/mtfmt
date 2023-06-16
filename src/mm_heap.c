@@ -13,10 +13,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#undef mstr_heap_init
-#undef mstr_heap_free
-#undef mstr_heap_alloc
-
 /**
  * @brief 堆的size, 可以省个几bytes
  *
@@ -115,19 +111,20 @@ static void* heap_allocate_impl(Heap*, heap_size_t, heap_size_t);
 //
 
 MSTR_EXPORT_API(void)
-mstr_heap_init(intptr_t heap_memory, usize_t heap_size)
+mstr_heap_init_sym(intptr_t heap_memory, usize_t heap_size)
 {
     heap_init_impl(&heap, heap_memory, heap_size);
 }
 
-MSTR_EXPORT_API(void*) mstr_heap_allocate(usize_t size, usize_t align)
+MSTR_EXPORT_API(void*)
+mstr_heap_allocate_sym(usize_t size, usize_t align)
 {
     return heap_allocate_impl(
         &heap, (heap_size_t)size, (heap_size_t)align
     );
 }
 
-MSTR_EXPORT_API(void) mstr_heap_free(void* memory)
+MSTR_EXPORT_API(void) mstr_heap_free_sym(void* memory)
 {
     heap_free_impl(&heap, memory);
 }
