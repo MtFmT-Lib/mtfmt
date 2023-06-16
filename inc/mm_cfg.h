@@ -35,7 +35,7 @@
  * @brief 表示使用armcc (ac6)编译
  *
  */
-#define MSTR_BUILD_CC_ARMCC_VER6 0x4
+#define MSTR_BUILD_CC_ARMCLANG   0x4
 
 /**
  * @brief 表示使用WASM
@@ -54,7 +54,7 @@
 #elif defined(__ARMCC_VERSION)
 // 优先考虑armcc而不是gnuc
 #if __ARMCC_VERSION >= 6000000
-#define MSTR_BUILD_CC MSTR_BUILD_CC_ARMCC_VER6
+#define MSTR_BUILD_CC MSTR_BUILD_CC_ARMCLANG
 #else
 #define MSTR_BUILD_CC MSTR_BUILD_CC_ARMCC
 #endif // __ARMCC_VERSION
@@ -66,14 +66,27 @@
 #define MSTR_BUILD_CC MSTR_BUILD_CC_OTHER
 #endif // 编译器版本
 
-#if MSTR_BUILD_CC == MSTR_BUILD_CC_MSVC
+#if defined(MSTR_IMP_SOURCES) && MSTR_BUILD_CC == MSTR_BUILD_CC_MSVC
 // "该文件包含不能在当前代码页(XXXX)中表示的字符"
 // unbengable (￣_￣|||)
 #pragma warning(disable : 4819)
 #endif // _MSC_VER
 
+#if defined(MSTR_IMP_SOURCES) && MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG
+// 我们不需要任何的对齐警告, 分支覆盖警告
+// 因为parser在很多case不会处理所有情况(取而代之由default: 处理 break;)
+// 所有的结构体不需要关注padding填充, 因为没有任何一个地方使用
+// reinterpret_cast 指针转换均不需要关注对齐问题,
+// 因为堆内存分配按照机器字长对齐
+#pragma clang diagnostic ignored "-Wpadded"
+#pragma clang diagnostic ignored "-Wcast-align"
+#pragma clang diagnostic ignored "-Wswitch-enum"
+#elif defined(MSTR_IMP_SOURCES) && MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
+// TODO
+#endif // _MSC_VER
+
 #if !defined(_MSTR_USE_HARDWARE_DIV)
-#if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC_VER6 || \
+#if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
     MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
 #if defined(__TARGET_FEATURE_DIVIDE)
 /**

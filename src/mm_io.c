@@ -9,6 +9,9 @@
  * @copyright Copyright (c) 向阳, all rights reserved.
  *
  */
+
+#define MSTR_IMP_SOURCES 1
+
 #include "mm_io.h"
 #include "mm_cfg.h"
 #include "mm_fmt.h"
