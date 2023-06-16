@@ -40,9 +40,25 @@ jobs:
           cd build
           cmake .. -DMTFMT_RT_USE_MALLOC=ON -DMTFMT_RT_USE_DIV=ON -DMTFMT_RT_USE_STDOUT=ON -DMTFMT_BUILD_SHARED=ON
           cmake --build .
-      # 打包
+      # 打包动态库
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: cmake-artifact
-          path: ./*
+          path: |
+            ./build/*.so
+      # 构建静态库版本
+      - name: cmake static lib
+        run: |
+          rm -rf build
+          mkdir build
+          cd build
+          cmake .. -DMTFMT_RT_USE_MALLOC=ON -DMTFMT_RT_USE_DIV=ON -DMTFMT_RT_USE_STDOUT=ON
+          cmake --build .
+      # 打包静态库
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cmake-artifact
+          path: |
+            ./build/*.a
