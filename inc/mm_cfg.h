@@ -47,7 +47,7 @@
  * @brief 表示使用其它的编译器编译
  *
  */
-#define MSTR_BUILD_CC_OTHER      0xff
+#define MSTR_BUILD_CC_OTHER      0xf
 
 #if defined(_MSC_VER)
 #define MSTR_BUILD_CC MSTR_BUILD_CC_MSVC
@@ -216,6 +216,24 @@
  *
  */
 #define MSTRCFG_USE_STD_IO         0x08
+
+/**
+ * @brief 取得库版本信息
+ *
+ */
+#define MSTR_CONFIGURE_VER_VAL(c)  (((c) >> 16) & 0xffff)
+
+/**
+ * @brief 取得使用的编译器版本
+ *
+ */
+#define MSTR_CONFIGURE_CC_VAL(c)   (((c) >> 12) & 0xf)
+
+/**
+ * @brief 取得构建配置
+ *
+ */
+#define MSTR_CONFIGURE_CFG_VAL(c)  ((c)&0xfff)
 
 /**
  * @brief 取得构建配置
