@@ -37,7 +37,17 @@ int main()
 {
     UNITY_BEGIN();
 
-    printf("Build configure: 0x%08x\n", mstr_configure());
+    uint32_t cfg = mstr_configure();
+    printf(
+        "Build configure - version: 0x%x\n", MSTR_CONFIGURE_VER_VAL(cfg)
+    );
+    printf(
+        "Build configure - compile: %d\n", MSTR_CONFIGURE_CC_VAL(cfg)
+    );
+    printf(
+        "Build configure - configure: 0x%x\n",
+        MSTR_CONFIGURE_CFG_VAL(cfg)
+    );
 
     RUN_TEST(allocate_then_free);
 

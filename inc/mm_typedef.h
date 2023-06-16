@@ -29,7 +29,7 @@ typedef uint8_t byte_t;
  * @brief 尺寸(无符号)
  *
  */
-typedef size_t usize_t;
+typedef size_t usize_t, uptr_t;
 
 /**
  * @brief 尺寸(有符号, sizeof(isize_t) == sizeof(usize_t) ==
