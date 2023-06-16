@@ -405,12 +405,12 @@ mstr_fmt_parse_goal(
     // else:
     if (LEX_CURRENT_TOKEN(state).type == TokenType_LeftBraceBrace) {
         result->arg_class = MStrFmtArgClass_EscapeChar;
-        result->escape_char = '{';
+        result->val.escape_char = '{';
         // ret: MStr_Ok
     }
     else if (LEX_CURRENT_TOKEN(state).type == TokenType_RightBraceBrace) {
         result->arg_class = MStrFmtArgClass_EscapeChar;
-        result->escape_char = '}';
+        result->val.escape_char = '}';
         // ret: MStr_Ok
     }
     else {
@@ -425,7 +425,7 @@ mstr_fmt_parser_end_position(
     MStrFmtParserState* state, const char* pbeg
 )
 {
-    return state->current - pbeg;
+    return (usize_t)(state->current - pbeg);
 }
 
 /**
@@ -499,35 +499,35 @@ static mstr_result_t parse_array_field(
 )
 {
     mstr_result_t result = MStr_Ok;
-    // Arg ID
     uint32_t arg_id = 0;
+    MStrFmtArgType arg_type = MStrFmtArgType_Unknown;
+    MStrFmtArgProperty arg_prop = {0, 0};
+    MStrFmtFormatDescript format_spec = {0};
+    const char* split_beg = NULL;
+    const char* split_end = NULL;
+    // Arg ID
     MSTR_AND_THEN(result, parse_arg_id(state, &arg_id));
     // `:` arg_type
     // 为了方便lex这两个作为1个token被match
     // 需要格式化的值类型
-    MStrFmtArgType arg_type;
-    MStrFmtArgProperty arg_prop;
     MSTR_AND_THEN(result, parse_arg_type(state, &arg_type, &arg_prop));
     // 可选的 `|:` split_ch
-    const char* split_beg = NULL;
-    const char* split_end = NULL;
     MSTR_AND_THEN(
         result, parse_opt_split_chars(state, &split_beg, &split_end)
     );
     // 可选的format_spec
-    MStrFmtFormatDescript format_spec;
     MSTR_AND_THEN(
         result,
         parse_opt_formatfield_spec(state, arg_type, &format_spec)
     );
     // 赋值给结果
     if (MSTR_SUCC(result)) {
-        parser_result->array_arg_id = arg_id;
-        parser_result->array_ele_type = arg_type;
-        parser_result->array_ele_prop = arg_prop;
-        parser_result->array_split_beg = split_beg;
-        parser_result->array_split_end = split_end;
-        parser_result->array_ele_format_spec = format_spec;
+        parser_result->val.arr.id = arg_id;
+        parser_result->val.arr.ele_typ = arg_type;
+        parser_result->val.arr.ele_prop = arg_prop;
+        parser_result->val.arr.split_beg = split_beg;
+        parser_result->val.arr.split_end = split_end;
+        parser_result->val.arr.spec = format_spec;
     }
     // 返回
     return result;
@@ -603,30 +603,32 @@ static mstr_result_t parse_simple_field(
     MStrFmtParserState* state, MStrFmtParseResult* parser_result
 )
 {
+    uint32_t arg_id = 0;
+    MStrFmtArgType arg_type = MStrFmtArgType_Unknown;
+    MStrFmtArgProperty arg_prop = {0, 0};
+    MStrFmtFormatDescript format_spec = {0};
     mstr_result_t result = MStr_Ok;
+    // 默认为未指定
+    format_spec.fmt_spec.fmt_type = MStrFmtFormatType_UnSpec;
     state->stage =
         PARSER_STAGE_BEGIN(state->stage, ParserStage_NeedEnd);
     // Arg ID
-    uint32_t arg_id = 0;
     MSTR_AND_THEN(result, parse_arg_id(state, &arg_id));
     // `:` arg_type
     // 为了方便lex这两个作为1个token被match
     // 需要格式化的值类型
-    MStrFmtArgType arg_type;
-    MStrFmtArgProperty arg_prop;
     MSTR_AND_THEN(result, parse_arg_type(state, &arg_type, &arg_prop));
     // 可选的 `:` format_spec
-    MStrFmtFormatDescript format_spec;
     MSTR_AND_THEN(
         result,
         parse_opt_formatfield_spec(state, arg_type, &format_spec)
     );
     // 赋值给结果
     if (MSTR_SUCC(result)) {
-        parser_result->arg_id = arg_id;
-        parser_result->arg_type = arg_type;
-        parser_result->arg_prop = arg_prop;
-        parser_result->format_spec = format_spec;
+        parser_result->val.val.id = arg_id;
+        parser_result->val.val.typ = arg_type;
+        parser_result->val.val.prop = arg_prop;
+        parser_result->val.val.spec = format_spec;
     }
     // 返回
     state->stage = PARSER_STAGE_END(state->stage, ParserStage_NeedEnd);
@@ -647,9 +649,11 @@ static mstr_result_t parse_opt_formatfield_spec(
     char fill_char = ' ';
     MStrFmtAlign align = MStrFmtAlign_Right;
     MStrFmtSignDisplay sign_display = MStrFmtSignDisplay_NegOnly;
-    MStrFmtFormatSpec fmt_spec;
-    fmt_spec.fmt_type = MStrFmtFormatType_UnSpec;
+    MStrFmtFormatSpec fmt_spec = {0};
     mstr_result_t result = MStr_Ok;
+    // arg_type可能会在未来用到, 不移除
+    (void)arg_type;
+    // chrono parse stage
     state->stage =
         PARSER_STAGE_BEGIN(state->stage, ParserStage_MatchChronoToken);
     if (LEX_CURRENT_TOKEN(state).type == TokenType_Colon) {
@@ -790,7 +794,7 @@ static mstr_result_t parse_chrono_spec(
 {
     usize_t index = 0;
     mstr_result_t result = MStr_Ok;
-    MStrFmtChronoFormatSpec* chrono_spec = &spec->chrono_spec;
+    MStrFmtChronoFormatSpec* chrono_spec = &spec->spec.chrono;
     // 默认值的lut
     // 它依赖于 MStrFmtChronoValueType 的顺序
     const uint8_t packed_lut[][4] = {
@@ -850,7 +854,7 @@ static mstr_result_t parse_chrono_spec(
             const char* split_beg = (const char*)packed_lut_ptr[i];
             MStrFmtChronoItemFormatSpec format_spec = {
                 .value_type = (MStrFmtChronoValueType)values[0],
-                .value_spec = {(bool_t)values[1], (usize_t)values[2]},
+                .chrono_spec = {(bool_t)values[1], (uint8_t)values[2]},
                 .split_beg = split_beg,
                 .split_end = split_beg + (usize_t)values[3],
             };
@@ -860,14 +864,14 @@ static mstr_result_t parse_chrono_spec(
             // 携带星期
             MStrFmtChronoItemFormatSpec sub_sec = {
                 .value_type = MStrFmtChronoValueType_SubSecond,
-                .value_spec = {True, 4},
+                .chrono_spec = {True, 4},
                 .split_beg = MFMT_DEFAULT_CHRONO_ITEM_SPLIT,
                 .split_end = MFMT_DEFAULT_CHRONO_ITEM_SPLIT +
                              MFMT_DEFAULT_CHRONO_ITEM_SPLIT_LENGTH,
             };
             MStrFmtChronoItemFormatSpec week = {
                 .value_type = MStrFmtChronoValueType_Week,
-                .value_spec = {False, 0},
+                .chrono_spec = {False, 0},
                 .split_beg = NULL,
                 .split_end = NULL,
             };
@@ -879,7 +883,7 @@ static mstr_result_t parse_chrono_spec(
             // 正常长度
             MStrFmtChronoItemFormatSpec r = {
                 .value_type = MStrFmtChronoValueType_SubSecond,
-                .value_spec = {True, 4},
+                .chrono_spec = {True, 4},
                 .split_beg = NULL,
                 .split_end = NULL,
             };
@@ -976,8 +980,8 @@ static mstr_result_t parse_chrono_spec_item(
         uint32_t idx = (uint32_t)cur_token->type - off;
         const uint8_t* values = packed_lut[idx];
         item->value_type = (MStrFmtChronoValueType)values[0];
-        item->value_spec.fixed_length = (bool_t)values[1];
-        item->value_spec.format_length = (uint8_t)values[2];
+        item->chrono_spec.fixed_length = (bool_t)values[1];
+        item->chrono_spec.format_length = (uint8_t)values[2];
     }
     else {
         result = MStr_Err_MissingChronoItemType;
@@ -1089,7 +1093,7 @@ static mstr_result_t parse_opt_items(
     case TokenType_Equ:
         // fill char为默认, 取得align
         return parse_align(state, align);
-        break;
+        // break
     case TokenType_Colon:
     case TokenType_Digits:
     case TokenType_LeftBrace:
@@ -1133,13 +1137,14 @@ static mstr_result_t parse_opt_items(
             // peek寄啦, next也会寄, 所以返回err
             return res;
         }
-    } break;
+    }
+    // break
     default:
         // 默认情况, 不处理
         *ch = ' ';
         *align = MStrFmtAlign_Left;
         return MStr_Ok;
-        break;
+        // break
     }
 }
 
@@ -1200,7 +1205,10 @@ static mstr_result_t parse_arg_type(
         typ = MStrFmtArgType_QuantizedUnsignedValue;
         parse_arg_get_fixed_props(cur_token, arg_prop);
         break;
-    default: valid_type = False; break;
+    default:
+        valid_type = False;
+        typ = MStrFmtArgType_Unknown;
+        break;
     }
     if (valid_type) {
         *arg_type = typ;
@@ -1356,14 +1364,15 @@ static mstr_result_t lex_next_token(
 s0:
     ch = LEX_PEEK_CHAR(pstr);
     switch (ch) {
-    case '=': goto equ; break;
-    case '>': goto gt; break;
-    case '<': goto lt; break;
-    case ':': goto colon; break;
-    case '{': goto l_brace; break;
-    case '}': goto r_brace; break;
-    case ']': goto r_bracket; break;
-    case '|': goto v_line; break;
+    case '=': goto equ;
+    case '>': goto gt;
+    case '<': goto lt;
+    case ':': goto colon;
+    case '{': goto l_brace;
+    case '}': goto r_brace;
+    case ']': goto r_bracket;
+    case '|': goto v_line;
+    case '\0': goto eof;
     case '%':
         if ((stage & ParserStage_MatchChronoToken) ==
             ParserStage_MatchChronoToken) {
@@ -1372,8 +1381,7 @@ s0:
         else {
             goto other_char;
         }
-        break;
-    case '\0': goto eof; break;
+        // break
     default:
         if (IS_NUMBER(ch)) {
             goto digits_beg;
@@ -1381,7 +1389,7 @@ s0:
         else {
             goto other_char;
         }
-        break;
+        // break
     }
 digits_beg:
     LEX_MOVE_TO_NEXT(pstr);
@@ -1416,13 +1424,13 @@ colon:
     // 检查后面跟的东东
     ch = LEX_PEEK_CHAR(pstr);
     switch (ch) {
-    case 'i': goto type_ix; break;
-    case 'u': goto type_ux; break;
-    case 'q': goto type_quat; break;
-    case 'F': goto type_fixed; break;
-    case 's': goto type_str; break;
-    case 't': goto type_time; break;
-    default: goto acc; break;
+    case 'i': goto type_ix;
+    case 'u': goto type_ux;
+    case 'q': goto type_quat;
+    case 'F': goto type_fixed;
+    case 's': goto type_str;
+    case 't': goto type_time;
+    default: goto acc;
     }
 type_ix:
     LEX_MOVE_TO_NEXT(pstr);
@@ -1651,18 +1659,18 @@ chrono_percentage:
     LEX_MOVE_TO_NEXT(pstr);
     ch = LEX_PEEK_CHAR(pstr);
     switch (ch) {
-    case '%': goto other_char; break;
-    case 'f': goto chrono_predef_f; break;
-    case 'g': goto chrono_predef_g; break;
-    case 'y': goto chrono_userdef_y; break;
-    case 'M': goto chrono_userdef_M; break;
-    case 'd': goto chrono_userdef_d; break;
-    case 'h': goto chrono_userdef_h; break;
-    case 'H': goto chrono_userdef_H; break;
-    case 'm': goto chrono_userdef_m; break;
-    case 's': goto chrono_userdef_s; break;
-    case 'x': goto chrono_userdef_x; break;
-    case 'w': goto chrono_userdef_W; break;
+    case '%': goto other_char;
+    case 'f': goto chrono_predef_f;
+    case 'g': goto chrono_predef_g;
+    case 'y': goto chrono_userdef_y;
+    case 'M': goto chrono_userdef_M;
+    case 'd': goto chrono_userdef_d;
+    case 'h': goto chrono_userdef_h;
+    case 'H': goto chrono_userdef_H;
+    case 'm': goto chrono_userdef_m;
+    case 's': goto chrono_userdef_s;
+    case 'x': goto chrono_userdef_x;
+    case 'w': goto chrono_userdef_W;
     case '>':
     case '<':
     case '=':
@@ -1672,7 +1680,6 @@ chrono_percentage:
     default:
         // 其余情况不应该出现单个字符
         goto err;
-        break;
     }
 chrono_predef_f:
     matched_type = TokenType_ChronoPredef_f;

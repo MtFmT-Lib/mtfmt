@@ -134,7 +134,7 @@ static mstr_result_t format_impl(
                 result, process_replacement_field(&fmt, &parser_result)
             );
             // 处理结果
-            uint32_t arg_id = parser_result.arg_id;
+            uint32_t arg_id = parser_result.val.val.id;
             MStrFmtArgClass arg_class = parser_result.arg_class;
             MStrFmtFormatArgument arg = {0};
             MStrFmtFormatArgument arg_attach = {0};
@@ -143,7 +143,7 @@ static mstr_result_t format_impl(
                 // 转义字符, 直接append
                 MSTR_AND_THEN(
                     result,
-                    mstr_append(res_str, parser_result.escape_char)
+                    mstr_append(res_str, parser_result.val.escape_char)
                 );
                 break;
             case MStrFmtArgClass_Value:
@@ -151,7 +151,7 @@ static mstr_result_t format_impl(
                 MSTR_AND_THEN(
                     result,
                     load_value(
-                        &arg, ctx, arg_id, parser_result.arg_type
+                        &arg, ctx, arg_id, parser_result.val.val.typ
                     )
                 );
                 // 进行格式化
@@ -167,7 +167,7 @@ static mstr_result_t format_impl(
                         &arg,
                         ctx,
                         arg_id,
-                        AS_ARRAY_TYPE(parser_result.array_ele_type)
+                        AS_ARRAY_TYPE(parser_result.val.arr.ele_typ)
                     )
                 );
                 // (数组长度)
@@ -253,7 +253,7 @@ static mstr_result_t format_array(
 )
 {
     if (arg->type !=
-        (parser_result->array_ele_type | MStrFmtArgType_Array_Bit)) {
+        (parser_result->val.arr.ele_typ | MStrFmtArgType_Array_Bit)) {
         return MStr_Err_InvaildArgumentType;
     }
     else if (sz_arg->type != MStrFmtArgType_Uint32) {
@@ -268,14 +268,14 @@ static mstr_result_t format_array(
     mstr_result_t result = mstr_create_empty(&buff);
     while (MSTR_SUCC(result) && array_index < array_len) {
         MStrFmtFormatArgument element;
-        element.type = parser_result->array_ele_type;
+        element.type = parser_result->val.arr.ele_typ;
         element.value = array_get_item(arg, array_index);
         // 格式化元素的值到 internal_buff
         MSTR_AND_THEN(result, convert(&buff, parser_result, &element));
         // 增加分隔符
         if (MSTR_SUCC(result) && array_index + 1 < array_len) {
-            const char* split_beg = parser_result->array_split_beg;
-            const char* split_end = parser_result->array_split_end;
+            const char* split_beg = parser_result->val.arr.split_beg;
+            const char* split_end = parser_result->val.arr.split_end;
             result =
                 mstr_concat_cstr_slice(&buff, split_beg, split_end);
         }
@@ -285,7 +285,7 @@ static mstr_result_t format_array(
     // 处理对齐和填充
     MSTR_AND_THEN(
         result,
-        copy_to_output(res_str, &parser_result->format_spec, &buff)
+        copy_to_output(res_str, &parser_result->val.val.spec, &buff)
     );
     // 返回
     mstr_free(&buff);
@@ -377,7 +377,7 @@ static mstr_result_t format_value(
     const MStrFmtFormatArgument* arg
 )
 {
-    if (arg->type != parser_result->arg_type) {
+    if (arg->type != parser_result->val.val.typ) {
         return MStr_Err_InvaildArgumentType;
     }
     // else:
@@ -392,7 +392,7 @@ static mstr_result_t format_value(
     // 处理对齐和填充
     MSTR_AND_THEN(
         result,
-        copy_to_output(res_str, &parser_result->format_spec, &buff)
+        copy_to_output(res_str, &parser_result->val.val.spec, &buff)
     );
     // 返回
     mstr_free(&buff);
@@ -483,51 +483,53 @@ static mstr_result_t convert(
 {
     iptr_t value = arg->value;
     MStrFmtArgType value_type = arg->type;
+    mstr_result_t result;
     switch (value_type) {
     case MStrFmtArgType_Uint8:
     case MStrFmtArgType_Uint16:
     case MStrFmtArgType_Uint32:
-        return convert_uint(
+        result = convert_uint(
             str,
             (uint32_t)value,
-            parser_result->format_spec.fmt_spec.fmt_type
+            parser_result->val.val.spec.fmt_spec.fmt_type
         );
         break;
     case MStrFmtArgType_Int8:
     case MStrFmtArgType_Int16:
     case MStrFmtArgType_Int32:
-        return convert_int(
+        result = convert_int(
             str,
             (int32_t)value,
-            parser_result->format_spec.sign_display,
-            parser_result->format_spec.fmt_spec.fmt_type
+            parser_result->val.val.spec.sign_display,
+            parser_result->val.val.spec.fmt_spec.fmt_type
         );
         break;
     case MStrFmtArgType_CString:
-        return convert_string(
-            str, value, &parser_result->format_spec.fmt_spec
+        result = convert_string(
+            str, value, &parser_result->val.val.spec.fmt_spec
         );
         break;
     case MStrFmtArgType_Time:
-        return convert_time(
-            str, value, &parser_result->format_spec.fmt_spec
+        result = convert_time(
+            str, value, &parser_result->val.val.spec.fmt_spec
         );
         break;
     case MStrFmtArgType_QuantizedValue:
-        return convert_quat(
+        result = convert_quat(
             str,
             (int32_t)value,
-            parser_result->arg_prop.a,
-            parser_result->format_spec.sign_display
+            parser_result->val.val.prop.a,
+            parser_result->val.val.spec.sign_display
         );
         break;
     case MStrFmtArgType_QuantizedUnsignedValue:
-        return convert_uquat(
-            str, (uint32_t)value, parser_result->arg_prop.a
+        result = convert_uquat(
+            str, (uint32_t)value, parser_result->val.val.prop.a
         );
         break;
-    default: return MStr_Err_UnsupportType; break;
+    default: result = MStr_Err_UnsupportType; break;
     }
+    return result;
 }
 
 /**
@@ -560,7 +562,7 @@ static mstr_result_t convert_time(
     }
     else {
         const MStrTime* tm = (const MStrTime*)value;
-        return mstr_fmt_ttoa(str, tm, &spec->chrono_spec);
+        return mstr_fmt_ttoa(str, tm, &spec->spec.chrono);
     }
 }
 

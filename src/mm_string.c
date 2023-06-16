@@ -201,15 +201,17 @@ MSTR_EXPORT_API(bool_t) mstr_equal(const MString* a, const MString* b)
     if (a->length != b->length) {
         return False;
     }
-    uint32_t bit = 0;
-    usize_t len = a->length;
-    for (usize_t i = 0; i < len; i += 1) {
-        uint32_t ch_a = a->buff[i];
-        uint32_t ch_b = b->buff[i];
-        // equ
-        bit |= ch_a - ch_b;
+    else {
+        uint32_t bit = 0;
+        usize_t len = a->length;
+        for (usize_t i = 0; i < len; i += 1) {
+            uint32_t ch_a = a->buff[i];
+            uint32_t ch_b = b->buff[i];
+            // equ
+            bit |= ch_a - ch_b;
+        }
+        return bit == 0;
     }
-    return bit == 0;
 }
 
 MSTR_EXPORT_API(void) mstr_free(MString* str)

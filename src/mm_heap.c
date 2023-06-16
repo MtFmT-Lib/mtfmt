@@ -91,7 +91,7 @@ typedef struct tagHeap
  * @brief 全局的堆管理器
  *
  */
-static Heap heap;
+static Heap global_heap;
 
 //
 // private:
@@ -113,37 +113,37 @@ static void* heap_allocate_impl(Heap*, heap_size_t, heap_size_t);
 MSTR_EXPORT_API(void)
 mstr_heap_init_sym(intptr_t heap_memory, usize_t heap_size)
 {
-    heap_init_impl(&heap, heap_memory, heap_size);
+    heap_init_impl(&global_heap, heap_memory, heap_size);
 }
 
 MSTR_EXPORT_API(void*)
 mstr_heap_allocate_sym(usize_t size, usize_t align)
 {
     return heap_allocate_impl(
-        &heap, (heap_size_t)size, (heap_size_t)align
+        &global_heap, (heap_size_t)size, (heap_size_t)align
     );
 }
 
 MSTR_EXPORT_API(void) mstr_heap_free_sym(void* memory)
 {
-    heap_free_impl(&heap, memory);
+    heap_free_impl(&global_heap, memory);
 }
 
 MSTR_EXPORT_API(usize_t) mstr_heap_get_free_size(void)
 {
-    return heap.cur_free_size;
+    return global_heap.cur_free_size;
 }
 
 MSTR_EXPORT_API(usize_t) mstr_heap_get_high_water_mark(void)
 {
-    return heap.free_highwatermark;
+    return global_heap.free_highwatermark;
 }
 
 MSTR_EXPORT_API(void)
 mstr_heap_get_allocate_count(usize_t* alloc_count, usize_t* free_count)
 {
-    *alloc_count = heap.alloc_count;
-    *free_count = heap.free_count;
+    *alloc_count = global_heap.alloc_count;
+    *free_count = global_heap.free_count;
 }
 
 /**
@@ -463,5 +463,5 @@ static void insert_block_helper(
  */
 static iptr_t align_of(iptr_t beg, usize_t align)
 {
-    return (beg + align - 1) & ~(align - 1);
+    return (iptr_t)(((usize_t)beg + align - 1) & ~(align - 1));
 }

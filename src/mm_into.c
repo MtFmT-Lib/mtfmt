@@ -113,7 +113,6 @@ mstr_fmt_ttoa(
             value = tm->sub_second;
             max_len = 4;
             break;
-        default: mstr_unreachable(); break;
         }
         // 格式化单个的项
         MSTR_AND_THEN(
@@ -121,9 +120,9 @@ mstr_fmt_ttoa(
             bcdtoa(
                 res_str,
                 value,
-                item->value_spec.format_length,
+                item->chrono_spec.format_length,
                 max_len,
-                item->value_spec.fixed_length
+                item->chrono_spec.fixed_length
             )
         );
         // 放入分隔符
@@ -153,11 +152,12 @@ static mstr_result_t utoa_impl_10base(MString* str, uint32_t value)
     else {
         // 转换
         while (value > 0) {
+            char ch;
             uint32_t digit, next_value;
             div_mod_10(value, &next_value, &digit);
             value = next_value;
             // 转换为字符
-            char ch = (char)('0' + digit);
+            ch = (char)('0' + digit);
             // push char
             MSTR_AND_THEN(result, mstr_append(str, ch));
             if (MSTR_FAILED(result)) {
@@ -189,10 +189,10 @@ static mstr_result_t utoa_impl_2base(
         uint32_t shift = index == 2 ? 1 : index == 8 ? 3 : 4;
         // 转换
         while (value > 0) {
+            char ch;
             uint32_t digit = value & (index - 1);
             value = value >> shift;
             // 转换为字符
-            char ch;
             if (digit >= 10) {
                 ch = (char)(hex_base + digit - 10);
             }
@@ -257,14 +257,21 @@ static mstr_result_t uqtoa_helper_dpart(
         MSTR_AND_THEN(result, mstr_append(&buff, '0'));
     }
     else {
+        uint32_t p5;
+        uint64_t acc;
+        uint32_t mask;
+        usize_t cv_sz = 0;
+        bool_t tail_0 = True;
+        uint64_t dpart_value;
+        usize_t fill_len;
         // 转换值
         // 因为2^-1 = 0.5, 2^-2 = 0.25 ...
         // 也就是5, 25, 125 ...
         // 即5的幂次, 因此这尝试用5的幂次来完成计算
         // 这样子的话, 就可以避免 / 4096 什么的啦
-        uint32_t p5 = 1;
-        uint64_t acc = 0;
-        uint32_t mask = 1 << (quat - 1);
+        p5 = 1;
+        acc = 0;
+        mask = 1 << (quat - 1);
         while (mask > 0) {
             p5 *= 5;
             acc *= 10;
@@ -274,15 +281,14 @@ static mstr_result_t uqtoa_helper_dpart(
             mask >>= 1;
         }
         // 把累加出来的值变成字符串
-        usize_t cv_sz = 0;
-        bool_t tail_0 = True;
-        uint64_t dpart_value = acc;
+        dpart_value = acc;
         while (dpart_value > 0) {
+            char ch;
             uint32_t digit;
             uint64_t next_value;
             div_mod_10_u64(dpart_value, &next_value, &digit);
             // 转换为字符
-            char ch = (char)('0' + digit);
+            ch = (char)('0' + digit);
             // 消除后缀多余的0, 然后push char
             if (digit != 0 || !tail_0) {
                 // push char
@@ -297,7 +303,7 @@ static mstr_result_t uqtoa_helper_dpart(
             dpart_value = next_value;
         }
         // 补全前导0
-        usize_t fill_len = quat - cv_sz;
+        fill_len = quat - cv_sz;
         while (fill_len > 0) {
             MSTR_AND_THEN(result, mstr_append(&buff, '0'));
             fill_len -= 1;
@@ -333,15 +339,17 @@ static mstr_result_t bcdtoa(
     usize_t counter = max_len;
     mstr_result_t result = MStr_Ok;
     while (MSTR_SUCC(result) && counter > 0) {
+        char ch;
+        uint32_t dec_val;
+        usize_t cur_pos;
         counter -= 1;
-        usize_t cur_pos = counter;
+        cur_pos = counter;
         if (fixed && cur_pos < max_len - len) {
             // 到达限定的位数了
             break;
         }
         // 转换当前位
-        char ch;
-        uint32_t dec_val = (bcd >> (4 * cur_pos)) & 0xf;
+        dec_val = (bcd >> (4 * cur_pos)) & 0xf;
         if (dec_val > 0) {
             ch = (char)(dec_val + '0');
             MSTR_AND_THEN(result, mstr_append(str, ch));
@@ -363,14 +371,15 @@ static void div_mod_10(uint32_t x, uint32_t* div, uint32_t* rem)
     *div = x / 10;
     *rem = x % 10;
 #else
-    uint32_t q = (x >> 1) + (x >> 2);
+    uint32_t q, r;
+    q = (x >> 1) + (x >> 2);
     q += (q >> 4);
     q += (q >> 8);
     q += (q >> 16);
     // q = x * 0.8, 现在计算q / 8, 得到x * 0.1
     q >>= 3;
     // 计算结果
-    uint32_t r = x - (q * 10);
+    r = x - (q * 10);
     if (r > 9) {
         *div = q + 1;
         *rem = r - 10;
@@ -392,7 +401,8 @@ static void div_mod_10_u64(uint64_t x, uint64_t* div, uint32_t* rem)
     *div = (uint64_t)(x / 10);
     *rem = (uint32_t)(x % 10);
 #else
-    uint64_t q = (x >> 1) + (x >> 2);
+    uint64_t q, r;
+    q = (x >> 1) + (x >> 2);
     q += (q >> 4);
     q += (q >> 8);
     q += (q >> 16);
@@ -400,7 +410,7 @@ static void div_mod_10_u64(uint64_t x, uint64_t* div, uint32_t* rem)
     // q = x * 0.8, 现在计算q / 8, 得到x * 0.1
     q >>= 3;
     // 计算结果
-    uint64_t r = x - (q * 10);
+    r = x - (q * 10);
     if (r > 9) {
         *div = q + 1;
         *rem = (uint32_t)((r - 10) & 0xffffffff);
