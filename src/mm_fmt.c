@@ -209,7 +209,7 @@ static mstr_result_t load_value(
     MStrFmtArgType spec_type
 )
 {
-    uint32_t max_place = ctx->max_place;
+    uint32_t max_place = (uint32_t)ctx->max_place;
     mstr_result_t result = MStr_Ok;
     MStrFmtFormatArgument* cache = ctx->cache;
     if (arg_id >= max_place) {
