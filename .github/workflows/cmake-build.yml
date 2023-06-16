@@ -6,14 +6,14 @@ on:
       - "src/**.c"
       - "inc/**.h"
       - "CMakeLists.txt"
-      - ".github/workflows/build-cmake.yml"
+      - ".github/workflows/cmake-build.yml"
   pull_request:
     branches: [master]
     paths:
       - "src/**.c"
       - "inc/**.h"
       - "CMakeLists.txt"
-      - ".github/workflows/build-cmake.yml"
+      - ".github/workflows/cmake-build.yml"
   workflow_dispatch:
     inputs:
       logLevel:
