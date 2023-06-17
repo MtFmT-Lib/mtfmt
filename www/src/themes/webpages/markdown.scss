@@ -33,9 +33,14 @@
         }
 
         code {
+            color: var(--text-color);
             padding-left: 0.1em;
             padding-right: 0.1em;
             background-color: var(--text-block-bg-color)
+        }
+
+        .bio-reading-bold {
+            color: var(--text-color);
         }
     }
 
@@ -117,5 +122,25 @@
         text-align: center;
         margin-top: 0.4em;
         margin-bottom: 1em;
+    }
+
+
+    // 需要保留原始色彩的元素
+    .katex,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    .img-info,
+    pre.hljs {
+        color: var(--text-color);
+    }
+
+    ul,
+    ol {
+        li code {
+            color: var(--text-color);
+        }
     }
 }

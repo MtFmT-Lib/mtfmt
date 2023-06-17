@@ -45,10 +45,19 @@
     let enable_bio_reader = writable(false)
 
     /**
+     * 文本颜色
+     */
+    let text_color = writable('inherit')
+
+    /**
      * 设置语言
      */
     function set_language(lang: string) {
         const language = lang.toLowerCase()
+        if ($enable_bio_reader && language !== 'en') {
+            // 仅在英文下允许使用bio reading
+            set_bio_mode(false)
+        }
         cur_language.set(language)
         Storager.write_local_storager(LANGUAGE_ITEM_KEY, language)
     }
@@ -56,8 +65,13 @@
     /**
      * 切换bio reading
      */
-    function toggle_bio_mode() {
-        enable_bio_reader.set(!$enable_bio_reader)
+    function set_bio_mode(enable: boolean) {
+        if (enable) {
+            text_color.set('var(--weak-color)')
+        } else {
+            text_color.set('inherit')
+        }
+        enable_bio_reader.set(enable)
     }
 
     /**
@@ -95,11 +109,18 @@
             <!-- bio 阅读 -->
             {#if $cur_language === 'en'}
                 {#if $enable_bio_reader}
-                    <button id="actived-button" on:click={toggle_bio_mode}>
+                    <button
+                        id="actived-button"
+                        title="Disable the bio-reading mode"
+                        on:click={() => set_bio_mode(!$enable_bio_reader)}
+                    >
                         <span>B</span>
                     </button>
                 {:else}
-                    <button on:click={toggle_bio_mode}>
+                    <button
+                        title="Active the bio-reading mode"
+                        on:click={() => set_bio_mode(!$enable_bio_reader)}
+                    >
                         <span>B</span>
                     </button>
                 {/if}
@@ -107,7 +128,11 @@
         </div>
         <div class="reader-language">
             <!-- 主题 -->
-            <select bind:value={cur_theme} on:change={update_cur_theme}>
+            <select
+                title="Choice theme"
+                bind:value={cur_theme}
+                on:change={update_cur_theme}
+            >
                 {#each $theme_info.themes as t}
                     <option value={t}>
                         {t.toUpperCase()}
@@ -116,7 +141,10 @@
             </select>
             <!-- 语言 -->
             {#each language as lang}
-                <button on:click={() => set_language(lang)}>
+                <button
+                    title="Select language {lang.toUpperCase()}"
+                    on:click={() => set_language(lang)}
+                >
                     {lang.toUpperCase()}
                 </button>
             {/each}
@@ -124,7 +152,7 @@
             <button>ADD</button>
         </div>
     </div>
-    <div class="markdown-box">
+    <div class="markdown-box" style="color: {$text_color}">
         {@html generate_toc(
             contents[$cur_language].html,
             contents[$cur_language].toc

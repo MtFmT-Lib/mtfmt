@@ -6,6 +6,7 @@
 :root {
     --bg-color: #{$bg-color};
     --text-color: #{$text-color};
+    --weak-color: #999;
     --border-color: #{$border-color};
     --text-block-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
 
@@ -24,6 +25,7 @@
 [page-theme='dark'] {
     --bg-color: #{$bg-color-dark};
     --text-color: #{invert($text-color)};
+    --weak-color: #999;
     --border-color: #{mix($bg-color-dark, $border-color, 75%)};
     --text-block-bg-color: #{mix($bg-color-dark, #f8f9fa, 90%)};
 
@@ -38,6 +40,7 @@
 
 // warm theme
 [page-theme='warm'] {
+    --weak-color: #888;
     --bg-color: #{$bg-color-warm};
     --border-color: #{mix($bg-color-warm, $text-color, 50%)};
     --text-block-bg-color: #{mix($bg-color-warm, $text-color, 85%)};
