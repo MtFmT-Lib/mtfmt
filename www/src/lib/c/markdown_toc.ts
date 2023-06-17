@@ -76,12 +76,18 @@ function generate_toc_helper(toc: { level: string; content: string }[]): string 
  */
 function as_section_id_name(content: string): string {
     const patt = content.match(/[0-9](\.[0-9]+)*/g)
+    const section_id = patt ? patt[0] : content
+    return 'section_' + replace_escape_char(section_id.toLowerCase())
+}
+
+/**
+ * 把<, >等字符替换为_
+ */
+function replace_escape_char(content: string): string {
     const lut = new Set([
         '<', '>', '&', '"', '\'', ' ', '-', ':', '.'
     ])
-    const section_id = patt ? patt[0] : content
-    const name = section_id.replace(/[<>&". -:]/g, (c: string) => {
+    return content.replace(/[<>&". -:]/g, (c: string) => {
         return lut.has(c) ? '_' : c
     })
-    return 'section_' + name.toLowerCase()
 }

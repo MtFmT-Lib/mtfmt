@@ -44,6 +44,8 @@ function markdown_preprocess(): MarkdownIt {
     })
     // katex
     markdown.use(katex)
+    // 表格标头
+    markdown.use(plugin_table_caption)
     // 嵌入图片
     markdown.use(plugin_embed_image)
     // 超链接的addr
@@ -53,6 +55,34 @@ function markdown_preprocess(): MarkdownIt {
     // bionic reading
     markdown.use(plugin_bionic_reading)
     return markdown
+}
+
+/**
+ * 表格标头
+ * 
+ * 该插件识别"!table-caption=XXX"开头的段落, 并替换为合适的表格标头
+ */
+function plugin_table_caption(md: MarkdownIt): void {
+    md.core.ruler.push('table-caption', state => {
+        state.tokens.forEach(token => {
+            if (token.type !== 'inline') {
+                return
+            }
+            const caption = token.content.match(/!table-caption:(.+)/)
+            if (caption === null) {
+                return
+            }
+            const caption_text = caption[1]
+            // 生成table id
+            const caption_id = as_table_id_name(caption_text)
+            // 重新生成caption text
+            token.children = []
+            token.children.push(make_html_token('<span id="' + caption_id + '" class="table-caption">'))
+            token.children.push(make_text_token(caption_text))
+            token.children.push(make_html_token('</span>'))
+        })
+    })
+    md.enable(['table-caption'])
 }
 
 /**
@@ -89,9 +119,9 @@ function plugin_embed_image(md: MarkdownIt): void {
                     img_alt_content = img_child.content
                 }
                 const text_token = make_html_token(img_alt_content)
-                token.children.push(make_html_token('<div class="img-info">'))
+                token.children.push(make_html_token('<span class="img-caption">'))
                 token.children.push(text_token)
-                token.children.push(make_html_token('</div>'))
+                token.children.push(make_html_token('</span>'))
                 // 添加图片id
                 img_child.attrSet('id', as_figure_id_name(img_alt_content))
             }
@@ -134,14 +164,8 @@ function plugin_section_id(md: MarkdownIt): void {
  */
 function as_section_id_name(content: string): string {
     const patt = content.match(/[0-9](\.[0-9]+)*/g)
-    const lut = new Set([
-        '<', '>', '&', '"', '\'', ' ', '-', ':', '.'
-    ])
     const section_id = patt ? patt[0] : content
-    const name = section_id.replace(/[<>&". -:]/g, (c: string) => {
-        return lut.has(c) ? '_' : c
-    })
-    return 'section_' + name.toLowerCase()
+    return 'section_' + replace_escape_char(section_id.toLowerCase())
 }
 
 /**
@@ -152,14 +176,32 @@ function as_section_id_name(content: string): string {
  */
 function as_figure_id_name(content: string): string {
     const patt = content.match(/(F|f)igure( *)([0-9](\.[0-9]+)*)/)
+    const figure_id = patt ? patt[3] : content
+    return 'figure_' + replace_escape_char(figure_id.toLowerCase())
+}
+
+/**
+ * 转换为合适的id名
+ * 
+ * 该函数会优先考虑 Table[0-9] { `.` [0-9]} 的范式生成id
+ * 否则会生成完整的内容
+ */
+function as_table_id_name(content: string): string {
+    const patt = content.match(/(T|t)able( *)([0-9](\.[0-9]+)*)/)
+    const table_id = patt ? patt[3] : content
+    return 'table_' + replace_escape_char(table_id.toLowerCase())
+}
+
+/**
+ * 把<, >等字符替换为_
+ */
+function replace_escape_char(content: string): string {
     const lut = new Set([
         '<', '>', '&', '"', '\'', ' ', '-', ':', '.'
     ])
-    const figure_id = patt ? patt[3].toLowerCase() : content.toLowerCase()
-    const name = figure_id.replace(/[<>&". -:]/g, (c: string) => {
+    return content.replace(/[<>&". -:]/g, (c: string) => {
         return lut.has(c) ? '_' : c
     })
-    return 'figure_' + name
 }
 
 /**
