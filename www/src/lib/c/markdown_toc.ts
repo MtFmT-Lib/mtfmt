@@ -49,7 +49,7 @@ function generate_toc_helper(toc: { level: string; content: string }[]): string 
             html_raw += '</ul>'
         }
         // 添加内容
-        const id_name = as_id_name(toc_content)
+        const id_name = as_section_id_name(toc_content)
         const id_label = `
             <a class="toc-hyper-link"
                href="#${id_name}"
@@ -70,20 +70,18 @@ function generate_toc_helper(toc: { level: string; content: string }[]): string 
 
 /**
  * 转换为合适的id名
+ * 
+ * 该函数会优先考虑 [0-9] { `.` [0-9]} 的范式生成id
+ * 否则会生成完整的内容
  */
-function as_id_name(content: string): string {
-    const name = content.replace(/[<>&". -:]/g, (c: string) => {
-        const lut = new Map([
-            ['<', '&lt;'],
-            ['>', '&gt;'],
-            ['&', '&amp;'],
-            ['"', '&quot;'],
-            [' ', '_'],
-            ['-', '_'],
-            [':', '_'],
-            ['.', '_']
-        ])
-        return lut.get(c) ?? c
+function as_section_id_name(content: string): string {
+    const patt = content.match(/[0-9](\.[0-9]+)*/g)
+    const lut = new Set([
+        '<', '>', '&', '"', '\'', ' ', '-', ':', '.'
+    ])
+    const section_id = patt ? patt[0] : content
+    const name = section_id.replace(/[<>&". -:]/g, (c: string) => {
+        return lut.has(c) ? '_' : c
     })
-    return 'section_' + name
+    return 'section_' + name.toLowerCase()
 }

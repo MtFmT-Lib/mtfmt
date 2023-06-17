@@ -38,11 +38,11 @@ struct MString
 };
 ```
 
-As you see, the implementation has four properties mainly. The first one, `buff`, is the pointer of the string memory region. The second one, `length`, is the count of buff. It indicates how many bytes of the buffer. And the third one, `cap_size`, also called capacity, is the amount of space in the underlying character buffer. And with the help of property `stack_region`, the string can be allocated on the stack located in the currently active record. So the string is located in the stack when the `stack_region` is equal for the `buff`. Otherwise, it's located in the heap. The main motivation is assuming that the string usually contains few characters, so it can reduce the heap usage in usual. The following sections descript the export API and the design details of `MString`. For the encoding of the string will be controlled by macro `_MSTR_USE_UTF8`, which determines which encoding (UTF-8 or NOT UTF-8) will be used. See more about string encoding in [section 2.5](#section_2_5_Advanced_topics).
+As you see, the implementation has four properties mainly. The first one, `buff`, is the pointer of the string memory region. The second one, `length`, is the count of buff. It indicates how many bytes of the buffer. And the third one, `cap_size`, also called capacity, is the amount of space in the underlying character buffer. And with the help of property `stack_region`, the string can be allocated on the stack located in the currently active record. So the string is located in the stack when the `stack_region` is equal for the `buff`. Otherwise, it's located in the heap. The main motivation is assuming that the string usually contains few characters, so it can reduce the heap usage in usual. The following sections descript the export API and the design details of `MString`. For the encoding of the string will be controlled by macro `_MSTR_USE_UTF8`, which determines which encoding (UTF-8 or NOT UTF-8) will be used. See more about string encoding in [section 2.5](#section_2_5).
 
 ### 2.2.1 Allocator
 
-The allocator is fixed and can be selected by macro `_MSTR_USE_MALLOC`. For the short string, which length is less than `MSTR_STACK_REGION_SIZE`,  the string will be allocated into the stack region. Otherwise, it will be allocated into the heap. The macro `_MSTR_USE_MALLOC` indicated which allocator should be used. When it's equal to 0, the built-in heap manager will be selected. Otherwise, the allocator is malloc, in `stdlib`. Use the macro functions as follows to replace the malloc in your application. Those will be switched by the macro `_MSTR_USE_MALLOC`. See more details in [section 2.4](#section_2_4_Build_in_heap_manager).
+The allocator is fixed and can be selected by macro `_MSTR_USE_MALLOC`. For the short string, which length is less than `MSTR_STACK_REGION_SIZE`,  the string will be allocated into the stack region. Otherwise, it will be allocated into the heap. The macro `_MSTR_USE_MALLOC` indicated which allocator should be used. When it's equal to 0, the built-in heap manager will be selected. Otherwise, the allocator is malloc, in `stdlib`. Use the macro functions as follows to replace the malloc in your application. Those will be switched by the macro `_MSTR_USE_MALLOC`. See more details in [section 2.4](#section_2_4).
 
 * `mstr_heap_init`: Initialize the heap
 * `mstr_heap_alloc`: Allocate memory
@@ -176,7 +176,7 @@ const char* c_str = mstr_as_cstr(&str);
 
 The construct functions of this object include three different versions. The first version, `mstr_create` is to create a string from a C-style string pointer directly. The second one, `mstr_copy_create` is to copy another string object to create. And the last one, `mstr_move_create` is to move memory from another object to create.
 
-The usage of `mstr_create` is simple and shows follow. After constructing from this function, the result must be called `mstr_free` by hand shown in [section 2.2.5.3](#section_2_2_5_3_Destruct_function)
+The usage of `mstr_create` is simple and shows follow. After constructing from this function, the result must be called `mstr_free` by hand shown in [section 2.2.5.3](#section_2_2_5_3)
 
 ```c
 MString str;
@@ -184,7 +184,7 @@ mstr_create(&str, "string");
 // str == "string"
 ```
 
-The `mstr_copy_create` is designed for copying another object. The following shows how to copy the source string to the destination string. After constructing from this function, the result must be called `mstr_free` by hand and more details show in [section 2.2.5.3](#section_2_2_5_3_Destruct_function).
+The `mstr_copy_create` is designed for copying another object. The following shows how to copy the source string to the destination string. After constructing from this function, the result must be called `mstr_free` by hand and more details show in [section 2.2.5.3](#section_2_2_5_3).
 
 ```c
 MString str;
@@ -278,7 +278,7 @@ The first argument is a literal string.
 
 ## 3.1 Foundations for formal languages
 
-The formal language in this section means a well-defined language. It's not a natural language in the real world. If you know how a parser work and know how to read a formal syntax, you can [skip this section](#section_3_2_Notational_conventions).
+The formal language in this section means a well-defined language. It's not a natural language in the real world. If you know how a parser work and know how to read a formal syntax, you can [skip this section](#section_3_2).
 
 ## 3.2 Notational conventions
 

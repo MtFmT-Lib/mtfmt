@@ -92,6 +92,8 @@ function plugin_embed_image(md: MarkdownIt): void {
                 token.children.push(make_html_token('<div class="img-info">'))
                 token.children.push(text_token)
                 token.children.push(make_html_token('</div>'))
+                // 添加图片id
+                img_child.attrSet('id', as_figure_id_name(img_alt_content))
             }
         })
     })
@@ -115,7 +117,7 @@ function plugin_section_id(md: MarkdownIt): void {
                     return token.content
                 })(index + 1, self)
                 // section的id
-                const section_id = as_id_name(content)
+                const section_id = as_section_id_name(content)
                 // push attr
                 token.attrPush(['id', section_id])
             }
@@ -126,22 +128,38 @@ function plugin_section_id(md: MarkdownIt): void {
 
 /**
  * 转换为合适的id名
+ * 
+ * 该函数会优先考虑 [0-9] { `.` [0-9]} 的范式生成id
+ * 否则会生成完整的内容
  */
-function as_id_name(content: string): string {
-    const name = content.replace(/[<>&". -:]/g, (c: string) => {
-        const lut = new Map([
-            ['<', '&lt;'],
-            ['>', '&gt;'],
-            ['&', '&amp;'],
-            ['"', '&quot;'],
-            [' ', '_'],
-            ['-', '_'],
-            [':', '_'],
-            ['.', '_']
-        ])
-        return lut.get(c) ?? c
+function as_section_id_name(content: string): string {
+    const patt = content.match(/[0-9](\.[0-9]+)*/g)
+    const lut = new Set([
+        '<', '>', '&', '"', '\'', ' ', '-', ':', '.'
+    ])
+    const section_id = patt ? patt[0] : content
+    const name = section_id.replace(/[<>&". -:]/g, (c: string) => {
+        return lut.has(c) ? '_' : c
     })
-    return 'section_' + name
+    return 'section_' + name.toLowerCase()
+}
+
+/**
+ * 转换为合适的id名
+ * 
+ * 该函数会优先考虑 Figure[0-9] { `.` [0-9]} 的范式生成id
+ * 否则会生成完整的内容
+ */
+function as_figure_id_name(content: string): string {
+    const patt = content.match(/(F|f)igure( *)([0-9](\.[0-9]+)*)/)
+    const lut = new Set([
+        '<', '>', '&', '"', '\'', ' ', '-', ':', '.'
+    ])
+    const figure_id = patt ? patt[3].toLowerCase() : content.toLowerCase()
+    const name = figure_id.replace(/[<>&". -:]/g, (c: string) => {
+        return lut.has(c) ? '_' : c
+    })
+    return 'figure_' + name
 }
 
 /**

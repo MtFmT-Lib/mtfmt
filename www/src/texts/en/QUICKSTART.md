@@ -25,7 +25,7 @@ git submodule add git@github.com:MtFmT-Lib/mtfmt.git
 
 The two folders should be included in the archive file. The `src` folder including C source files is all implementations. And, the `inc` folder includes C header files and C++ wrapper header files. A reasonable approach is to create a new folder to contain the `inc` and the `src` directories and copy that into your project directory.
 
-## The Keil IDE
+## Keil IDE
 
 Using the middleware package is an easy way to add to the Keil IDE. You can find them here. As an alternative option, you can add the sources and configure the including path manually.
 
@@ -37,7 +37,7 @@ TODO
 
 ### Add sources by Manual
 
-Firstly, select the "Add existing file to Source Group" option like the figure 1.
+Firstly, select the "Add existing file to Source Group" option like in [Figure 1](#figure_1).
 
 ![Figure 1. Add existing file menu item](./img/keil_add_ext_src_nlfs.png)
 
@@ -47,7 +47,7 @@ Then, add all files in the folder `src` into your project.
 
 Now you add all source files succeeded. The next step is that add the including directory. The preprocessor must know where the file locates in that the preprocessor of the C compiler will copy the header into the source file simply. To add that to the project, click the "Options for Target" button in the toolbar.
 
-![Figure 3. The "Options for Target" button](./img/keil_opt_for_target_btn.png)
+![Figure . The "Options for Target" button](./img/keil_opt_for_target_btn.png)
 
 Then find the "C/C++" tab and click the "..." button on the right side of the edit box.
 
@@ -63,13 +63,11 @@ Finally, we must set the C99 standard.
 
 Now you completed this section! Click the "Build" button or press the `F7` key to build your project and check the output has not any errors.
 
-## The others IDE
+## CMake
 
-TODO
+The CMake file includes the archive also. 
 
-## Add it by CMake
 
-The CMake file includes the archive also.
 
 # Customization
 
