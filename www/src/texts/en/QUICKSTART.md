@@ -61,7 +61,7 @@ Finally, we must set the C99 standard.
 
 ![Figure 2.6: Select C99 standard](./img/keil_c_standard.png)
 
-Now you completed this section! Click the "Build" button or press the `F7` key to build your project and check the output has not any errors.
+Now you completed this section! Click the "Build" button or press the `F7` key to build your project and check the output has not any errors. Then, you can [go to the next section](#section_3)!
 
 ## 2.2 CMake
 
@@ -80,7 +80,7 @@ Finally, add the including path manually because the `add_subdirectory` command 
 target_include_directories(your_target PRIVATE "./mtfmt/inc")
 ```
 
-Now you completed this section.
+Now you completed this section. [Go to the next section](#section_3)!
 
 # 3 Customization
 
@@ -88,7 +88,7 @@ The microcontroller has a different instruction set such as [ARM v6m](https://de
 
 ## 3.1 Optional features
 
-The following table shows all available macros.
+The following [table 3.1](#table_3_1) shows all available macros.
 
 !table-caption: Table 3.1 available macros
 
@@ -115,12 +115,62 @@ Data synchronization is very important in the multi-threading or multi-task syst
 
 ## 4.1 Using language supports
 
-The C standard library provides the heap manager function. Enable the macro `_MSTR_USE_MALLOC` to use the `malloc` and the `free` function instead built-in heap manager.
+The C standard library provides the heap manager function. Enable the macro `_MSTR_USE_MALLOC` to use the `malloc` and the `free` function instead built-in heap manager. [Go to the next section](#section_5)!
 
-## 4.2 Using memory manager API
+## 4.2 Using memory management API
 
-Many RTOS like [FreeRTOS](https://www.freertos.org/) or [µC/OS](https://weston-embedded.com/micrium/overview) provides a thread-safe or task-safe memory manager. To replace the build-in heap manager with that, enable the macro `_MSTR_USE_MALLOC` first and find `./inc/mm_cfg.h`.
+Many RTOS like [FreeRTOS](https://www.freertos.org/) or [µC/OS](https://weston-embedded.com/micrium/overview) provides a thread-safe or task-safe memory manager. To replace the build-in heap manager with that, enable the macro `_MSTR_USE_MALLOC` first and find `./inc/mm_cfg.h`. The `_MSTR_MEM_ALLOC_FUNCTION` macro specifies the allocating memory function and holds the same type $\text{size\_t}\rightarrow\text{void}*$ of `malloc` in the C standard library. Likewise, the `_MSTR_MEM_FREE_FUNCTION` macro specifies the releasing memory function and holds the same type $\text{void}*\rightarrow\text{void}$ of `free`. By default, those macros will be defined as follows.
 
-# 5 TODO
+```c
+#define _MSTR_MEM_ALLOC_FUNCTION(s) malloc(s)
+#define _MSTR_MEM_FREE_FUNCTION(s)  free(s)
+```
+
+Adding those macros to the file `./inc/mm_cfg.h` will replace the default implementation.
+
+```c
+#if !defined(_INCLUDE_MM_CFG_H_)
+#define _INCLUDE_MM_CFG_H_
+#include <stdint.h>
+// add the macro definitions to here or #include "your_configure.h"
+...
+#endif // _INCLUDE_MM_CFG_H_
+```
+
+### 4.2.1 FreeRTOS
+
+The FreeRTOS provides five different memory manager tactics which can be found [here](https://freertos.org/a00111.html). The `pvPortMalloc` function is the instead version of `malloc` and the `vPortFree` function is the instead version of `free`. They have the same signature as the standard library function. So we can replace the function symbol directly as follows.
+
+```c
+// #include "freertos.h"
+#define _MSTR_MEM_ALLOC_FUNCTION(s) pvPortMalloc(s)
+#define _MSTR_MEM_FREE_FUNCTION(s)  vPortFree(s)
+```
+
+You can go to [section 5](#section_5) to view the demo.
+
+### 4.2.2 µC/OS
+
+The μC/OS provides API which can be found [here](https://micrium.atlassian.net/wiki/spaces/osiidoc/pages/163866/Memory+Management) is not the same as the standard library function. That means we must write two helper functions in a standard C source file and then add them into `mm_cfg.h`.
+
+TODO
+
+### 4.2.3 RT-Thread
+
+The RT-Thread provides API is the same signature as the standard library which can be found [here](https://www.rt-thread.io/document/site/programming-manual/memory/memory/#allocate-and-release-memory-block).  So we can replace the function symbol directly as follows.
+
+```c
+// #include "rtthread.h"
+#define _MSTR_MEM_ALLOC_FUNCTION(s) rt_malloc(s)
+#define _MSTR_MEM_FREE_FUNCTION(s)  rt_free(s)
+```
+
+You can go to [section 5](#section_5) to view the demo.
+
+### 4.2.4 Others
+
+TODO
+
+# 5 A simple demo
 
 TODO
