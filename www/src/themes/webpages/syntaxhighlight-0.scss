@@ -27,3 +27,12 @@
     color: #028760;
     font-style: italic;
 }
+
+.hljs-meta {
+    color: #887938;
+
+    .hljs-keyword {
+        color: inherit;
+        font-weight: 600;
+    }
+}
