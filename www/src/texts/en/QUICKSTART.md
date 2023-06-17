@@ -63,10 +63,26 @@ Finally, we must set the C99 standard.
 
 Now you completed this section! Click the "Build" button or press the `F7` key to build your project and check the output has not any errors.
 
-## The others
+## The others IDE
 
 TODO
 
-# Add it by CMake
+## Add it by CMake
 
 The CMake file includes the archive also.
+
+# Customization
+
+TODO
+
+## Hardware divider
+
+TODO
+
+## Build-in heap manager
+
+TODO
+
+## Standard IO
+
+TODO
