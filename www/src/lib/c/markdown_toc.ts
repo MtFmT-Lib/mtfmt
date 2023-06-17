@@ -61,8 +61,9 @@ function generate_toc_helper(toc: { level: string; content: string }[]): string 
         last_level = level
     }
     // </ul> 闭合
-    if (tag_count == 1) {
+    while (tag_count > 0) {
         html_raw += '</ul>'
+        tag_count -= 1
     }
     return html_raw
 }
