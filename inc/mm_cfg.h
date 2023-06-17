@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if !defined(_MSTR_MALLOC_FUNCTION)
+#if !defined(_MSTR_MEM_ALLOC_FUNCTION)
 /**
  * @brief 内存分配函数
  *
