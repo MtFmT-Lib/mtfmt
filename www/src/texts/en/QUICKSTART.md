@@ -2,7 +2,7 @@
 typora-root-url: ..\
 ---
 
-This page shows how to add the `MtFmt` library to your project. In the latest version, we provide a CMake file in the repository. You can add the source files by hand or by git submodule.
+This page shows how to add the `MtFmt` library to your project.
 
 [toc]
 
@@ -93,14 +93,34 @@ The following table shows all available macros.
 !table-caption: Table 3.1 available macros
 
 | Macros                     | Default | Description                                           |
-| -------------------------- | ------- | ----------------------------------------------------- |
-| `_MSTR_USE_HARDWARE_DIV`   | 0       | Enable to use hardware divider operator.              |
-| `_MSTR_USE_MALLOC `        | 0       | Enable to use `malloc` instead build-in heap manager. |
-| `_MSTR_RUNTIME_HEAP_ALIGN` | 4       | Specify the alignment of build-in heap manager        |
-| `_MSTR_USE_STD_IO`         | 0       | Enable to use `stdout` support.                       |
+| -------------------------- | :-----: | ----------------------------------------------------- |
+| `_MSTR_USE_HARDWARE_DIV`   |    0    | Enable to use hardware divider operator.              |
+| `_MSTR_USE_MALLOC `        |    0    | Enable to use `malloc` instead build-in heap manager. |
+| `_MSTR_RUNTIME_HEAP_ALIGN` |    4    | Specify the alignment of build-in heap manager.       |
+| `_MSTR_USE_STD_IO`         |    0    | Enable to use `stdout` support.                       |
 
-Define.
+Define the macro equal to `1`  to enable it. Otherwise, the value is not equal to `1` or the macro is undefined means disabling it. 
 
 ## 3.2 Usage examples
+
+TODO
+
+# 4 Cooperate with RTOS
+
+Data synchronization is very important in the multi-threading or multi-task system. The **built-in memory manager has no data synchronization**. That means you **cannot use that in those situations**.  Instead using the OS API to replace the built-in memory manager. It is recommended to follow the following guidelines.
+
+* NO-OS: using the built-in heap manager. No changes are required.
+* RTOS: using the memory manager API provided by OS. See more details in [section 4.2](#section_4_2).
+* Others(Linux, Windows, etc.): using the language standard library. See more details in [section 4.1](#section_4_1).
+
+## 4.1 Using language supports
+
+The C standard library provides the heap manager function. Enable the macro `_MSTR_USE_MALLOC` to use the `malloc` and the `free` function instead built-in heap manager.
+
+## 4.2 Using memory manager API
+
+Many RTOS like [FreeRTOS](https://www.freertos.org/) or [µC/OS](https://weston-embedded.com/micrium/overview) provides a thread-safe or task-safe memory manager. To replace the build-in heap manager with that, enable the macro `_MSTR_USE_MALLOC` first and find `./inc/mm_cfg.h`.
+
+# 5 TODO
 
 TODO

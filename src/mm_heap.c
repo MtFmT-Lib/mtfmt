@@ -115,7 +115,7 @@ static void* heap_allocate_impl(Heap*, heap_size_t, heap_size_t);
 //
 
 MSTR_EXPORT_API(void)
-mstr_heap_init(intptr_t heap_memory, usize_t heap_size)
+mstr_heap_init(iptr_t heap_memory, usize_t heap_size)
 {
     heap_init_impl(&heap, heap_memory, heap_size);
 }

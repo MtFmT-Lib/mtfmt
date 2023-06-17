@@ -15,12 +15,12 @@
 #include "mm_typedef.h"
 
 #if _MSTR_USE_MALLOC
-#define mstr_heap_alloc(s) (malloc((s)))
+#define mstr_heap_alloc(s) _MSTR_MEM_ALLOC_FUNCTION((s))
 
-#define mstr_heap_free(m) \
-    do {                  \
-        free(m);          \
-        (m) = NULL;       \
+#define mstr_heap_free(m)           \
+    do {                            \
+        _MSTR_MEM_FREE_FUNCTION(m); \
+        (m) = NULL;                 \
     } while (0)
 
 #define mstr_heap_init(mem, leng) ((void)mem, (void)leng)
@@ -32,7 +32,7 @@
  * @param[in] heap_size: 堆内存区的大小
  */
 MSTR_EXPORT_API(void)
-mstr_heap_init(intptr_t heap_memory, usize_t heap_size);
+mstr_heap_init(iptr_t heap_memory, usize_t heap_size);
 
 /**
  * @brief 尝试从堆中分配size大小的内存
@@ -68,9 +68,9 @@ MSTR_EXPORT_API(usize_t) mstr_heap_get_high_water_mark(void);
 MSTR_EXPORT_API(void)
 mstr_heap_get_allocate_count(usize_t* alloc_count, usize_t* free_count);
 
-#define mstr_heap_init(mem, leng)                         \
-    do {                                                  \
-        mstr_heap_init((intptr_t)(mem), (usize_t)(leng)); \
+#define mstr_heap_init(mem, leng)                       \
+    do {                                                \
+        mstr_heap_init((iptr_t)(mem), (usize_t)(leng)); \
     } while (0)
 
 #define mstr_heap_alloc(s) (mstr_heap_allocate((s), 4))
