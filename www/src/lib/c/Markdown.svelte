@@ -4,9 +4,15 @@
 <script lang="ts">
     import { writable } from 'svelte/store'
     import generate_toc from './markdown_toc'
+    import { into_boolean } from '$lib/fp/cast'
     import * as Storager from '$lib/local_storager'
     import { set_theme, type Theme } from './theme_storager'
     import theme_info, { get_storager_theme } from './theme_storager'
+
+    /**
+     * 文本颜色
+     */
+    type TextColor = 'inherit' | 'var(--weak-color)'
 
     /**
      * 内容
@@ -30,9 +36,9 @@
     const LANGUAGE_ITEM_KEY = 'language'
 
     /**
-     * 当前的语言
+     * bio-reading模式配置项
      */
-    let cur_language = writable(get_default_language())
+    const BIO_READING_ITEM_KEY = 'bio-reading'
 
     /**
      * 当前的主题名
@@ -40,24 +46,50 @@
     let cur_theme: Theme = get_storager_theme()
 
     /**
-     * 是否开启bio-reader
-     */
-    let enable_bio_reader = writable(false)
-
-    /**
      * 文本颜色
      */
-    let text_color = writable('inherit')
+    let text_color = writable<TextColor>('inherit')
+
+    /**
+     * 是否开启bio-reader
+     */
+    let enable_bio_reader = writable(
+        Storager.read_local_storager(BIO_READING_ITEM_KEY)
+            .map(into_boolean)
+            .or(false)
+    )
+
+    enable_bio_reader.subscribe((enable) => {
+        if (enable) {
+            text_color.set('var(--weak-color)')
+        } else {
+            text_color.set('inherit')
+        }
+    })
+
+    /**
+     * 当前的语言
+     */
+    let cur_language = writable(get_default_language())
+
+    cur_language.subscribe((language) => {
+        if ($enable_bio_reader && language !== 'en') {
+            // 仅在英文下允许使用bio reading
+            enable_bio_reader.set(false)
+        } else {
+            const las = Storager.read_local_storager(BIO_READING_ITEM_KEY)
+                .map(into_boolean)
+                .or(false)
+            // 恢复上次的选项
+            enable_bio_reader.set(las)
+        }
+    })
 
     /**
      * 设置语言
      */
     function set_language(lang: string) {
         const language = lang.toLowerCase()
-        if ($enable_bio_reader && language !== 'en') {
-            // 仅在英文下允许使用bio reading
-            set_bio_mode(false)
-        }
         cur_language.set(language)
         Storager.write_local_storager(LANGUAGE_ITEM_KEY, language)
     }
@@ -66,12 +98,8 @@
      * 切换bio reading
      */
     function set_bio_mode(enable: boolean) {
-        if (enable) {
-            text_color.set('var(--weak-color)')
-        } else {
-            text_color.set('inherit')
-        }
         enable_bio_reader.set(enable)
+        Storager.write_local_storager(BIO_READING_ITEM_KEY, enable)
     }
 
     /**

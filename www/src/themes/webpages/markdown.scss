@@ -15,6 +15,18 @@
     text-align: justify;
     text-justify: inter-ideograph;
 
+    // 需要保留原始色彩的元素
+    .katex,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    .img-info,
+    pre.hljs {
+        color: var(--text-color);
+    }
+
     // 段落文本
     p {
         margin: 0;
@@ -40,6 +52,13 @@
         }
 
         .bio-reading-bold {
+            color: var(--text-color);
+        }
+    }
+
+    ul,
+    ol {
+        li code {
             color: var(--text-color);
         }
     }
@@ -122,25 +141,5 @@
         text-align: center;
         margin-top: 0.4em;
         margin-bottom: 1em;
-    }
-
-
-    // 需要保留原始色彩的元素
-    .katex,
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    .img-info,
-    pre.hljs {
-        color: var(--text-color);
-    }
-
-    ul,
-    ol {
-        li code {
-            color: var(--text-color);
-        }
     }
 }
