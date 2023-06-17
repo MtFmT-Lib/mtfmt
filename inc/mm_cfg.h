@@ -121,6 +121,21 @@
 #if _MSTR_USE_MALLOC
 #include <stdlib.h>
 #include <string.h>
+
+#if !defined(_MSTR_MEM_ALLOC_FUNCTION)
+/**
+ * @brief 内存分配函数
+ *
+ */
+#define _MSTR_MEM_ALLOC_FUNCTION(s) malloc(s)
+#endif // _MSTR_MALLOC_FUNCTION
+#if !defined(_MSTR_MEM_FREE_FUNCTION)
+/**
+ * @brief 内存释放函数
+ *
+ */
+#define _MSTR_MEM_FREE_FUNCTION(s) free(s)
+#endif // _MSTR_MEM_FREE_FUNCTION
 #endif // _MSTR_USE_MALLOCs
 
 #if !defined(_MSTR_RUNTIME_HEAP_ALIGN)

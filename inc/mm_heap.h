@@ -15,12 +15,12 @@
 #include "mm_typedef.h"
 
 #if _MSTR_USE_MALLOC
-#define mstr_heap_alloc(s) (malloc((s)))
+#define mstr_heap_alloc(s) _MSTR_MEM_ALLOC_FUNCTION((s))
 
-#define mstr_heap_free(m) \
-    do {                  \
-        free(m);          \
-        (m) = NULL;       \
+#define mstr_heap_free(m)           \
+    do {                            \
+        _MSTR_MEM_FREE_FUNCTION(m); \
+        (m) = NULL;                 \
     } while (0)
 
 #define mstr_heap_init(mem, leng) ((void)mem, (void)leng)
@@ -69,9 +69,9 @@ MSTR_EXPORT_API(usize_t) mstr_heap_get_high_water_mark(void);
 MSTR_EXPORT_API(void)
 mstr_heap_get_allocate_count(usize_t* alloc_count, usize_t* free_count);
 
-#define mstr_heap_init(mem, leng)                             \
-    do {                                                      \
-        mstr_heap_init_sym((intptr_t)(mem), (usize_t)(leng)); \
+#define mstr_heap_init(mem, leng)                           \
+    do {                                                    \
+        mstr_heap_init_sym((iptr_t)(mem), (usize_t)(leng)); \
     } while (0)
 
 #define mstr_heap_alloc(s) (mstr_heap_allocate_sym((s), 4))

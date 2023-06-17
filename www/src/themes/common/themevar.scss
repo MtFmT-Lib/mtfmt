@@ -8,6 +8,7 @@
     --text-color: #{$text-color};
     --weak-color: #999;
     --border-color: #{$border-color};
+    --table-border-color: #{$table-border-color};
     --text-block-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
 
     // 超链接
@@ -27,6 +28,7 @@
     --text-color: #{invert($text-color)};
     --weak-color: #999;
     --border-color: #{mix($bg-color-dark, $border-color, 75%)};
+    --table-border-color: #{$table-border-color};
     --text-block-bg-color: #{mix($bg-color-dark, #f8f9fa, 90%)};
 
     // 超链接
@@ -43,6 +45,7 @@
     --weak-color: #888;
     --bg-color: #{$bg-color-warm};
     --border-color: #{mix($bg-color-warm, $text-color, 50%)};
+    --table-border-color: #{$table-border-color};
     --text-block-bg-color: #{mix($bg-color-warm, $text-color, 85%)};
 
     // 按钮
