@@ -166,6 +166,9 @@ typedef enum tagMStrFmtSignDisplay
  */
 typedef enum tagMStrFmtFormatType
 {
+    //! 未指定的转换方式
+    MStrFmtFormatType_UnSpec,
+
     //! 二进制值字符串
     MStrFmtFormatType_Binary,
 
@@ -186,9 +189,6 @@ typedef enum tagMStrFmtFormatType
 
     //! 大写十六进制值, 带"0X"前缀
     MStrFmtFormatType_Hex_UpperCase_WithPrefix,
-
-    //! 未指定的转换方式
-    MStrFmtFormatType_UnSpec,
 } MStrFmtFormatType;
 
 /**
@@ -279,7 +279,7 @@ typedef struct tagMStrFmtChronoItemFormatSpec
     MStrFmtChronoValueType value_type;
 
     //! 值的格式化描述
-    MStrFmtChronoValueFormatSpec value_spec;
+    MStrFmtChronoValueFormatSpec chrono_spec;
 
     //! 该值后面的split chars, 可以为空, 引用自fmt, [beg,
     //! end)是需要的split char
@@ -306,17 +306,25 @@ typedef struct tagMStrFmtChronoFormatSpec
  * @brief 格式化标记
  *
  */
+typedef union tagMStrFmtFormatSpecUnion {
+    //! [type: 非Time] 进行格式化的方式, 默认情况为未指定
+    MStrFmtValueFormatSpec value;
+
+    //! [type: Time] 进行格式化的方式
+    MStrFmtChronoFormatSpec chrono;
+} MStrFmtFormatSpecUnion;
+
+/**
+ * @brief 格式化标记
+ *
+ */
 typedef struct tagMStrFmtFormatSpec
 {
     //! 格式化的值类型
     MStrFmtFormatType fmt_type;
 
-    union {
-        //! [type: 非Time] 进行格式化的方式, 默认情况为未指定
-        MStrFmtValueFormatSpec value_spec;
-        //! [type: Time] 进行格式化的方式
-        MStrFmtChronoFormatSpec chrono_spec;
-    };
+    //! 格式化标记的值
+    MStrFmtFormatSpecUnion spec;
 } MStrFmtFormatSpec;
 
 /**
@@ -353,6 +361,68 @@ typedef struct tagMStrFmtArgProperty
 } MStrFmtArgProperty;
 
 /**
+ * @brief 解析结果的值, 表示一个值的解析结果
+ *
+ */
+typedef struct tagMStrFmtParseResultValueResult
+{
+    //! 参数位置
+    uint32_t id;
+
+    //! 参数类型
+    MStrFmtArgType typ;
+
+    //! 附带参数
+    MStrFmtArgProperty prop;
+
+    //! 格式化描述
+    MStrFmtFormatDescript spec;
+
+    //! align
+    const char* reserved[2];
+} MStrFmtParseResultValueResult;
+
+/**
+ * @brief 解析结果的值, 表示一个数组的解析结果
+ *
+ */
+typedef struct tagMStrFmtParseResultArrayResult
+{
+    //! 参数位置
+    uint32_t id;
+
+    //! 参数类型
+    MStrFmtArgType ele_typ;
+
+    //! 附带参数
+    MStrFmtArgProperty ele_prop;
+
+    //! 格式化描述
+    MStrFmtFormatDescript spec;
+
+    //! split chars, 引用自fmt, [beg, end)是需要的split char
+    const char* split_beg;
+
+    //! split chars结束位置
+    const char* split_end;
+} MStrFmtParseResultArrayResult;
+
+/**
+ * @brief 解析结果的值
+ *
+ */
+typedef union tagMStrFmtParseResultValue {
+    //! [MStrFmtArgClass: EscapeChar] 转义字符
+    char escape_char;
+
+    //! [MStrFmtArgClass: Value] 格式化信息
+    MStrFmtParseResultValueResult val;
+
+    //! [MStrFmtArgClass: Array] 格式化信息
+    MStrFmtParseResultArrayResult arr;
+} MStrFmtParseResultValue;
+
+/**
  * @brief 解析器结果
  *
  */
@@ -360,39 +430,9 @@ typedef struct tagMStrFmtParseResult
 {
     //! 参数分类
     MStrFmtArgClass arg_class;
-    union {
-        //! [MStrFmtArgClass: EscapeChar] 转义字符
-        char escape_char;
-        //! [MStrFmtArgClass: Value] 格式化信息
-        struct
-        {
-            //! 参数位置
-            uint32_t arg_id;
-            //! 参数类型
-            MStrFmtArgType arg_type;
-            //! 附带参数
-            MStrFmtArgProperty arg_prop;
-            //! 格式化描述
-            MStrFmtFormatDescript format_spec;
-        };
-        //! [MStrFmtArgClass: Array] 格式化信息
-        struct
-        {
-            //! 参数位置
-            uint32_t array_arg_id;
-            //! 参数类型
-            MStrFmtArgType array_ele_type;
-            //! 附带参数
-            MStrFmtArgProperty array_ele_prop;
-            //! 格式化描述
-            MStrFmtFormatDescript array_ele_format_spec;
-            //! split chars, 引用自fmt, [beg, end)是需要的split char
-            const char* array_split_beg;
 
-            //! split chars结束位置
-            const char* array_split_end;
-        };
-    };
+    //! 值
+    MStrFmtParseResultValue val;
 } MStrFmtParseResult;
 
 /**

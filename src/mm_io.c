@@ -9,6 +9,9 @@
  * @copyright Copyright (c) 向阳, all rights reserved.
  *
  */
+
+#define MSTR_IMP_SOURCES 1
+
 #include "mm_io.h"
 #include "mm_cfg.h"
 #include "mm_fmt.h"
@@ -52,8 +55,9 @@ mstr_ioformat(
 )
 {
     va_list ap;
+    mstr_result_t res;
     va_start(ap, fmt_place);
-    mstr_result_t res = mstr_iovformat(io, fmt, fmt_place, &ap);
+    res = mstr_iovformat(io, fmt, fmt_place, &ap);
     va_end(ap);
     return res;
 }
@@ -67,9 +71,10 @@ mstr_iovformat(
 )
 {
     MString buff;
+    mstr_result_t res_create;
     mstr_result_t res = MStr_Ok;
     MSTR_AND_THEN(res, mstr_create_empty(&buff));
-    mstr_result_t res_create = res;
+    res_create = res;
     // 进行格式化
     MSTR_AND_THEN(res, mstr_vformat(fmt, &buff, fmt_place, ap_ptr));
     // 写到输出
@@ -96,5 +101,8 @@ static mstr_result_t stdio_callback(
     fwrite(data + ncnt * nu, 1, nrem, stdout);
     return MStr_Ok;
 #endif
+    (void)ctx;
+    (void)data;
+    (void)len;
     return MStr_Err_NoImplemention;
 }

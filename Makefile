@@ -142,7 +142,7 @@ C_INCLUDES = \
 -Itests
 
 # Standard
-C_STANDARD = --std=c11
+C_STANDARD = --std=c99
 
 # Standard
 CXX_STANDARD = --std=c++11
