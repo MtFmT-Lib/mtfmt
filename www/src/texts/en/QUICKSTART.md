@@ -63,7 +63,11 @@ Finally, we must set the C99 standard.
 
 Now you completed this section! Click the "Build" button or press the `F7` key to build your project and check the output has not any errors. Then, you can [go to the next section](#section_3)!
 
-## 2.2 CMake
+## 2.2 CCS IDE
+
+TODO
+
+## 2.3 CMake
 
 The archive includes the CMake file. Using the [git submodule](https://git-scm.com/docs/git-submodule) is a good choice if you use that version control system. [Section 1](#section_1) shows how to add the library by git submodule. Otherwise, copy the file to a suitable directory first.
 
@@ -81,6 +85,10 @@ target_include_directories(your_target PRIVATE "./mtfmt/inc")
 ```
 
 Now you completed this section. [Go to the next section](#section_3)!
+
+## 2.4 Others
+
+TODO
 
 # 3 Customization
 
@@ -151,9 +159,45 @@ You can go to [section 5](#section_5) to view the demo.
 
 ### 4.2.2 µC/OS
 
-The μC/OS provides API which can be found [here](https://micrium.atlassian.net/wiki/spaces/osiidoc/pages/163866/Memory+Management) is not the same as the standard library function. That means we must write two helper functions in a standard C source file and then add them into `mm_cfg.h`.
+The μC/OS provides API which can be found [here](https://micrium.atlassian.net/wiki/spaces/osiidoc/pages/163866/Memory+Management) is not the same as the standard library function and is a block allocator. That means we must write two helper functions in a standard C source file and then add them into `mm_cfg.h`.
 
-TODO
+The function requires a parameter `pmem` to specify the list of free memory control blocks. A simple way is that export your free memory control block variable to the global namespace. And then create that with a block size of 64 bytes at least. Finally, create a C source file, the source code may seem like the following.
+
+```c
+// #include "ucos.h"
+// #include "mm_cfg.h"
+// your global memory block
+extern OS_MEM* mtfmt_mem;
+// create that:
+// OS_MEM *mtfmt_mem;
+// INT8U  mtfmt_mem_block[8][64];
+// INT8U err;
+// mtfmt_mem = OSMemCreate(mtfmt_mem_block, 8, 64, &err);
+void* wrap_ucos_mget(size_t sz) {
+    (void)sz;
+    uint8_t err = OS_NO_ERR;
+    void* pblock = OSMemGet(mtfmt_mem, &err);
+    if (err != OS_NO_ERR) {
+        return NULL;
+    } else {
+        return pblock;
+    }
+}
+void wrap_ucos_mfree(void* pblock) {
+    (void)OSMemPut(mtfmt_mem, pblock);
+}
+```
+
+Normally, the memory usage is very small for the value formatting. The except situation is string formatting, for the $L$ bytes string formatting the library will use $2L$ bytes memory. Finally, append those macros and two function prototypes into `mm_cfg.h`.
+
+```c
+extern void* wrap_ucos_mget(size_t sz);
+extern void wrap_ucos_mfree(void* pblock);
+#define _MSTR_MEM_ALLOC_FUNCTION(s) wrap_ucos_mget(s)
+#define _MSTR_MEM_FREE_FUNCTION(s)  wrap_ucos_mfree(s)
+```
+
+You can go to [section 5](#section_5) now.
 
 ### 4.2.3 RT-Thread
 
@@ -169,7 +213,12 @@ You can go to [section 5](#section_5) to view the demo.
 
 ### 4.2.4 Others
 
-TODO
+For the other operating system, make sure functions have the same signature as the `malloc` function and the `free` function. If the signature is not same you should implement a wrapper function like [section 4.2.2](#section_4_2_2). Finally, append those macros as follows.
+
+```c
+#define _MSTR_MEM_ALLOC_FUNCTION(s) your_mem_alloc(s)
+#define _MSTR_MEM_FREE_FUNCTION(s)  your_mem_free(s)
+```
 
 # 5 A simple demo
 
