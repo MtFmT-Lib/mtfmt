@@ -1,12 +1,15 @@
 *
 !*/
 
+.idea
 .pyenv
 .vscode
 lib
+pack
 build
 target
 target_coverage
+cmake-build-debug
 
 !*.md
 !LICENSE
@@ -34,9 +37,6 @@ target_coverage
 !Makefile
 !Doxyfile
 !*_resource.rc
-
-cmake-build-debug/
-.idea/
 
 */internal/*
 

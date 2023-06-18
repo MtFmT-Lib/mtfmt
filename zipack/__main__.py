@@ -16,10 +16,11 @@ Package tool
 
 import argparse
 import colorama
+from app import Application
 
 if __name__ == '__main__':
     colorama.init(autoreset=True)
-    print('MtFmt library - package tool')
+    print('Package tool')
     parser = argparse.ArgumentParser(description='Package tool')
     # 选项
     # 工程文件名
@@ -30,6 +31,10 @@ if __name__ == '__main__':
         help='工程文件, 默认为根目录下的"project.toml"'
     )
     # 动作
-    parser.add_argument('active', type=str, help='动作')
+    parser.add_argument(
+        'action',
+        type=str,
+        help='动作')
+    # app
     args = parser.parse_args()
-    print(args)
+    app = Application(args)

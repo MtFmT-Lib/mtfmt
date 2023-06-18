@@ -2,23 +2,28 @@
 name = "MtFmt"
 version = "1.0.0"
 
-[project]
-dir-build = "./build"
-dir-target = "./target"
-files = ["./inc", "LICENSE", "*.md", "version.txt"]
-package = "zip"
-sources = ["./src"]
+[[package.file]]
+category = "binarys"
+file = ["target/*.a", "target/*.so"]
+output = "bin"
 
-[[build-target]]
-dir = "target/*.a"
-package = "static_library"
+[[package.file]]
+category = "headers"
+file = ["inc/**"]
+output = "inc"
 
-[[build-target]]
-dir = "target/*.so"
-package = "dymatic_library"
+[[package.file]]
+category = "sources"
+file = ["src/**"]
+output = "src"
 
-[[autogen]]
+[[package.file]]
+file = ["LICENSE", "*.md", "version.txt"]
+output = "."
+
+[[action]]
 mode = "pattern"
+name = "update-c-version"
 pattern = """
 #if 1
 //! major version
@@ -37,11 +42,18 @@ pattern-beg = "//@ <autogen:version>"
 pattern-end = "//@ </autogen:version>"
 target = "./inc/mm_cfg.h"
 
-[[autogen]]
-mode = "cmsis-pack"
-target = "cmsis-pack"
+[[action]]
+mode = "pack"
+name = "pack"
+target = "mtfmt_release"
 
-[[autogen]]
+[[action]]
+mode = "cmsispack"
+name = "cmsis-pack"
+target = "MTFMT"
+
+[[action]]
 mode = "pattern"
+name = "update-version-text"
 pattern = "{version:major}.{version:minor}.{version:release}"
 target = "./version.txt"
