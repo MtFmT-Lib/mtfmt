@@ -65,7 +65,6 @@ class Application:
             pass
         elif action_type == ActionType.PACK:
             PackAction(project, type_case(PackFileInfo, config)).run()
-
         elif action_type == ActionType.CMSIS:
             pdsc_config = type_case(CMSISPdscFileInfo, config)
             GeneratePDSCFile(project, pdsc_config).run()
