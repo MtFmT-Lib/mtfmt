@@ -16,7 +16,6 @@ Package tool
 
 import os
 from action import IAction
-from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
 from project import Project, PackFileInfo, PackageFileInfo
 
@@ -45,5 +44,4 @@ class PackAction(IAction):
         for file in file.files:
             file_name = os.path.basename(file)
             file_arhv = f'{base_dir}{sep}{file_name}'
-            print(f'  - pack: Processing file \033[1;32m{file_arhv}\033[0;0m.')
             fs.write(file, file_arhv, ZIP_DEFLATED, 9)

@@ -22,16 +22,19 @@ from typing import Dict, Any, List, Union, Tuple, Optional
 from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
+from deps import DependenceGraphic
 
 
 class ActionType(Enum):
     """
     表示文件所属的范畴
     """
+    # 啥也不干
+    NONE = 0
     # 打包ZIP
-    PACK = 0
+    PACK = 1
     # 生成cmsis pack file
-    CMSIS = 1
+    CMSIS = 2
 
 
 class FileCategory(Enum):
@@ -46,8 +49,10 @@ class FileCategory(Enum):
     HEADERS = 2
     # 编译出来的二进制文件
     BINARYS = 3
+    # 资源
+    RESOURCES = 4
     # 许可证
-    LICENSE = 4
+    LICENSE = 5
 
 
 @dataclass
@@ -62,7 +67,7 @@ class PackageFileInfo:
     pack_dir: Path
 
     # 指定范畴
-    category: FileCategory
+    category: Union[FileCategory, str]
 
 
 @dataclass
@@ -189,6 +194,14 @@ class PackageInfo:
             files
         )
 
+    def add_target_files(self, name: str, target_dir: Path, outputs: List[Path]):
+        """
+        把target file添加到file list
+        """
+        category = 'target:' + name
+        pkg_info = PackageFileInfo(outputs, target_dir, category)
+        self.package_files.append(pkg_info)
+
     @staticmethod
     def _enum_file_items(file_items):
         """
@@ -229,7 +242,7 @@ class PackFileInfo:
     target: Path
 
     # 参与打包的文件分类
-    categories: FileCategory
+    categories: Union[FileCategory, str]
 
     @staticmethod
     def load(toml_dat: Any):
@@ -238,15 +251,50 @@ class PackFileInfo:
         """
         name = toml_dat['name']
         target = Path(toml_dat['target'])
+        dependences = []
         if 'categories' in toml_dat:
-            categories = [FileCategory[s.upper()]
-                          for s in toml_dat['categories']]
+            categories = []
+            for s in toml_dat['categories']:
+                if s[0] == '@':
+                    categories.append('target:' + s[1:])
+                    dependences.append(s[1:])
+                else:
+                    categories.append(FileCategory[s.upper()])
         else:
             categories = [FileCategory.DEFAULT]
-        return PackFileInfo(name, target, categories)
+        return (dependences, PackFileInfo(name, target, categories))
 
 
 @dataclass
+class CMSISPdscFileInfo:
+    """
+    自动生成的CMSIS pdsc文件信息
+    """
+    # 名称
+    name: str
+
+    # 目标
+    target: Path
+
+    # c-class
+    c_class: str
+
+    # c-group
+    c_group: str
+
+    @staticmethod
+    def load(toml_dat: Any):
+        """
+        加载内容
+        """
+        name = toml_dat['name']
+        target = Path(toml_dat['target'])
+        c_class = toml_dat['cmsis-Cclass']
+        c_group = toml_dat['cmsis-Cgroup']
+        return ([], CMSISPdscFileInfo(name, target, c_class, c_group))
+
+
+@ dataclass
 class AutogenFileInfo:
     """
     自动生成文件的信息
@@ -257,14 +305,34 @@ class AutogenFileInfo:
     # 目标
     target: Path
 
-    @staticmethod
+    @ staticmethod
     def load(toml_dat: Any):
         """
         加载内容
         """
         name = toml_dat['name']
         target = Path(toml_dat['target'])
-        return AutogenFileInfo(name, target)
+        return ([], AutogenFileInfo(name, target))
+
+
+@dataclass
+class EmptyActionInfo:
+    """
+    空的action
+    """
+    # 名称
+    name: str
+
+
+class State(Enum):
+    """
+    状态机状态
+    """
+    APPEND = 0
+    BRACKET = 1
+    REPLACEMENT = 2
+    REPLACEMENT_ENDQ = 3
+    REPLACEMENT_END = 4
 
 
 class Project:
@@ -277,10 +345,16 @@ class Project:
 
     # 动作
     actions: Dict[str, Tuple[ActionType,
-                             Union[AutogenFileInfo, PackFileInfo]]]
+                             Union[AutogenFileInfo, CMSISPdscFileInfo, PackFileInfo]]]
 
     # 输出目录
     output_dir: Path
+
+    # toml文件的raw reference
+    toml_raw: Any
+
+    # 依赖关系图
+    deps: DependenceGraphic
 
     def __init__(self, output_dir: str, file: str):
         """
@@ -293,25 +367,43 @@ class Project:
                 os.makedirs(self.output_dir)
             # 解析toml
             toml_dat = rtoml.load(Path(file))
+            self.toml_raw = toml_dat
             self.actions = {}
             self.package = PackageInfo.load(toml_dat['package'])
+            # 加载actions
+            action_dep: Dict[str, List[str]] = {}
             action_dat = toml_dat['action']
             for action in action_dat:
                 mode: str = action['mode']
                 name: str = action['name']
 
-                if name in self.actions:
+                if name in self.actions or name == 'all':
                     raise AttributeError(f'Name "{name}" is not unique.')
 
                 mode_val = ActionType[mode.upper()]
                 if mode_val == ActionType.PACK:
-                    patt_action = PackFileInfo.load(action)
+                    dependences, patt_action = PackFileInfo.load(action)
                 elif mode_val == ActionType.CMSIS:
-                    patt_action = AutogenFileInfo.load(action)
+                    dependences, patt_action = CMSISPdscFileInfo.load(action)
                 else:
                     raise AttributeError(f'Unsupport action mode "{mode}"')
 
+                action_dep.update({name: dependences})
                 self.actions.update({name: (mode_val, patt_action)})
+            # 检查依赖项
+            self._check_dependences(action_dep)
+            # 把所有的action作为一个files添加到PackageInfo
+            for (action_name, (action_typ, action)) in self.actions.items():
+                target = self.get_output_fullpath(action.target)
+                self.package.add_target_files(
+                    action_name, Path('.'), [target])
+            # 添加 "all" target
+            action_dep.update({'all': list(self.actions.keys())})
+            self.actions.update(
+                {'all': (ActionType.NONE, EmptyActionInfo('all'))})
+
+            # 构建依赖关系图
+            self.deps = DependenceGraphic(action_dep)
             # 打印项目信息
             self._print_project_info()
         except KeyError:
@@ -319,11 +411,116 @@ class Project:
         except FileNotFoundError as e:
             raise AttributeError(f'Missing file {e.filename}.')
 
-    def get_output_fullpath(self, file: str) -> Path:
+    def get_output_fullpath(self, file: Path) -> Path:
         """
         取得基于输出目录下的文件file的完整路径
         """
-        return os.path.join(self.output_dir, file)
+        return os.path.join(self.output_dir, self._eval_string(str(file)))
+
+    def get_actions(self, name: str) -> List[str]:
+        """
+        按照依赖关系返回需要运行的action
+
+        它返回的action顺序从0 ~ n满足依赖关系
+        """
+        return self.deps.dep_of(name)
+
+    def _check_dependences(self, action_dep: Dict[str, List[str]]):
+        """
+        检查依赖项
+        """
+        for (action_name, action_deps) in action_dep.items():
+            for dep_name in action_deps:
+                if dep_name not in self.actions:
+                    raise AttributeError(
+                        f'Dependence "{dep_name}" of action "{action_name}" is not existed.')
+
+    def _eval_string(self, str: str) -> str:
+        """
+        把{XXX:XXX}这类特殊的replacement替换为合适的值
+        """
+        char_token = [ch for ch in str]
+        return self._eval_string_helper(char_token)
+
+    def _eval_string_helper(self, chars: List[str]) -> str:
+        """
+        把{XXX:XXX}这类特殊的replacement替换为合适的值(helper)
+        """
+        res = ''
+        name = ''
+        state = State.APPEND
+        # 替换值
+        i = 0
+        while i < len(chars):
+            char = chars[i]
+            if state == State.APPEND:
+                i, state, res = Project._ev_branch_append(i, char, res)
+            elif state == State.BRACKET:
+                if char == '{':
+                    # {{, 转义字符
+                    i += 1
+                    res += '{'
+                    state = State.APPEND
+                else:
+                    # 名字
+                    name = ''
+                    state = State.REPLACEMENT
+            elif state == State.REPLACEMENT:
+                i, state, name = Project._ev_branch_replace(i, char, name)
+            elif state == State.REPLACEMENT_ENDQ:
+                if char == '}':
+                    i += 1
+                    name += '}'
+                    state = State.REPLACEMENT
+                else:
+                    state = State.REPLACEMENT_END
+            elif state == State.REPLACEMENT_END:
+                # res += char
+                # 按照":"分割并在toml_raw里面找对应的值
+                res += self._replace_string(name)
+                state = State.APPEND
+        return res
+
+    @staticmethod
+    def _ev_branch_append(i: int, cur_ch: str, ref_res: str):
+        """
+        state == State.APPEND的branch
+        """
+        i += 1
+        if cur_ch == '{':
+            state = State.BRACKET
+        else:
+            ref_res += cur_ch
+            state = State.APPEND
+        return (i, state, ref_res)
+
+    @staticmethod
+    def _ev_branch_replace(i: int, cur_ch: str, ref_name: str):
+        """
+        state == State.REPLACEMENT的branch
+        """
+        if cur_ch == '}':
+            i += 1
+            state = State.REPLACEMENT_ENDQ
+        else:
+            i += 1
+            ref_name += cur_ch
+            state = State.REPLACEMENT
+        return (i, state, ref_name)
+
+    def _replace_string(self, name: str) -> str:
+        """
+        替换字符串中的{XXX}
+        """
+        names = name.split(':')
+        if names[0] not in self.toml_raw:
+            raise AttributeError(f'No value named "{names[0]}".')
+        value = self.toml_raw[names[0]]
+        for name in names[1:]:
+            if name not in value:
+                raise AttributeError(f'No value named "{name}".')
+            value = value[name]
+        return str(value)
 
     def _print_project_info(self):
         """

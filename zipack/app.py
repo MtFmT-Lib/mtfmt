@@ -14,7 +14,6 @@ Package tool
 
 """
 
-import os
 import argparse
 from project import Project, ActionType
 from pack import PackAction
@@ -41,17 +40,28 @@ class Application:
             print(f'> \033[1;31mNo action named {action}\033[0;0m')
             exit(1)
         else:
-            self._invoke_action(action, project)
+            actions = project.get_actions(action)
+            for action_step in actions:
+                name_str = f'\033[1;32m{action}\033[0;0m'
+                step_str = f'\033[1;34m{action_step}\033[0;0m'
+                if action_step == action:
+                    print(f'> Running action {name_str} ...', end='')
+                else:
+                    print(
+                        f'> Running action {step_str} ...', end='')
+                self._invoke_action(action_step, project)
+                # 完成
+                print(' \033[1;34mDone\033[0;0m')
+            print(f'> Completed \033[1;32m{action}\033[0;0m')
 
     def _invoke_action(self, action_name: str, project: Project):
         """
         执行动作
         """
         action_type = project.actions[action_name][0]
-        print(f'> Running action \033[1;32m{action_name}\033[0;0m ...')
-        print(f'  Action name: \033[1;33m{action_name}\033[0;0m')
-        print(f'  Action type: \033[1;33m{action_type}\033[0;0m')
-        if action_type == ActionType.PACK:
+        if action_type == ActionType.NONE:
+            pass
+        elif action_type == ActionType.PACK:
             runner = PackAction(project,
                                 project.actions[action_name][1])
             runner.run()
@@ -62,5 +72,3 @@ class Application:
         else:
             print(f'> \033[1;31mAction {action_name} is not support.\033[0;0m')
             exit(1)
-        # 完成
-        print(f'> Completed action \033[1;32m{action_name}\033[0;0m.')
