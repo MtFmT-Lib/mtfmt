@@ -17,9 +17,7 @@ Package tool
 import os
 import datetime
 from action import IAction
-from pathlib import Path
 from project import Project, CMSISPdscFileInfo, FileCategory
-from xml.dom.minidom import parse
 import xml.dom.minidom as minidom
 import codecs
 
@@ -124,7 +122,7 @@ class GeneratePDSCFile(IAction):
                 file_node = dom.createElement('file')
                 root.appendChild(file_node)
                 file_node.setAttribute('category', typ)
-                file_node.setAttribute('name', f'{file.pack_dir}/{file_name}')
+                file_node.setAttribute('name', f'{pack_root}/{file_name}')
 
     def _add_keywords(self, dom: minidom.Document, root: minidom.Element):
         """

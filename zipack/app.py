@@ -14,7 +14,6 @@ Package tool
 
 """
 
-import os
 import argparse
 from project import Project, ActionType
 from pack import PackAction

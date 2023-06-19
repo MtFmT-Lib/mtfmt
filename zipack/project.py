@@ -454,12 +454,7 @@ class Project:
         while i < len(chars):
             char = chars[i]
             if state == State.APPEND:
-                i += 1
-                if char == '{':
-                    state = State.BRACKET
-                else:
-                    res += char
-                    state = State.APPEND
+                i, state, res = Project._ev_branch_append(i, char, res)
             elif state == State.BRACKET:
                 if char == '{':
                     # {{, 转义字符
@@ -471,13 +466,7 @@ class Project:
                     name = ''
                     state = State.REPLACEMENT
             elif state == State.REPLACEMENT:
-                if char == '}':
-                    i += 1
-                    state = State.REPLACEMENT_ENDQ
-                else:
-                    i += 1
-                    name += char
-                    state = State.REPLACEMENT
+                i, state, name = Project._ev_branch_replace(i, char, name)
             elif state == State.REPLACEMENT_ENDQ:
                 if char == '}':
                     i += 1
@@ -488,17 +477,50 @@ class Project:
             elif state == State.REPLACEMENT_END:
                 # res += char
                 # 按照":"分割并在toml_raw里面找对应的值
-                names = name.split(':')
-                if names[0] not in self.toml_raw:
-                    raise AttributeError(f'No value named "{names[0]}".')
-                value = self.toml_raw[names[0]]
-                for name in names[1:]:
-                    if name not in value:
-                        raise AttributeError(f'No value named "{name}".')
-                    value = value[name]
-                res += str(value)
+                res += self._replace_string(name)
                 state = State.APPEND
         return res
+
+    @staticmethod
+    def _ev_branch_append(i: int, cur_ch: str, ref_res: str):
+        """
+        state == State.APPEND的branch
+        """
+        i += 1
+        if cur_ch == '{':
+            state = State.BRACKET
+        else:
+            ref_res += cur_ch
+            state = State.APPEND
+        return (i, state, ref_res)
+
+    @staticmethod
+    def _ev_branch_replace(i: int, cur_ch: str, ref_name: str):
+        """
+        state == State.REPLACEMENT的branch
+        """
+        if cur_ch == '}':
+            i += 1
+            state = State.REPLACEMENT_ENDQ
+        else:
+            i += 1
+            ref_name += cur_ch
+            state = State.REPLACEMENT
+        return (i, state, ref_name)
+
+    def _replace_string(self, name: str) -> str:
+        """
+        替换字符串中的{XXX}
+        """
+        names = name.split(':')
+        if names[0] not in self.toml_raw:
+            raise AttributeError(f'No value named "{names[0]}".')
+        value = self.toml_raw[names[0]]
+        for name in names[1:]:
+            if name not in value:
+                raise AttributeError(f'No value named "{name}".')
+            value = value[name]
+        return str(value)
 
     def _print_project_info(self):
         """

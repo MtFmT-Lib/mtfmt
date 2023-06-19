@@ -16,7 +16,6 @@ Package tool
 
 import os
 from action import IAction
-from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
 from project import Project, PackFileInfo, PackageFileInfo
 
