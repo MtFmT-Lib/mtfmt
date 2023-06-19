@@ -4,7 +4,7 @@ authors = [
   "HalfSweet <HalfSweet@HalfSweet.cn>",
 ]
 description = "A formatting library wrote by pure C language"
-keywords = ["formatting", "heap-manager"]
+keywords = ["formatting", "heap-manager", "string"]
 name = "mtfmt"
 organization = "mtfmt-lib"
 version = "1.0.0"
@@ -35,7 +35,12 @@ output = "inc"
 
 [[package.file]]
 category = "sources"
-file = ["src/**"]
+file = ["src/*.c"]
+output = "src"
+
+[[package.file]]
+category = "resources"
+file = ["src/*.rc"]
 output = "src"
 
 [[package.file]]
@@ -49,12 +54,14 @@ name = "pack"
 target = "mtfmt_src.zip"
 
 [[action]]
+cmsis-Cclass = "Utility"
+cmsis-Cgroup = "MtFmt:Library"
 mode = "cmsis"
 name = "@cmsis-pdsc"
-target = "cmsis-pdsc"
+target = "cmsis-pdsc.pdsc"
 
 [[action]]
-categories = ["default", "headers", "sources"]
+categories = ["headers", "sources"]
 dependence = ["@cmsis-pdsc"]
 mode = "pack"
 name = "cmsis-pack"

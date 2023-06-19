@@ -46,8 +46,10 @@ class FileCategory(Enum):
     HEADERS = 2
     # 编译出来的二进制文件
     BINARYS = 3
+    # 资源
+    RESOURCES = 4
     # 许可证
-    LICENSE = 4
+    LICENSE = 5
 
 
 @dataclass
@@ -247,6 +249,35 @@ class PackFileInfo:
 
 
 @dataclass
+class CMSISPdscFileInfo:
+    """
+    自动生成的CMSIS pdsc文件信息
+    """
+    # 名称
+    name: str
+
+    # 目标
+    target: Path
+
+    # c-class
+    c_class: str
+
+    # c-group
+    c_group: str
+
+    @staticmethod
+    def load(toml_dat: Any):
+        """
+        加载内容
+        """
+        name = toml_dat['name']
+        target = Path(toml_dat['target'])
+        c_class = toml_dat['cmsis-Cclass']
+        c_group = toml_dat['cmsis-Cgroup']
+        return CMSISPdscFileInfo(name, target, c_class, c_group)
+
+
+@ dataclass
 class AutogenFileInfo:
     """
     自动生成文件的信息
@@ -257,7 +288,7 @@ class AutogenFileInfo:
     # 目标
     target: Path
 
-    @staticmethod
+    @ staticmethod
     def load(toml_dat: Any):
         """
         加载内容
@@ -277,7 +308,7 @@ class Project:
 
     # 动作
     actions: Dict[str, Tuple[ActionType,
-                             Union[AutogenFileInfo, PackFileInfo]]]
+                             Union[AutogenFileInfo, CMSISPdscFileInfo, PackFileInfo]]]
 
     # 输出目录
     output_dir: Path
@@ -307,7 +338,7 @@ class Project:
                 if mode_val == ActionType.PACK:
                     patt_action = PackFileInfo.load(action)
                 elif mode_val == ActionType.CMSIS:
-                    patt_action = AutogenFileInfo.load(action)
+                    patt_action = CMSISPdscFileInfo.load(action)
                 else:
                     raise AttributeError(f'Unsupport action mode "{mode}"')
 
