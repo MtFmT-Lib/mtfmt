@@ -298,6 +298,17 @@ class AutogenFileInfo:
         return AutogenFileInfo(name, target)
 
 
+class State(Enum):
+    """
+    状态机状态
+    """
+    APPEND = 0
+    BRACKET = 1
+    REPLACEMENT = 2
+    REPLACEMENT_ENDQ = 3
+    REPLACEMENT_END = 4
+
+
 class Project:
     """
     表示一个项目文件
@@ -313,6 +324,9 @@ class Project:
     # 输出目录
     output_dir: Path
 
+    # toml文件的raw reference
+    toml_raw: Any
+
     def __init__(self, output_dir: str, file: str):
         """
         加载项目文件
@@ -324,6 +338,7 @@ class Project:
                 os.makedirs(self.output_dir)
             # 解析toml
             toml_dat = rtoml.load(Path(file))
+            self.toml_raw = toml_dat
             self.actions = {}
             self.package = PackageInfo.load(toml_dat['package'])
             action_dat = toml_dat['action']
@@ -350,11 +365,76 @@ class Project:
         except FileNotFoundError as e:
             raise AttributeError(f'Missing file {e.filename}.')
 
-    def get_output_fullpath(self, file: str) -> Path:
+    def get_output_fullpath(self, file: Path) -> Path:
         """
         取得基于输出目录下的文件file的完整路径
         """
-        return os.path.join(self.output_dir, file)
+        return os.path.join(self.output_dir, self._eval_string(str(file)))
+
+    def _eval_string(self, str: str) -> str:
+        """
+        把{XXX:XXX}这类特殊的replacement替换为合适的值
+        """
+        char_token = [ch for ch in str]
+        return self._eval_string_helper(char_token)
+
+    def _eval_string_helper(self, chars: List[str]) -> str:
+        """
+        把{XXX:XXX}这类特殊的replacement替换为合适的值(helper)
+        """
+        res = ''
+        name = ''
+        state = State.APPEND
+        # 替换值
+        i = 0
+        while i < len(chars):
+            char = chars[i]
+            if state == State.APPEND:
+                i += 1
+                if char == '{':
+                    state = State.BRACKET
+                else:
+                    res += char
+                    state = State.APPEND
+            elif state == State.BRACKET:
+                if char == '{':
+                    # {{, 转义字符
+                    i += 1
+                    res += '{'
+                    state = State.APPEND
+                else:
+                    # 名字
+                    name = ''
+                    state = State.REPLACEMENT
+            elif state == State.REPLACEMENT:
+                if char == '}':
+                    i += 1
+                    state = State.REPLACEMENT_ENDQ
+                else:
+                    i += 1
+                    name += char
+                    state = State.REPLACEMENT
+            elif state == State.REPLACEMENT_ENDQ:
+                if char == '}':
+                    i += 1
+                    name += '}'
+                    state = State.REPLACEMENT
+                else:
+                    state = State.REPLACEMENT_END
+            elif state == State.REPLACEMENT_END:
+                # res += char
+                # 按照":"分割并在toml_raw里面找对应的值
+                names = name.split(':')
+                if names[0] not in self.toml_raw:
+                    raise AttributeError(f'No value named "{names[0]}".')
+                value = self.toml_raw[names[0]]
+                for name in names[1:]:
+                    if name not in value:
+                        raise AttributeError(f'No value named "{name}".')
+                    value = value[name]
+                res += str(value)
+                state = State.APPEND
+        return res
 
     def _print_project_info(self):
         """
