@@ -15,9 +15,10 @@ Package tool
 """
 
 import argparse
-from project import Project, ActionType
 from pack import PackAction
 from pdscfile import GeneratePDSCFile
+from typing import cast as type_case
+from project import Project, ActionType, PackFileInfo, CMSISPdscFileInfo
 
 
 class Application:
@@ -58,17 +59,16 @@ class Application:
         """
         执行动作
         """
+        config = project.actions[action_name][1]
         action_type = project.actions[action_name][0]
         if action_type == ActionType.NONE:
             pass
         elif action_type == ActionType.PACK:
-            runner = PackAction(project,
-                                project.actions[action_name][1])
-            runner.run()
+            PackAction(project, type_case(PackFileInfo, config)).run()
+
         elif action_type == ActionType.CMSIS:
-            runner = GeneratePDSCFile(project,
-                                      project.actions[action_name][1])
-            runner.run()
+            pdsc_config = type_case(CMSISPdscFileInfo, config)
+            GeneratePDSCFile(project, pdsc_config).run()
         else:
             print(f'> \033[1;31mAction {action_name} is not support.\033[0;0m')
             exit(1)

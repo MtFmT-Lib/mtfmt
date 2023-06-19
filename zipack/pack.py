@@ -38,10 +38,10 @@ class PackAction(IAction):
                 if file.category in categories:
                     self._run_helper(zip, file)
 
-    def _run_helper(self, fs, file: PackageFileInfo):
+    def _run_helper(self, fs, file_info: PackageFileInfo):
         sep = os.path.sep
-        base_dir = file.pack_dir
-        for file in file.files:
+        base_dir = file_info.pack_dir
+        for file in file_info.files:
             file_name = os.path.basename(file)
             file_arhv = f'{base_dir}{sep}{file_name}'
             fs.write(file, file_arhv, ZIP_DEFLATED, 9)

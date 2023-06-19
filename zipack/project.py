@@ -214,7 +214,7 @@ class PackageInfo:
                 total_files += PackageInfo._enum_files(pattern)
             output_dir = Path(file_item['output'])
             if 'category' in file_item:
-                cat_name: str = file_item['category']
+                cat_name = file_item['category']
                 category = FileCategory[cat_name.upper()]
             else:
                 category = FileCategory.DEFAULT
@@ -227,7 +227,7 @@ class PackageInfo:
         枚举所有文件
         """
         files = glob.iglob(pattern)
-        return [os.path.abspath(f) for f in files]
+        return [Path(os.path.abspath(f)) for f in files]
 
 
 @dataclass
@@ -242,7 +242,7 @@ class PackFileInfo:
     target: Path
 
     # 参与打包的文件分类
-    categories: Union[FileCategory, str]
+    categories: List[Union[FileCategory, str]]
 
     @staticmethod
     def load(toml_dat: Any):
@@ -253,7 +253,7 @@ class PackFileInfo:
         target = Path(toml_dat['target'])
         dependences = []
         if 'categories' in toml_dat:
-            categories = []
+            categories: List[Union[FileCategory, str]] = []
             for s in toml_dat['categories']:
                 if s[0] == '@':
                     categories.append('target:' + s[1:])
@@ -345,7 +345,10 @@ class Project:
 
     # 动作
     actions: Dict[str, Tuple[ActionType,
-                             Union[AutogenFileInfo, CMSISPdscFileInfo, PackFileInfo]]]
+                             Union[EmptyActionInfo,
+                                   AutogenFileInfo,
+                                   CMSISPdscFileInfo,
+                                   PackFileInfo]]]
 
     # 输出目录
     output_dir: Path
@@ -362,7 +365,7 @@ class Project:
         """
         try:
             # 输出目录
-            self.output_dir = os.path.abspath(output_dir)
+            self.output_dir = Path(os.path.abspath(output_dir))
             if not os.path.exists(self.output_dir):
                 os.makedirs(self.output_dir)
             # 解析toml
@@ -415,7 +418,7 @@ class Project:
         """
         取得基于输出目录下的文件file的完整路径
         """
-        return os.path.join(self.output_dir, self._eval_string(str(file)))
+        return Path(os.path.join(self.output_dir, self._eval_string(str(file))))
 
     def get_actions(self, name: str) -> List[str]:
         """

@@ -44,7 +44,7 @@ class DependenceGraphic:
             sub_deps: Dict[str, Set[str]] = {}
             while len(q) > 0:
                 name = q.pop()
-                dep_items = deps[name]
+                dep_items = set(deps[name])
                 if len(dep_items) > 0:
                     sub_deps.update({name: dep_items})
                 for dep_item in dep_items:
