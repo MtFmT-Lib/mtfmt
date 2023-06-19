@@ -22,16 +22,19 @@ from typing import Dict, Any, List, Union, Tuple, Optional
 from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
+from deps import DependenceGraphic
 
 
 class ActionType(Enum):
     """
     表示文件所属的范畴
     """
+    # 啥也不干
+    NONE = 0
     # 打包ZIP
-    PACK = 0
+    PACK = 1
     # 生成cmsis pack file
-    CMSIS = 1
+    CMSIS = 2
 
 
 class FileCategory(Enum):
@@ -64,7 +67,7 @@ class PackageFileInfo:
     pack_dir: Path
 
     # 指定范畴
-    category: FileCategory
+    category: Union[FileCategory, str]
 
 
 @dataclass
@@ -191,6 +194,14 @@ class PackageInfo:
             files
         )
 
+    def add_target_files(self, name: str, target_dir: Path, outputs: List[Path]):
+        """
+        把target file添加到file list
+        """
+        category = 'target:' + name
+        pkg_info = PackageFileInfo(outputs, target_dir, category)
+        self.package_files.append(pkg_info)
+
     @staticmethod
     def _enum_file_items(file_items):
         """
@@ -231,7 +242,7 @@ class PackFileInfo:
     target: Path
 
     # 参与打包的文件分类
-    categories: FileCategory
+    categories: Union[FileCategory, str]
 
     @staticmethod
     def load(toml_dat: Any):
@@ -240,12 +251,18 @@ class PackFileInfo:
         """
         name = toml_dat['name']
         target = Path(toml_dat['target'])
+        dependences = []
         if 'categories' in toml_dat:
-            categories = [FileCategory[s.upper()]
-                          for s in toml_dat['categories']]
+            categories = []
+            for s in toml_dat['categories']:
+                if s[0] == '@':
+                    categories.append('target:' + s[1:])
+                    dependences.append(s[1:])
+                else:
+                    categories.append(FileCategory[s.upper()])
         else:
             categories = [FileCategory.DEFAULT]
-        return PackFileInfo(name, target, categories)
+        return (dependences, PackFileInfo(name, target, categories))
 
 
 @dataclass
@@ -274,7 +291,7 @@ class CMSISPdscFileInfo:
         target = Path(toml_dat['target'])
         c_class = toml_dat['cmsis-Cclass']
         c_group = toml_dat['cmsis-Cgroup']
-        return CMSISPdscFileInfo(name, target, c_class, c_group)
+        return ([], CMSISPdscFileInfo(name, target, c_class, c_group))
 
 
 @ dataclass
@@ -295,7 +312,16 @@ class AutogenFileInfo:
         """
         name = toml_dat['name']
         target = Path(toml_dat['target'])
-        return AutogenFileInfo(name, target)
+        return ([], AutogenFileInfo(name, target))
+
+
+@dataclass
+class EmptyActionInfo:
+    """
+    空的action
+    """
+    # 名称
+    name: str
 
 
 class State(Enum):
@@ -327,6 +353,9 @@ class Project:
     # toml文件的raw reference
     toml_raw: Any
 
+    # 依赖关系图
+    deps: DependenceGraphic
+
     def __init__(self, output_dir: str, file: str):
         """
         加载项目文件
@@ -341,23 +370,40 @@ class Project:
             self.toml_raw = toml_dat
             self.actions = {}
             self.package = PackageInfo.load(toml_dat['package'])
+            # 加载actions
+            action_dep: Dict[str, List[str]] = {}
             action_dat = toml_dat['action']
             for action in action_dat:
                 mode: str = action['mode']
                 name: str = action['name']
 
-                if name in self.actions:
+                if name in self.actions or name == 'all':
                     raise AttributeError(f'Name "{name}" is not unique.')
 
                 mode_val = ActionType[mode.upper()]
                 if mode_val == ActionType.PACK:
-                    patt_action = PackFileInfo.load(action)
+                    dependences, patt_action = PackFileInfo.load(action)
                 elif mode_val == ActionType.CMSIS:
-                    patt_action = CMSISPdscFileInfo.load(action)
+                    dependences, patt_action = CMSISPdscFileInfo.load(action)
                 else:
                     raise AttributeError(f'Unsupport action mode "{mode}"')
 
+                action_dep.update({name: dependences})
                 self.actions.update({name: (mode_val, patt_action)})
+            # 检查依赖项
+            self._check_dependences(action_dep)
+            # 把所有的action作为一个files添加到PackageInfo
+            for (action_name, (action_typ, action)) in self.actions.items():
+                target = self.get_output_fullpath(action.target)
+                self.package.add_target_files(
+                    action_name, Path('.'), [target])
+            # 添加 "all" target
+            action_dep.update({'all': list(self.actions.keys())})
+            self.actions.update(
+                {'all': (ActionType.NONE, EmptyActionInfo('all'))})
+
+            # 构建依赖关系图
+            self.deps = DependenceGraphic(action_dep)
             # 打印项目信息
             self._print_project_info()
         except KeyError:
@@ -370,6 +416,24 @@ class Project:
         取得基于输出目录下的文件file的完整路径
         """
         return os.path.join(self.output_dir, self._eval_string(str(file)))
+
+    def get_actions(self, name: str) -> List[str]:
+        """
+        按照依赖关系返回需要运行的action
+
+        它返回的action顺序从0 ~ n满足依赖关系
+        """
+        return self.deps.dep_of(name)
+
+    def _check_dependences(self, action_dep: Dict[str, List[str]]):
+        """
+        检查依赖项
+        """
+        for (action_name, action_deps) in action_dep.items():
+            for dep_name in action_deps:
+                if dep_name not in self.actions:
+                    raise AttributeError(
+                        f'Dependence "{dep_name}" of action "{action_name}" is not existed.')
 
     def _eval_string(self, str: str) -> str:
         """

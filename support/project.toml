@@ -57,12 +57,11 @@ target = "mtfmt_src.zip"
 cmsis-Cclass = "Utility"
 cmsis-Cgroup = "MtFmt:Library"
 mode = "cmsis"
-name = "@cmsis-pdsc"
+name = "cmsis-pdsc"
 target = "{package:organization}.{package:name}.pdsc"
 
 [[action]]
-categories = ["headers", "sources"]
-dependences = ["@cmsis-pdsc"]
+categories = ["headers", "sources", "@cmsis-pdsc"]
 mode = "pack"
 name = "cmsis-pack"
 target = "{package:organization}.{package:name}.{package:version}.pack"
