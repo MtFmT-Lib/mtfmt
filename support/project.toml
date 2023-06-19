@@ -1,0 +1,61 @@
+[package]
+authors = [
+  "向阳 <hinatahoshino@foxmail.com>",
+  "HalfSweet <HalfSweet@HalfSweet.cn>",
+]
+description = "A formatting library wrote by pure C language"
+keywords = ["formatting", "heap-manager"]
+name = "mtfmt"
+organization = "mtfmt-lib"
+version = "1.0.0"
+
+[package.support]
+homepage = "https://mtfmt.cc/"
+issue = "https://github.com/MtFmT-Lib/mtfmt/issues"
+organization = "https://github.com/MtFmT-Lib/mtfmt"
+
+[[package.file]]
+category = "binarys"
+file = ["target/*.a", "target/*.so"]
+output = "bin/lib"
+
+[[package.file]]
+category = "binarys"
+file = [
+  "build/target/bin/*.dll",
+  "build/target/lib/*.lib",
+  "build/target/lib/*.exp",
+]
+output = "bin/dll"
+
+[[package.file]]
+category = "headers"
+file = ["inc/**"]
+output = "inc"
+
+[[package.file]]
+category = "sources"
+file = ["src/**"]
+output = "src"
+
+[[package.file]]
+file = ["LICENSE", "*.md", "version.txt"]
+output = "."
+
+[[action]]
+categories = ["default", "headers", "sources"]
+mode = "pack"
+name = "pack"
+target = "mtfmt_src.zip"
+
+[[action]]
+mode = "cmsis"
+name = "@cmsis-pdsc"
+target = "cmsis-pdsc"
+
+[[action]]
+categories = ["default", "headers", "sources"]
+dependence = ["@cmsis-pdsc"]
+mode = "pack"
+name = "cmsis-pack"
+target = "MTFMT"
