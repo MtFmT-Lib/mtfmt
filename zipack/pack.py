@@ -26,13 +26,13 @@ class PackAction(IAction):
     打包zip的action
     """
 
-    def __init__(self, output_dir: Path, prj: Project, cfg: PackFileInfo):
+    def __init__(self, prj: Project, cfg: PackFileInfo):
         self.project = prj
         self.configure = cfg
-        self.output_file = os.path.join(output_dir, cfg.target)
 
     def run(self):
-        with ZipFile(self.output_file, 'w') as zip:
+        output_file = self.project.get_output_fullpath(self.configure.target)
+        with ZipFile(output_file, 'w') as zip:
             categories = self.configure.categories
             # 写入源文件, 头文件等等的东东
             for file in self.project.package.package_files:

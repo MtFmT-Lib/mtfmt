@@ -105,6 +105,9 @@ class PackageInfo:
     # 版本
     version: PackageVersion
 
+    # 作者
+    authors: List[str]
+
     # 参与打包的文件
     package_files: List[PackageFileInfo]
 
@@ -114,9 +117,22 @@ class PackageInfo:
         从toml数据加载
         """
         name = toml_dat['name']
-        files = []
+        files = PackageInfo._enum_file_items(toml_dat['file'])
         version = PackageVersion.parse(toml_dat['version'])
-        file_items = toml_dat['file']
+        # 作者信息
+        if 'authors' in toml_dat:
+            author_list = toml_dat['authors']
+            authors = [str(s) for s in author_list]
+        else:
+            authors = []
+        return PackageInfo(name, version, authors, files)
+
+    @staticmethod
+    def _enum_file_items(file_items):
+        """
+        枚举package.file配置项所指定的文件们
+        """
+        files = []
         for file_item in file_items:
             total_files = []
             for pattern in file_item['file']:
@@ -128,7 +144,7 @@ class PackageInfo:
             else:
                 category = FileCategory.DEFAULT
             files.append(PackageFileInfo(total_files, output_dir, category))
-        return PackageInfo(name, version, files)
+        return files
 
     @staticmethod
     def _enum_files(pattern: str) -> List[Path]:
@@ -201,11 +217,18 @@ class Project:
     actions: Dict[str, Tuple[ActionType,
                              Union[AutogenFileInfo, PackFileInfo]]]
 
-    def __init__(self, file: str):
+    # 输出目录
+    output_dir: Path
+
+    def __init__(self, output_dir: str, file: str):
         """
         加载项目文件
         """
         try:
+            # 输出目录
+            self.output_dir = os.path.abspath(output_dir)
+            if not os.path.exists(self.output_dir):
+                os.makedirs(self.output_dir)
             # 解析toml
             toml_dat = rtoml.load(Path(file))
             self.actions = {}
@@ -233,6 +256,12 @@ class Project:
             raise AttributeError('Project file was missing some items.')
         except FileNotFoundError as e:
             raise AttributeError(f'Missing file {e.filename}.')
+
+    def get_output_fullpath(self, file: str) -> Path:
+        """
+        取得基于输出目录下的文件file的完整路径
+        """
+        return os.path.join(self.output_dir, file)
 
     def _print_project_info(self):
         """
