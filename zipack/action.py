@@ -14,8 +14,6 @@ Package tool
 
 """
 from abc import ABCMeta, abstractmethod
-from project import Project
-from enum import Enum
 
 
 class IAction:

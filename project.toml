@@ -1,11 +1,25 @@
 [package]
-name = "MtFmt"
+authors = [
+  "向阳 <hinatahoshino@foxmail.com>",
+  "HalfSweet <HalfSweet@HalfSweet.cn>",
+]
+license = "lgpl-3.0"
+name = "mtfmt"
 version = "1.0.0"
 
 [[package.file]]
 category = "binarys"
 file = ["target/*.a", "target/*.so"]
-output = "bin"
+output = "bin/lib"
+
+[[package.file]]
+category = "binarys"
+file = [
+  "build/target/bin/*.dll",
+  "build/target/lib/*.lib",
+  "build/target/lib/*.exp",
+]
+output = "bin/dll"
 
 [[package.file]]
 category = "headers"
@@ -22,38 +36,19 @@ file = ["LICENSE", "*.md", "version.txt"]
 output = "."
 
 [[action]]
-mode = "pattern"
-name = "update-c-version"
-pattern = """
-#if 1
-//! major version
-#define MSTR_VERSION_MAJOR {version:major}
-#endif
-#if 1
-//! minor version
-#define MSTR_VERSION_MINOR {version:minor}
-#endif
-#if 1
-//! release version
-#define MSTR_VERSION_RELEASE {version:release}
-#endif
-"""
-pattern-beg = "//@ <autogen:version>"
-pattern-end = "//@ </autogen:version>"
-target = "./inc/mm_cfg.h"
-
-[[action]]
+categories = ["default", "headers", "sources"]
 mode = "pack"
 name = "pack"
-target = "mtfmt_release"
+target = "mtfmt_src.zip"
 
 [[action]]
-mode = "cmsispack"
+mode = "cmsis"
+name = "@cmsis-pdsc"
+target = "cmsis-pdsc"
+
+[[action]]
+categories = ["default", "headers", "sources"]
+dependence = ["@cmsis-pdsc"]
+mode = "pack"
 name = "cmsis-pack"
 target = "MTFMT"
-
-[[action]]
-mode = "pattern"
-name = "update-version-text"
-pattern = "{version:major}.{version:minor}.{version:release}"
-target = "./version.txt"

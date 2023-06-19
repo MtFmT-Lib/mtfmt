@@ -30,10 +30,8 @@ class ActionType(Enum):
     """
     # 打包ZIP
     PACK = 0
-    # 打包CMSIS_PACK
-    CMSISPACK = 1
-    # 模式
-    PATTERN = 2
+    # 生成cmsis pack file
+    CMSIS = 1
 
 
 class FileCategory(Enum):
@@ -84,7 +82,7 @@ class PackageVersion:
         """
         解析版本号(XX.XX.XX)
         """
-        matched = re.match('([0-9]+)\.([0-9]+)\.([0-9]+)', version)
+        matched = re.match('([0-9]+)\\.([0-9]+)\\.([0-9]+)', version)
         if matched is not None:
             groups = matched.groups()
             major = int(groups[0])
@@ -142,43 +140,6 @@ class PackageInfo:
 
 
 @dataclass
-class PatternInfo:
-    """
-    自动生成的模式串信息
-    """
-    # 名称
-    name: str
-
-    # 目标名
-    target: Path
-
-    # 起始模式
-    beg_pattern: str
-
-    # 结束模式
-    end_pattern: str
-
-    # 模式串
-    pattern: str
-
-    @staticmethod
-    def load(toml_dat: Any):
-        """
-        加载内容
-        """
-        name = toml_dat['name']
-        target = Path(toml_dat['target'])
-        pattern = toml_dat['pattern']
-        if 'pattern-beg' in toml_dat:
-            beg_pattern = toml_dat['pattern-beg']
-            end_pattern = toml_dat['pattern-end']
-        else:
-            beg_pattern = ''
-            end_pattern = ''
-        return PatternInfo(name, target, pattern, beg_pattern, end_pattern)
-
-
-@dataclass
 class PackFileInfo:
     """
     自动生成的打包信息
@@ -189,6 +150,9 @@ class PackFileInfo:
     # 目标
     target: Path
 
+    # 参与打包的文件分类
+    categories: FileCategory
+
     @staticmethod
     def load(toml_dat: Any):
         """
@@ -196,13 +160,18 @@ class PackFileInfo:
         """
         name = toml_dat['name']
         target = Path(toml_dat['target'])
-        return PackFileInfo(name, target)
+        if 'categories' in toml_dat:
+            categories = [FileCategory[s.upper()]
+                          for s in toml_dat['categories']]
+        else:
+            categories = [FileCategory.DEFAULT]
+        return PackFileInfo(name, target, categories)
 
 
 @dataclass
-class CMSISPackFileInfo:
+class AutogenFileInfo:
     """
-    自动生成的CMSIS包信息
+    自动生成文件的信息
     """
     # 名称
     name: str
@@ -217,7 +186,7 @@ class CMSISPackFileInfo:
         """
         name = toml_dat['name']
         target = Path(toml_dat['target'])
-        return PackFileInfo(name, target)
+        return AutogenFileInfo(name, target)
 
 
 class Project:
@@ -230,8 +199,7 @@ class Project:
 
     # 动作
     actions: Dict[str, Tuple[ActionType,
-                             Union[PatternInfo,
-                                   CMSISPackFileInfo, PackFileInfo]]]
+                             Union[AutogenFileInfo, PackFileInfo]]]
 
     def __init__(self, file: str):
         """
@@ -251,12 +219,10 @@ class Project:
                     raise AttributeError(f'Name "{name}" is not unique.')
 
                 mode_val = ActionType[mode.upper()]
-                if mode_val == ActionType.PATTERN:
-                    patt_action = PatternInfo.load(action)
-                elif mode_val == ActionType.PACK:
+                if mode_val == ActionType.PACK:
                     patt_action = PackFileInfo.load(action)
-                elif mode_val == ActionType.CMSISPACK:
-                    patt_action = CMSISPackFileInfo.load(action)
+                elif mode_val == ActionType.CMSIS:
+                    patt_action = AutogenFileInfo.load(action)
                 else:
                     raise AttributeError(f'Unsupport action mode "{mode}"')
 

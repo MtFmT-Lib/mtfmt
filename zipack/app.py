@@ -56,10 +56,11 @@ class Application:
         print(f'  Action name: \033[1;33m{action_name}\033[0;0m')
         print(f'  Action type: \033[1;33m{action_type}\033[0;0m')
         if action_type == ActionType.PACK:
-            runner = PackAction(f'./{self.output_dir}/{project.package.name}.zip',
+            runner = PackAction(self.output_dir,
                                 project,
                                 project.actions[action_name][1])
             runner.run()
+            print(f'> Completed action \033[1;32m{action_name}\033[0;0m.')
         else:
             print(f'> \033[1;31mAction {action_name} is not support.\033[0;0m')
             exit(1)
