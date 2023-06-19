@@ -3,9 +3,16 @@ authors = [
   "向阳 <hinatahoshino@foxmail.com>",
   "HalfSweet <HalfSweet@HalfSweet.cn>",
 ]
-license = "lgpl-3.0"
+description = "A formatting library wrote by pure C language"
+keywords = ["formatting", "heap-manager"]
 name = "mtfmt"
+organization = "mtfmt-lib"
 version = "1.0.0"
+
+[package.support]
+homepage = "https://mtfmt.cc/"
+issue = "https://github.com/MtFmT-Lib/mtfmt/issues"
+organization = "https://github.com/MtFmT-Lib/mtfmt"
 
 [[package.file]]
 category = "binarys"

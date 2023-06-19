@@ -18,7 +18,7 @@ import os
 import re
 import glob
 import rtoml
-from typing import Dict, Any, List, Union, Tuple
+from typing import Dict, Any, List, Union, Tuple, Optional
 from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
@@ -94,6 +94,32 @@ class PackageVersion:
 
 
 @dataclass
+class PackageSupportInfo:
+    """
+    支持信息
+    """
+
+    # 主页
+    homepage_url: str
+
+    # issue
+    issue_url: str
+
+    # 组织页面
+    organization_url: str
+
+    @staticmethod
+    def load(toml_dat: Any):
+        """
+        解析tomldata
+        """
+        issue_url = toml_dat['issue'] if 'issue' in toml_dat else ''
+        homepage_url = toml_dat['homepage'] if 'homepage' in toml_dat else ''
+        organization_url = toml_dat['organization'] if 'organization' in toml_dat else ''
+        return PackageSupportInfo(homepage_url, issue_url, organization_url)
+
+
+@dataclass
 class PackageInfo:
     """
     包信息
@@ -107,6 +133,18 @@ class PackageInfo:
 
     # 作者
     authors: List[str]
+
+    # 关键字
+    keywords: List[str]
+
+    # 组织名
+    organization_name: str
+
+    # 描述
+    description: str
+
+    # 支持信息
+    support: Optional[PackageSupportInfo]
 
     # 参与打包的文件
     package_files: List[PackageFileInfo]
@@ -125,7 +163,31 @@ class PackageInfo:
             authors = [str(s) for s in author_list]
         else:
             authors = []
-        return PackageInfo(name, version, authors, files)
+        # 关键字
+        if 'keywords' in toml_dat:
+            keyword_list = toml_dat['keywords']
+            keywords = [str(s) for s in keyword_list]
+        else:
+            keywords = []
+        # 组织名
+        organization_name = toml_dat['organization'] if 'organization' in toml_dat else ''
+        # 描述
+        description = toml_dat['description'] if 'description' in toml_dat else 'No description'
+        # 支持信息
+        if 'support' in toml_dat:
+            support_info = PackageSupportInfo.load(toml_dat['support'])
+        else:
+            support_info = None
+        return PackageInfo(
+            name,
+            version,
+            authors,
+            keywords,
+            organization_name,
+            description,
+            support_info,
+            files
+        )
 
     @staticmethod
     def _enum_file_items(file_items):
