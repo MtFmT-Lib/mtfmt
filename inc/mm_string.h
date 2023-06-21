@@ -146,13 +146,6 @@ MSTR_EXPORT_API(mstr_codepoint_t)
 mstr_char_at(const MString* str, usize_t idx);
 
 /**
- * @brief 清空字符串
- *
- * @param[inout] str: 需要清空的字符串
- */
-MSTR_EXPORT_API(void) mstr_clear(MString* str);
-
-/**
  * @brief 拼接字符串
  *
  * @param[out] str: 目标字符串
@@ -210,13 +203,20 @@ MSTR_EXPORT_API(mstr_result_t)
 mstr_repeat_append(MString* str, mstr_codepoint_t ch, usize_t cnt);
 
 /**
+ * @brief 清空字符串
+ *
+ * @param[inout] str: 需要清空的字符串
+ */
+MSTR_EXPORT_API(void) mstr_clear(MString* str);
+
+/**
  * @brief 翻转字符串
  *
  * @param[inout] str: 需要翻转的字符串
  *
  * @return mstr_result_t: 结果, 永远为MStr_Ok
  */
-MSTR_EXPORT_API(mstr_result_t) mstr_reverse_self(MString* str);
+MSTR_EXPORT_API(void) mstr_reverse_self(MString* str);
 
 /**
  * @brief 转换为cstr

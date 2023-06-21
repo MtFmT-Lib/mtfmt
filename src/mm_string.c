@@ -139,12 +139,6 @@ mstr_char_at(const MString* str, usize_t idx)
 #endif // _MSTR_USE_UTF_8
 }
 
-MSTR_EXPORT_API(void) mstr_clear(MString* str)
-{
-    str->count = 0;
-    str->length = 0;
-}
-
 MSTR_EXPORT_API(mstr_result_t)
 mstr_append(MString* str, mstr_codepoint_t ch)
 {
@@ -257,8 +251,17 @@ mstr_concat_cstr_slice(MString* str, const char* start, const char* end)
     return res;
 }
 
-MSTR_EXPORT_API(mstr_result_t) mstr_reverse_self(MString* str)
+MSTR_EXPORT_API(void) mstr_clear(MString* str)
 {
+    str->count = 0;
+    str->length = 0;
+}
+
+MSTR_EXPORT_API(void) mstr_reverse_self(MString* str)
+{
+#if _MSTR_USE_UTF_8
+
+#else
     char* pend = str->buff + str->count - 1;
     char* pbeg = str->buff;
     while (pbeg < pend) {
@@ -269,7 +272,7 @@ MSTR_EXPORT_API(mstr_result_t) mstr_reverse_self(MString* str)
         pbeg += 1;
         pend -= 1;
     }
-    return MStr_Ok;
+#endif // _MSTR_USE_UTF_8
 }
 
 MSTR_EXPORT_API(const char*) mstr_as_cstr(MString* str)
