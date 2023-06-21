@@ -190,7 +190,7 @@
 #elif defined(_MSTR_RUNTIME_ASSERT)
 #include <assert.h>
 #define mstr_unreachable()        assert(0)
-#define mstr_bounding_check(expr) assert_param(!!(expr))
+#define mstr_bounding_check(expr) assert(!!(expr))
 #else
 #define mstr_unreachable()        ((void)0U)
 #define mstr_bounding_check(expr) ((void)0U)

@@ -26,11 +26,12 @@
 //
 // private:
 //
-static mstr_result_t
-    mstr_strlen(usize_t*, usize_t*, const mstr_char_t*, const mstr_char_t*);
 static void* mstr_realloc(void*, bool_t, usize_t, usize_t);
 static mstr_result_t mstr_expand_size(MString*, usize_t);
+static mstr_result_t
+    mstr_strlen(usize_t*, usize_t*, const mstr_char_t*, const mstr_char_t*);
 #if _MSTR_USE_UTF_8
+static mstr_result_t mstr_as_utf8(mstr_codepoint_t, char*, usize_t*);
 static mstr_result_t mstr_codepoint_of(
     mstr_codepoint_t*, const mstr_char_t*, usize_t
 );
@@ -51,14 +52,14 @@ mstr_create(MString* str, const char* content)
     else {
         mstr_strlen(&content_len, &content_cnt, content, NULL);
     }
-    if (content_len == 0) {
+    if (content_cnt == 0) {
         str->buff = str->stack_region;
         str->count = 0;
         str->length = 0;
         str->cap_size = MSTR_STACK_REGION_SIZE;
         return MStr_Ok;
     }
-    else if (content_len < MSTR_STACK_REGION_SIZE) {
+    else if (content_cnt < MSTR_STACK_REGION_SIZE) {
         str->buff = str->stack_region;
         str->count = content_cnt;
         str->length = content_len;
@@ -141,36 +142,55 @@ mstr_char_at(const MString* str, usize_t idx)
 MSTR_EXPORT_API(void) mstr_clear(MString* str)
 {
     str->count = 0;
+    str->length = 0;
 }
 
-MSTR_EXPORT_API(mstr_result_t) mstr_append(MString* str, char ch)
+MSTR_EXPORT_API(mstr_result_t)
+mstr_append(MString* str, mstr_codepoint_t ch)
 {
     return mstr_repeat_append(str, ch, 1);
 }
 
 MSTR_EXPORT_API(mstr_result_t)
-mstr_repeat_append(MString* str, char ch, usize_t cnt)
+mstr_repeat_append(MString* str, mstr_codepoint_t ch, usize_t cnt)
 {
     if (cnt == 0) {
         return MStr_Ok;
     }
     else {
+        usize_t code_len;
+        usize_t need_len;
+        mstr_char_t buff[8];
         mstr_result_t result = MStr_Ok;
-        if (str->count + cnt + 1 >= str->cap_size) {
+#if _MSTR_USE_UTF_8
+        result = mstr_as_utf8(ch, buff, &code_len);
+#else
+        code_len = 1;
+        buff[0] = (mstr_char_t)(ch & 0x7f);
+#endif // _MSTR_USE_UTF_8
+        need_len = code_len * cnt;
+        if (str->count + need_len + 1 >= str->cap_size) {
             // 保证length < cap_size + 1
             // 且有足够的空间存放下一个字符
             MSTR_AND_THEN(
                 result,
                 mstr_expand_size(
-                    str, str->cap_size + MSTR_CAP_SIZE_STEP
+                    str, str->cap_size + need_len + MSTR_CAP_SIZE_STEP
                 )
             );
         }
         if (MSTR_SUCC(result)) {
-            for (usize_t i = 0; i < cnt; i += 1) {
-                str->buff[str->count + i] = ch;
+            usize_t i_cnt = 0;
+            mstr_char_t* it = str->buff + str->count;
+            while (i_cnt < cnt) {
+                for (usize_t j = 0; j < code_len; j += 1) {
+                    *it = buff[j];
+                    it += 1;
+                }
+                i_cnt += 1;
             }
-            str->count += cnt;
+            str->count += code_len * cnt;
+            str->length += cnt;
         }
         return result;
     }
@@ -341,6 +361,7 @@ static mstr_result_t mstr_strlen(
         // 给一个大大的值让str < str_end恒为true
         str_end = (const mstr_char_t*)(uptr_t)(-1);
     }
+#if _MSTR_USE_UTF_8
     while (*str && str < str_end) {
         usize_t cnt = mstr_char_length(*str);
         count_val += cnt;
@@ -357,9 +378,67 @@ static mstr_result_t mstr_strlen(
     else {
         return MStr_Ok;
     }
+#else
+    while (*str && str < str_end) {
+        count_val += 1;
+        len_val += 1;
+        str += 1;
+    }
+    *len = len_val;
+    *count = count_val;
+    return MStr_Ok;
+#endif // _MSTR_USE_UTF_8
 }
 
 #if _MSTR_USE_UTF_8
+/**
+ * @brief 转换为UTF-8
+ *
+ * @param code: 字符代码点
+ * @param result: 转换输出, 至少要有6个bytes
+ * @param result_len: 转换输出的有效长度
+ *
+ */
+static mstr_result_t mstr_as_utf8(
+    mstr_codepoint_t code, mstr_char_t* result, usize_t* result_len
+)
+{
+    if (code <= 0x7f) {
+        // 0xxxxxxx, 1bytes
+        result[0] = (mstr_char_t)(code & 0x7f);
+        *result_len = 1;
+        return MStr_Ok;
+    }
+    else if (code <= 0x7ff) {
+        // 110xxxxx 10xxxxxx, 2bytes
+        result[0] = (mstr_char_t)((code >> 6) & 0x1f) | 0xc0;
+        result[1] = (mstr_char_t)(code & 0x3f) | 0x80;
+        *result_len = 2;
+        return MStr_Ok;
+    }
+    else if (code <= 0xffff) {
+        // 1110xxxx 10xxxxxx 10xxxxxx, 3bytes
+        result[0] = (mstr_char_t)((code >> 12) & 0xf) | 0xe0;
+        result[1] = (mstr_char_t)((code >> 6) & 0x3f) | 0x80;
+        result[2] = (mstr_char_t)(code & 0x3f) | 0x80;
+        *result_len = 3;
+        return MStr_Ok;
+    }
+    else if (code <= 0x1fffff) {
+        // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx, 4bytes
+        result[0] = (mstr_char_t)((code >> 18) & 0x7) | 0xf0;
+        result[1] = (mstr_char_t)((code >> 12) & 0x3f) | 0x80;
+        result[2] = (mstr_char_t)((code >> 6) & 0x3f) | 0x80;
+        result[3] = (mstr_char_t)(code & 0x3f) | 0x80;
+        *result_len = 4;
+        return MStr_Ok;
+    }
+    else {
+        *result_len = 0;
+        return MStr_Err_UnicodeEncodingError;
+    }
+}
+
 /**
  * @brief 取得lead字符ch[0]所跟着的内容的unicode代码点值
  *

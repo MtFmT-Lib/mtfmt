@@ -16,6 +16,14 @@
 #include "unity.h"
 #include <stdio.h>
 
+extern "C" void string_copy_create(void)
+{
+}
+
+extern "C" void string_move_create(void)
+{
+}
+
 extern "C" void string_length(void)
 {
     // ASCII
@@ -47,4 +55,17 @@ extern "C" void string_char_at(void)
     // free
     mstr_free(&str_ch);
     mstr_free(&str_ch);
+}
+
+extern "C" void string_equal(void)
+{
+    MString src;
+    EVAL(mstr_create(&src, "Example"));
+    // equal
+    ASSERT_EQUAL_STRING(&src, "Example");
+    // neq
+    ASSERT_NOT_EQUAL_STRING(&src, "Exampl");
+    ASSERT_NOT_EQUAL_STRING(&src, "Example1");
+    ASSERT_NOT_EQUAL_STRING(&src, "ExAmple");
+    mstr_free(&src);
 }

@@ -18,6 +18,28 @@ extern "C"
 #endif
     void allocate_then_free(void);
 
+    void string_copy_create(void);
+    void string_move_create(void);
+    void string_length(void);
+    void string_char_at(void);
+    void string_equal(void);
+
+    void string_concat_object(void);
+    void string_concat_c_str(void);
+    void string_concat_c_slice(void);
+
+    void string_append(void);
+    void string_repeat_append(void);
+
+    void string_trans_clear(void);
+    void string_trans_reverse(void);
+    void string_trans_reverse_unicode(void);
+
+    void cpp_string_equal(void);
+    void cpp_string_not_equal(void);
+    void cpp_string_push(void);
+    void cpp_string_concat(void);
+
     void fmt_align_left(void);
     void fmt_align_left_fill(void);
     void fmt_align_left_long(void);
@@ -50,18 +72,6 @@ extern "C"
     void fmt_sty_hex(void);
     void fmt_sty_hex_prefix(void);
 
-    void string_length(void);
-    void string_char_at(void);
-
-    void string_concat_object(void);
-    void string_concat_c_str(void);
-    void string_concat_c_slice(void);
-
-    void append_char(void);
-    void equal_string(void);
-    void reverse_self(void);
-    void repeat_append_char(void);
-
     void fmt_array(void);
     void fmt_array_element_style(void);
     void fmt_array_userdefind_split(void);
@@ -80,11 +90,6 @@ extern "C"
     void fmt_escape_bracket(void);
 
     void sync_io_write(void);
-
-    void cpp_string_equal(void);
-    void cpp_string_not_equal(void);
-    void cpp_string_push(void);
-    void cpp_string_concat(void);
 
     void cpp_monadic_result_and_then(void);
     void cpp_monadic_result_or_value(void);

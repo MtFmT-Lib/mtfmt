@@ -51,6 +51,28 @@ int main()
 
     RUN_TEST(allocate_then_free);
 
+    RUN_TEST(string_copy_create);
+    RUN_TEST(string_move_create);
+    RUN_TEST(string_length);
+    RUN_TEST(string_char_at);
+    RUN_TEST(string_equal);
+
+    RUN_TEST(string_concat_object);
+    RUN_TEST(string_concat_c_str);
+    RUN_TEST(string_concat_c_slice);
+
+    RUN_TEST(string_append);
+    RUN_TEST(string_repeat_append);
+
+    RUN_TEST(string_trans_clear);
+    RUN_TEST(string_trans_reverse);
+    RUN_TEST(string_trans_reverse_unicode);
+
+    RUN_TEST(cpp_string_equal);
+    RUN_TEST(cpp_string_not_equal);
+    RUN_TEST(cpp_string_push);
+    RUN_TEST(cpp_string_concat);
+
     RUN_TEST(fmt_align_left);
     RUN_TEST(fmt_align_left_fill);
     RUN_TEST(fmt_align_left_long);
@@ -82,18 +104,6 @@ int main()
     RUN_TEST(fmt_sty_hex);
     RUN_TEST(fmt_sty_hex_prefix);
 
-    RUN_TEST(string_length);
-    RUN_TEST(string_char_at);
-
-    RUN_TEST(string_concat_object);
-    RUN_TEST(string_concat_c_str);
-    RUN_TEST(string_concat_c_slice);
-
-    RUN_TEST(append_char);
-    RUN_TEST(equal_string);
-    RUN_TEST(reverse_self);
-    RUN_TEST(repeat_append_char);
-
     RUN_TEST(fmt_array);
     RUN_TEST(fmt_array_element_style);
     RUN_TEST(fmt_array_userdefind_split);
@@ -112,11 +122,6 @@ int main()
     RUN_TEST(fmt_escape_bracket);
 
     RUN_TEST(sync_io_write);
-
-    RUN_TEST(cpp_string_equal);
-    RUN_TEST(cpp_string_not_equal);
-    RUN_TEST(cpp_string_push);
-    RUN_TEST(cpp_string_concat);
 
     RUN_TEST(cpp_monadic_result_and_then);
     RUN_TEST(cpp_monadic_result_or_value);

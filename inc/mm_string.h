@@ -192,21 +192,22 @@ mstr_concat_cstr_slice(
  * @brief 向字符串尾部插入一个字符
  *
  * @param[inout] str: 字符串
- * @param[in] ch: 需要放入的字符
+ * @param[in] ch: 需要放入的字符(unicode point)
  * @return mstr_result_t: 结果
  */
-MSTR_EXPORT_API(mstr_result_t) mstr_append(MString* str, char ch);
+MSTR_EXPORT_API(mstr_result_t)
+mstr_append(MString* str, mstr_codepoint_t ch);
 
 /**
  * @brief 向字符串尾部重复插入一个字符
  *
  * @param[inout] str: 字符串
- * @param[in] ch: 需要放入的字符
+ * @param[in] ch: 需要放入的字符(unicode point)
  * @param[in] cnt: 重复次数
  * @return mstr_result_t: 结果
  */
 MSTR_EXPORT_API(mstr_result_t)
-mstr_repeat_append(MString* str, char ch, usize_t cnt);
+mstr_repeat_append(MString* str, mstr_codepoint_t ch, usize_t cnt);
 
 /**
  * @brief 翻转字符串
