@@ -235,8 +235,18 @@
 }
 
 @media screen and (width < 720px) {
-    .markdown-box table {
-        padding-left: 1em;
-        padding-right: 1em;
+    .markdown-box {
+        table {
+            padding-left: 1em;
+            padding-right: 1em;
+        }
+
+        blockquote {
+            margin-left: 1em;
+            margin-right: 1em;
+            border-radius: 0;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+        }
     }
 }
