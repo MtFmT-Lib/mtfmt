@@ -10,6 +10,9 @@
     --border-color: #{$border-color};
     --table-border-color: #{$table-border-color};
     --text-block-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
+    --quote-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
+    --quote-code-bg-color: #{mix(#f8f9fa, #a3a3a2, 80%)};
+    --quote-caption-color: #{$text-color};
 
     // 超链接
     --hpyer-link-color: #{$hpyer-link-color};
@@ -30,6 +33,9 @@
     --border-color: #{mix($bg-color-dark, $border-color, 75%)};
     --table-border-color: #{$table-border-color};
     --text-block-bg-color: #{mix($bg-color-dark, #f8f9fa, 90%)};
+    --quote-bg-color: #{mix($bg-color-dark, #f8f9fa, 95%)};
+    --quote-code-bg-color: #{mix($bg-color-dark, #f8f9fa, 85%)};
+    --quote-caption-color: #{invert($text-color)};
 
     // 超链接
     --hpyer-link-color: #{mix($hpyer-link-color, white, 80%)};
@@ -47,6 +53,9 @@
     --border-color: #{mix($bg-color-warm, $text-color, 50%)};
     --table-border-color: #{$table-border-color};
     --text-block-bg-color: #{mix($bg-color-warm, $text-color, 85%)};
+    --quote-bg-color: #{mix($bg-color-warm, #f8f9fa, 95%)};
+    --quote-code-bg-color: #{mix($bg-color-warm, $text-color, 92%)};
+    --quote-caption-color: #{$text-color};
 
     // 按钮
     --button-hover-bg-color: #{mix($bg-color-warm, black, 90%)};

@@ -47,7 +47,8 @@
             color: var(--text-color);
             padding-left: 0.1em;
             padding-right: 0.1em;
-            background-color: var(--text-block-bg-color)
+            background-color: var(--text-block-bg-color);
+            border-radius: 2px;
         }
 
         .bio-reading-bold {
@@ -97,6 +98,38 @@
 
         .bio-reading-bold {
             color: inherit;
+        }
+    }
+
+    // 引用块
+    blockquote {
+        font-size: 0.9em;
+        box-sizing: border-box;
+        padding: 0.5em;
+
+        // 边框
+        border: 1px solid var(--border-color);
+        border-radius: 2px;
+
+        // 颜色
+        background-color: var(--quote-bg-color);
+
+        .bio-reading-bold {
+            color: var(--text-color);
+        }
+
+        p code {
+            background-color: var(--quote-code-bg-color);
+        }
+
+        p:first-child {
+            text-align: center;
+            font-weight: 500;
+            color: var(--quote-caption-color);
+        }
+
+        strong {
+            font-weight: 500;
         }
     }
 
