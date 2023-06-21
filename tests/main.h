@@ -50,6 +50,13 @@ extern "C"
     void fmt_sty_hex(void);
     void fmt_sty_hex_prefix(void);
 
+    void string_length(void);
+    void string_char_at(void);
+
+    void string_concat_object(void);
+    void string_concat_c_str(void);
+    void string_concat_c_slice(void);
+
     void append_char(void);
     void equal_string(void);
     void reverse_self(void);

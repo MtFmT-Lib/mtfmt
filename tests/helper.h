@@ -15,16 +15,27 @@
 #include "unity.h"
 
 /**
+ * @brief 确定两个值相等
+ *
+ */
+#define ASSERT_EQUAL_VALUE(val1, val2)           \
+    do {                                         \
+        TEST_ASSERT_TRUE_MESSAGE(                \
+            (val1) == (val2), #val1 " != " #val2 \
+        );                                       \
+    } while (0)
+
+/**
  * @brief 确定2个字符串相等
  *
  */
-#define ASSERT_EQUAL_STRING(str, target_str)   \
-    do {                                       \
-        MString target;                        \
-        mstr_create(&target, (target_str));    \
-        bool_t res = mstr_equal(str, &target); \
-        mstr_free(&target);                    \
-        TEST_ASSERT_TRUE(res);                 \
+#define ASSERT_EQUAL_STRING(str, target_str)                  \
+    do {                                                      \
+        MString target;                                       \
+        mstr_create(&target, (target_str));                   \
+        bool_t res = mstr_equal(str, &target);                \
+        mstr_free(&target);                                   \
+        TEST_ASSERT_TRUE_MESSAGE(res, " str != " target_str); \
     } while (0)
 
 /**

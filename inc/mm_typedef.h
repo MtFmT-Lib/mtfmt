@@ -50,6 +50,12 @@ enum
 };
 
 /**
+ * @brief 字符
+ *
+ */
+typedef char mstr_char_t;
+
+/**
  * @brief unicode代码点
  *
  */

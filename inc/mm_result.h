@@ -23,6 +23,10 @@ typedef enum tagMStrResult
     MStr_Err_HeapTooSmall = -128,
     // ERR: 未实现
     MStr_Err_NoImplemention,
+    // ERR: 编码错误
+    MStr_Err_UnicodeEncodingError,
+    // ERR: 源字符串不完整
+    MStr_Err_UnicodeEncodingNotCompleted,
     // ERR: buff太短
     MStr_Err_BufferTooSmall,
     // ERR: 格式化: 索引太多

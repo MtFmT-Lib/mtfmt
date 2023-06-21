@@ -82,6 +82,13 @@ int main()
     RUN_TEST(fmt_sty_hex);
     RUN_TEST(fmt_sty_hex_prefix);
 
+    RUN_TEST(string_length);
+    RUN_TEST(string_char_at);
+
+    RUN_TEST(string_concat_object);
+    RUN_TEST(string_concat_c_str);
+    RUN_TEST(string_concat_c_slice);
+
     RUN_TEST(append_char);
     RUN_TEST(equal_string);
     RUN_TEST(reverse_self);

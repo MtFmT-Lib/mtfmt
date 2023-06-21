@@ -26,9 +26,15 @@
 //
 // private:
 //
-
+static mstr_result_t
+    mstr_strlen(usize_t*, usize_t*, const mstr_char_t*, const mstr_char_t*);
 static void* mstr_realloc(void*, bool_t, usize_t, usize_t);
 static mstr_result_t mstr_expand_size(MString*, usize_t);
+#if _MSTR_USE_UTF_8
+static mstr_result_t mstr_codepoint_of(
+    mstr_codepoint_t*, const mstr_char_t*, usize_t
+);
+#endif // _MSTR_USE_UTF_8
 
 //
 // public:
@@ -37,9 +43,14 @@ static mstr_result_t mstr_expand_size(MString*, usize_t);
 MSTR_EXPORT_API(mstr_result_t)
 mstr_create(MString* str, const char* content)
 {
-    usize_t content_len = (content == NULL || content[0] == '\0') ?
-                              0 :
-                              (usize_t)strlen(content);
+    usize_t content_len, content_cnt;
+    if (content == NULL || content[0] == '\0') {
+        content_len = 0;
+        content_cnt = 0;
+    }
+    else {
+        mstr_strlen(&content_len, &content_cnt, content, NULL);
+    }
     if (content_len == 0) {
         str->buff = str->stack_region;
         str->count = 0;
@@ -49,20 +60,22 @@ mstr_create(MString* str, const char* content)
     }
     else if (content_len < MSTR_STACK_REGION_SIZE) {
         str->buff = str->stack_region;
-        str->count = content_len;
+        str->count = content_cnt;
+        str->length = content_len;
         str->cap_size = MSTR_STACK_REGION_SIZE;
         strcpy(str->buff, content);
         return MStr_Ok;
     }
     else {
-        str->cap_size = content_len + 1 + MSTR_CAP_SIZE_STEP;
+        str->cap_size = content_cnt + 1 + MSTR_CAP_SIZE_STEP;
         str->buff = (char*)mstr_heap_alloc(str->cap_size);
         if (str->buff == NULL) {
             // 内存分配失败
             return MStr_Err_HeapTooSmall;
         }
-        str->count = content_len;
-        strcpy(str->buff, content);
+        str->count = content_cnt;
+        str->length = content_len;
+        memcpy(str->buff, content, content_cnt);
         return MStr_Ok;
     }
 }
@@ -94,6 +107,35 @@ mstr_copy_create(MString* str, const MString* other)
     MSTR_AND_THEN(result, mstr_create(str, ""));
     MSTR_AND_THEN(result, mstr_concat(str, other));
     return result;
+}
+
+MSTR_EXPORT_API(mstr_codepoint_t)
+mstr_char_at(const MString* str, usize_t idx)
+{
+#if _MSTR_USE_UTF_8
+    usize_t cur_idx = 0;
+    usize_t rem_bytes = 0;
+    mstr_result_t res = MStr_Ok;
+    mstr_codepoint_t out_code = 0;
+    const char* it = str->buff;
+    mstr_bounding_check(idx < str->length);
+    while (cur_idx != idx) {
+        usize_t cnt = mstr_char_length(*it);
+        it += cnt;
+        cur_idx += 1;
+    }
+    rem_bytes = str->count - (usize_t)(it - str->buff);
+    res = mstr_codepoint_of(&out_code, it, rem_bytes);
+    if (MSTR_SUCC(res)) {
+        return out_code;
+    }
+    else {
+        return 0;
+    }
+#else
+    mstr_bounding_check(idx < str->length);
+    return (mstr_codepoint_t)str->buff[idx];
+#endif // _MSTR_USE_UTF_8
 }
 
 MSTR_EXPORT_API(void) mstr_clear(MString* str)
@@ -149,11 +191,12 @@ mstr_concat(MString* str, const MString* other)
     }
     if (MSTR_SUCC(result)) {
         char* dst = str->buff + str->count;
-        usize_t len = other->count;
+        usize_t cnt = other->count;
         const char* src = other->buff;
         // 复制内容
-        memcpy(dst, src, len);
-        str->count += len;
+        memcpy(dst, src, cnt);
+        str->count += cnt;
+        str->length += other->length;
     }
     return result;
 }
@@ -162,22 +205,36 @@ MSTR_EXPORT_API(mstr_result_t)
 mstr_concat_cstr(MString* str, const char* other)
 {
     MString lit;
-    // const MString不会被修改, 所以可强转一下
-    lit.buff = (char*)(iptr_t)other;
-    lit.count = (usize_t)strlen(other);
-    lit.cap_size = 0;
-    return mstr_concat(str, &lit);
+    usize_t content_len, content_cnt;
+    mstr_result_t res;
+    res = mstr_strlen(&content_len, &content_cnt, other, NULL);
+    if (MSTR_SUCC(res)) {
+        // const MString不会被修改, 所以可强转一下
+        lit.buff = (char*)(iptr_t)other;
+        lit.count = content_cnt;
+        lit.length = content_len;
+        lit.cap_size = 0;
+        res = mstr_concat(str, &lit);
+    }
+    return res;
 }
 
 MSTR_EXPORT_API(mstr_result_t)
 mstr_concat_cstr_slice(MString* str, const char* start, const char* end)
 {
     MString lit;
-    // const MString不会被修改, 所以可强转一下
-    lit.buff = (char*)(iptr_t)start;
-    lit.count = (usize_t)(end - start);
-    lit.cap_size = 0;
-    return mstr_concat(str, &lit);
+    usize_t content_len, content_cnt;
+    mstr_result_t res;
+    res = mstr_strlen(&content_len, &content_cnt, start, end);
+    if (MSTR_SUCC(res)) {
+        // const MString不会被修改, 所以可强转一下
+        lit.buff = (char*)(iptr_t)start;
+        lit.count = content_cnt;
+        lit.length = content_len;
+        lit.cap_size = 0;
+        res = mstr_concat(str, &lit);
+    }
+    return res;
 }
 
 MSTR_EXPORT_API(mstr_result_t) mstr_reverse_self(MString* str)
@@ -221,6 +278,38 @@ MSTR_EXPORT_API(bool_t) mstr_equal(const MString* a, const MString* b)
     }
 }
 
+MSTR_EXPORT_API(void) mstr_iter(MStringIter* it, const MString* str)
+{
+    it->it = str->buff;
+    it->it_end = str->buff + str->count;
+    it->rem_length = str->length;
+}
+
+MSTR_EXPORT_API(void) mstr_iter_mut(MStringIterMut* it, MString* str)
+{
+    it->it = str->buff;
+    it->it_end = str->buff + str->count;
+    it->rem_length = str->length;
+}
+
+MSTR_EXPORT_API(usize_t) mstr_char_length(char lead)
+{
+#if _MSTR_USE_UTF_8
+    // 构造的小欧拉图会帮忙计算utf-8编码的长度
+    const uint32_t map[8] = {1, 7, 2, 6, 0, 3, 4, 5};
+    uint8_t uch = (uint8_t)lead;
+    uint32_t v = (uint32_t)(uch ^ 0xff);
+    v |= v >> 1;
+    v |= v >> 2;
+    v |= v >> 4;
+    v += 1;
+    return map[((v * 232) >> 8) & 0x7];
+#else
+    (void)lead;
+    return 1;
+#endif // _MSTR_USE_UTF_8
+}
+
 MSTR_EXPORT_API(void) mstr_free(MString* str)
 {
     if (str->buff != NULL && str->buff != str->stack_region) {
@@ -231,6 +320,116 @@ MSTR_EXPORT_API(void) mstr_free(MString* str)
     str->count = 0;
     str->cap_size = 0;
 }
+
+/**
+ * @brief 计算字符串长度
+ *
+ * @param len: 字符长度
+ * @param count: 字符串占用的字节数
+ * @param str: 字符串
+ * @param str_end: 字符串结束, 为NULL表示'\0'自己算
+ */
+static mstr_result_t mstr_strlen(
+    usize_t* len,
+    usize_t* count,
+    const mstr_char_t* str,
+    const mstr_char_t* str_end
+)
+{
+    usize_t len_val = 0, count_val = 0;
+    if (str_end == NULL) {
+        // 给一个大大的值让str < str_end恒为true
+        str_end = (const mstr_char_t*)(uptr_t)(-1);
+    }
+    while (*str && str < str_end) {
+        usize_t cnt = mstr_char_length(*str);
+        count_val += cnt;
+        len_val += 1;
+        str += cnt;
+    }
+    *len = len_val;
+    *count = count_val;
+    if (str > str_end) {
+        // 正常情况应该刚好相等
+        // 不然说明原字符串不完整
+        return MStr_Err_UnicodeEncodingNotCompleted;
+    }
+    else {
+        return MStr_Ok;
+    }
+}
+
+#if _MSTR_USE_UTF_8
+/**
+ * @brief 取得lead字符ch[0]所跟着的内容的unicode代码点值
+ *
+ * @param[in] ch: 字符串
+ * @param[in] byte_count: 字符的字节数
+ *
+ */
+static mstr_result_t mstr_codepoint_of(
+    mstr_codepoint_t* code, const mstr_char_t* ch, usize_t byte_count
+)
+{
+    uint32_t val = 0;
+    mstr_result_t res;
+    uint8_t lead_char = (uint8_t)ch[0];
+    if (lead_char <= 0x7f) {
+        // 0xxxxxxx, 1bytes
+        if (byte_count >= 1) {
+            val |= (uint32_t)(ch[0] & 0x7f);
+            res = MStr_Ok;
+        }
+        else {
+            res = MStr_Err_UnicodeEncodingNotCompleted;
+        }
+    }
+    else if (lead_char <= 0xdf) {
+        // 110xxxxx 10xxxxxx, 2bytes
+        if (byte_count >= 2) {
+            val |= (uint32_t)(ch[1]) & 0x3f;
+            val |= ((uint32_t)(ch[0]) & 0x1f) << 6;
+            res = MStr_Ok;
+        }
+        else {
+            res = MStr_Err_UnicodeEncodingNotCompleted;
+        }
+    }
+    else if (lead_char <= 0xef) {
+        // 1110xxxx 10xxxxxx 10xxxxxx, 3bytes
+        if (byte_count >= 3) {
+            val |= (uint32_t)(ch[2]) & 0x3f;
+            val |= ((uint32_t)(ch[1]) & 0x3f) << 6;
+            val |= ((uint32_t)(ch[0]) & 0x0f) << (6 + 6);
+            res = MStr_Ok;
+        }
+        else {
+            res = MStr_Err_UnicodeEncodingNotCompleted;
+        }
+    }
+    else if (lead_char <= 0xf7) {
+        // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx, 4 bytes
+        if (byte_count >= 4) {
+            val |= (uint32_t)(ch[3]) & 0x3f;
+            val |= ((uint32_t)(ch[2]) & 0x3f) << 6;
+            val |= ((uint32_t)(ch[1]) & 0x3f) << (6 + 6);
+            val |= ((uint32_t)(ch[0]) & 0x07) << (6 + 6 + 6);
+            res = MStr_Ok;
+        }
+        else {
+            res = MStr_Err_UnicodeEncodingNotCompleted;
+        }
+    }
+    else {
+        // 再长的就不处理了 (￣▽￣)"
+        res = MStr_Err_UnicodeEncodingError;
+    }
+    if (MSTR_SUCC(res)) {
+        *code = val;
+    }
+    return res;
+}
+#endif // _MSTR_USE_UTF_8
 
 /**
  * @brief 扩展str的size
