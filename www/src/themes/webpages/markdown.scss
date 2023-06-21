@@ -123,6 +123,7 @@
         }
 
         p:first-child {
+            text-indent: initial;
             text-align: center;
             font-weight: 500;
             color: var(--quote-caption-color);
