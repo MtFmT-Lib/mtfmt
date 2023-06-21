@@ -80,7 +80,7 @@ mstr_iovformat(
     // 写到输出
     MSTR_AND_THEN(
         res,
-        io->io_write(io->capture, (const byte_t*)buff.buff, buff.length)
+        io->io_write(io->capture, (const byte_t*)buff.buff, buff.count)
     );
     // 释放
     if (MSTR_SUCC(res_create)) {

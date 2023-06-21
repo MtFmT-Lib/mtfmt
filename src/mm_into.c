@@ -168,7 +168,9 @@ static mstr_result_t utoa_impl_10base(MString* str, uint32_t value)
             }
         }
         // 翻转转换结果
-        MSTR_AND_THEN(result, mstr_reverse_self(str));
+        if (MSTR_SUCC(result)) {
+            mstr_reverse_self(str);
+        }
     }
     return result;
 }
@@ -209,7 +211,9 @@ static mstr_result_t utoa_impl_2base(
             }
         }
         // 翻转转换结果
-        MSTR_AND_THEN(result, mstr_reverse_self(str));
+        if (MSTR_SUCC(result)) {
+            mstr_reverse_self(str);
+        }
     }
     return result;
 }
@@ -315,7 +319,9 @@ static mstr_result_t uqtoa_helper_dpart(
             }
         }
         // 翻转结果
-        MSTR_AND_THEN(result, mstr_reverse_self(&buff));
+        if (MSTR_SUCC(result)) {
+            mstr_reverse_self(&buff);
+        }
     }
     // copy到输出
     MSTR_AND_THEN(result, mstr_concat(str, &buff));

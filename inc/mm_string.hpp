@@ -32,6 +32,13 @@ class string final
 
 public:
     using char_t = char;
+    using value_t = char_t;
+    using pointer = value_t*;
+    using const_pointer = const value_t*;
+    using reference = value_t&;
+    using const_reference = const value_t&;
+    using size_type = size_t;
+    using difference_type = ptrdiff_t;
 
     /**
      * @brief 创建空的字符串
@@ -268,7 +275,7 @@ public:
      */
     std::string as_std_string()
     {
-        return std::string(this_obj.buff, this_obj.length);
+        return std::string(this_obj.buff, this_obj.count);
     }
 
     /**

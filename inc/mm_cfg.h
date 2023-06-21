@@ -181,16 +181,32 @@
  * @brief 标记不可达的分支
  *
  */
-#define mstr_unreachable() assert_param(0)
+#define mstr_unreachable()        assert_param(0)
+/**
+ * @brief 边界检查
+ *
+ */
+#define mstr_bounding_check(expr) assert_param(!!(expr))
 #elif defined(_MSTR_RUNTIME_ASSERT)
 #include <assert.h>
-#define mstr_unreachable() assert(0)
+#define mstr_unreachable()        assert(0)
+#define mstr_bounding_check(expr) assert(!!(expr))
 #else
-#define mstr_unreachable() ((void)0U)
+#define mstr_unreachable()        ((void)0U)
+#define mstr_bounding_check(expr) ((void)0U)
 #endif
 #else
-#define mstr_unreachable() ((void)0U)
+#define mstr_unreachable()        ((void)0U)
+#define mstr_bounding_check(expr) ((void)0U)
 #endif // _MSTR_RUNTIME_CTRLFLOW_MARKER
+
+#if !defined(_MSTR_USE_UTF_8)
+/**
+ * @brief 指定是否启用UTF-8支持
+ *
+ */
+#define _MSTR_USE_UTF_8 1
+#endif // _MSTR_USE_UTF_8
 
 //
 // 导出函数修辞
@@ -244,6 +260,12 @@
  *
  */
 #define MSTRCFG_USE_STD_IO         0x08
+
+/**
+ * @brief 标记是否使用了UTF-8
+ *
+ */
+#define MSTRCFG_USE_UTF_8          0x10
 
 /**
  * @brief 取得库版本信息
