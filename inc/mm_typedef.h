@@ -50,6 +50,12 @@ enum
 };
 
 /**
+ * @brief unicode代码点
+ *
+ */
+typedef uint32_t mstr_codepoint_t;
+
+/**
  * @brief RTC时间
  *
  */

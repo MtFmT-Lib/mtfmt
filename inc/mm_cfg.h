@@ -192,6 +192,14 @@
 #define mstr_unreachable() ((void)0U)
 #endif // _MSTR_RUNTIME_CTRLFLOW_MARKER
 
+#if !defined(_MSTR_USE_UTF_8)
+/**
+ * @brief 指定是否启用UTF-8支持
+ *
+ */
+#define _MSTR_USE_UTF_8 1
+#endif // _MSTR_USE_UTF_8
+
 //
 // 导出函数修辞
 //

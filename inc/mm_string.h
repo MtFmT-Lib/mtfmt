@@ -36,13 +36,19 @@ typedef struct tagMString
     char stack_region[MSTR_STACK_REGION_SIZE];
 
     /**
+     * @brief 字符串的字节长度
+     *
+     */
+    usize_t count;
+
+    /**
      * @brief 字符串长度
      *
      */
     usize_t length;
 
     /**
-     * @brief 已经分配了的内存大小, cap_size >= length + 1
+     * @brief 已经分配了的内存大小, cap_size >= count + 1
      *
      */
     usize_t cap_size;

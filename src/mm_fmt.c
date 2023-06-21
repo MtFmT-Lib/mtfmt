@@ -436,7 +436,7 @@ static mstr_result_t copy_to_output(
         return mstr_concat(out_str, src_str);
     }
     // 计算宽度够不够
-    src_len = src_str->length;
+    src_len = src_str->count;
     need_width = (usize_t)fmt_spec->width;
     if (src_len >= need_width) {
         // 宽度太宽, 不管对齐了

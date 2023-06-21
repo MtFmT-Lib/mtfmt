@@ -42,13 +42,14 @@ mstr_create(MString* str, const char* content)
                               (usize_t)strlen(content);
     if (content_len == 0) {
         str->buff = str->stack_region;
+        str->count = 0;
         str->length = 0;
         str->cap_size = MSTR_STACK_REGION_SIZE;
         return MStr_Ok;
     }
     else if (content_len < MSTR_STACK_REGION_SIZE) {
         str->buff = str->stack_region;
-        str->length = content_len;
+        str->count = content_len;
         str->cap_size = MSTR_STACK_REGION_SIZE;
         strcpy(str->buff, content);
         return MStr_Ok;
@@ -60,7 +61,7 @@ mstr_create(MString* str, const char* content)
             // 内存分配失败
             return MStr_Err_HeapTooSmall;
         }
-        str->length = content_len;
+        str->count = content_len;
         strcpy(str->buff, content);
         return MStr_Ok;
     }
@@ -71,18 +72,18 @@ mstr_move_create(MString* str, MString* other)
 {
     if (other->buff == other->stack_region) {
         str->buff = str->stack_region;
-        str->length = other->length;
+        str->count = other->count;
         str->cap_size = MSTR_STACK_REGION_SIZE;
         // 复制stack上的内容
-        memcpy(str->buff, other->buff, other->length);
+        memcpy(str->buff, other->buff, other->count);
     }
     else {
         str->buff = other->buff;
-        str->length = other->length;
+        str->count = other->count;
         str->cap_size = other->cap_size;
     }
     other->buff = NULL;
-    other->length = 0;
+    other->count = 0;
     other->cap_size = 0;
 }
 
@@ -97,7 +98,7 @@ mstr_copy_create(MString* str, const MString* other)
 
 MSTR_EXPORT_API(void) mstr_clear(MString* str)
 {
-    str->length = 0;
+    str->count = 0;
 }
 
 MSTR_EXPORT_API(mstr_result_t) mstr_append(MString* str, char ch)
@@ -113,7 +114,7 @@ mstr_repeat_append(MString* str, char ch, usize_t cnt)
     }
     else {
         mstr_result_t result = MStr_Ok;
-        if (str->length + cnt + 1 >= str->cap_size) {
+        if (str->count + cnt + 1 >= str->cap_size) {
             // 保证length < cap_size + 1
             // 且有足够的空间存放下一个字符
             MSTR_AND_THEN(
@@ -125,9 +126,9 @@ mstr_repeat_append(MString* str, char ch, usize_t cnt)
         }
         if (MSTR_SUCC(result)) {
             for (usize_t i = 0; i < cnt; i += 1) {
-                str->buff[str->length + i] = ch;
+                str->buff[str->count + i] = ch;
             }
-            str->length += cnt;
+            str->count += cnt;
         }
         return result;
     }
@@ -137,22 +138,22 @@ MSTR_EXPORT_API(mstr_result_t)
 mstr_concat(MString* str, const MString* other)
 {
     mstr_result_t result = MStr_Ok;
-    if (str->length + other->length >= str->cap_size) {
+    if (str->count + other->count >= str->cap_size) {
         // 且有足够的空间存放
         MSTR_AND_THEN(
             result,
             mstr_expand_size(
-                str, str->cap_size + other->length + MSTR_CAP_SIZE_STEP
+                str, str->cap_size + other->count + MSTR_CAP_SIZE_STEP
             )
         );
     }
     if (MSTR_SUCC(result)) {
-        char* dst = str->buff + str->length;
-        usize_t len = other->length;
+        char* dst = str->buff + str->count;
+        usize_t len = other->count;
         const char* src = other->buff;
         // 复制内容
         memcpy(dst, src, len);
-        str->length += len;
+        str->count += len;
     }
     return result;
 }
@@ -163,7 +164,7 @@ mstr_concat_cstr(MString* str, const char* other)
     MString lit;
     // const MString不会被修改, 所以可强转一下
     lit.buff = (char*)(iptr_t)other;
-    lit.length = (usize_t)strlen(other);
+    lit.count = (usize_t)strlen(other);
     lit.cap_size = 0;
     return mstr_concat(str, &lit);
 }
@@ -174,14 +175,14 @@ mstr_concat_cstr_slice(MString* str, const char* start, const char* end)
     MString lit;
     // const MString不会被修改, 所以可强转一下
     lit.buff = (char*)(iptr_t)start;
-    lit.length = (usize_t)(end - start);
+    lit.count = (usize_t)(end - start);
     lit.cap_size = 0;
     return mstr_concat(str, &lit);
 }
 
 MSTR_EXPORT_API(mstr_result_t) mstr_reverse_self(MString* str)
 {
-    char* pend = str->buff + str->length - 1;
+    char* pend = str->buff + str->count - 1;
     char* pbeg = str->buff;
     while (pbeg < pend) {
         char v = *pend;
@@ -198,18 +199,18 @@ MSTR_EXPORT_API(const char*) mstr_as_cstr(MString* str)
 {
     // 在length的地方补上0
     // 因为cap_size至少比length大1, 因此不需要担心内存问题
-    str->buff[str->length] = 0;
+    str->buff[str->count] = 0;
     return str->buff;
 }
 
 MSTR_EXPORT_API(bool_t) mstr_equal(const MString* a, const MString* b)
 {
-    if (a->length != b->length) {
+    if (a->count != b->count) {
         return False;
     }
     else {
         uint32_t bit = 0;
-        usize_t len = a->length;
+        usize_t len = a->count;
         for (usize_t i = 0; i < len; i += 1) {
             uint32_t ch_a = a->buff[i];
             uint32_t ch_b = b->buff[i];
@@ -227,7 +228,7 @@ MSTR_EXPORT_API(void) mstr_free(MString* str)
     }
     // else: stack上分配的, 不用管它
     str->buff = NULL;
-    str->length = 0;
+    str->count = 0;
     str->cap_size = 0;
 }
 
@@ -247,7 +248,7 @@ static mstr_result_t mstr_expand_size(MString* str, usize_t new_size)
         char* new_ptr = (char*)mstr_realloc(
             str->buff,
             str->buff == str->stack_region,
-            str->length,
+            str->count,
             new_size
         );
         if (new_ptr == NULL) {

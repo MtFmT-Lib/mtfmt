@@ -268,7 +268,7 @@ public:
      */
     std::string as_std_string()
     {
-        return std::string(this_obj.buff, this_obj.length);
+        return std::string(this_obj.buff, this_obj.count);
     }
 
     /**
