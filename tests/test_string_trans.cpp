@@ -30,6 +30,12 @@ extern "C" void string_trans_clear(void)
 
 extern "C" void string_trans_reverse(void)
 {
+    MString src;
+    EVAL(mstr_create(&src, u8"😀😊"));
+    ASSERT_EQUAL_STRING(&src, u8"😀😊");
+    mstr_reverse_self(&src);
+    ASSERT_EQUAL_STRING(&src, u8"😊😀");
+    mstr_free(&src);
 }
 
 extern "C" void string_trans_reverse_unicode(void)
