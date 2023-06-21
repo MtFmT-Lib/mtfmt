@@ -307,13 +307,17 @@ MSTR_EXPORT_API(void) mstr_reverse_self(MString* str)
             //      /|\  /|\ 2个byte长度
             //       p1   p2
             // 交给proc_2以一样的方式交换p1和p2即可
-            ch = *p1, *p1++ = *--p2, *p2 = ch;
+            ch = *p1;
+            *p1++ = *--p2;
+            *p2 = ch;
             goto proc_2;
         proc_3:
             // str[1]和str[1]不需要交换
             goto proc_2;
         proc_2:
-            ch = *p1, *p1++ = *--p2, *p2 = ch;
+            ch = *p1;
+            *p1++ = *--p2;
+            *p2 = ch;
             goto end;
         end:
             p1 = t;
