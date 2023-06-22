@@ -9,11 +9,18 @@
  * @copyright Copyright (c) 向阳, all rights reserved.
  *
  */
+#include "helper.h"
 #include "main.h"
 #include "mtfmt.hpp"
 #include "unity.h"
 #include <stddef.h>
 #include <stdio.h>
+
+template <std::size_t N>
+constexpr mtfmt::unicode_t unicode_char(const char (&u8char)[N])
+{
+    return mtfmt::string::unicode_char(u8char);
+}
 
 extern "C" void cpp_string_equal(void)
 {
@@ -42,13 +49,19 @@ extern "C" void cpp_string_not_equal(void)
 extern "C" void cpp_string_push(void)
 {
     mtfmt::string str;
-    TEST_ASSERT_TRUE(str == "");
+    ASSERT_EQUAL_VALUE(str, "");
     // 'M'
     str.push('M');
-    TEST_ASSERT_TRUE(str == "M");
+    ASSERT_EQUAL_VALUE(str, "M");
     // '@' * 7
     str.push('@', 7);
-    TEST_ASSERT_TRUE(str == "M@@@@@@@");
+    ASSERT_EQUAL_VALUE(str, "M@@@@@@@");
+    // emoji
+    str.push(unicode_char(u8"😊"));
+    ASSERT_EQUAL_VALUE(str, "M@@@@@@@😊");
+    // '😀' * 3
+    str.push(unicode_char(u8"😀"), 3);
+    ASSERT_EQUAL_VALUE(str, "M@@@@@@@😊😀😀😀");
 }
 
 extern "C" void cpp_string_concat(void)
@@ -61,4 +74,41 @@ extern "C" void cpp_string_concat(void)
     // 'mt''
     str += "mt";
     TEST_ASSERT_TRUE(str == "MtFmt");
+}
+
+extern "C" void cpp_string_index(void)
+{
+    mtfmt::string str = u8"😊😀汉字";
+    ASSERT_EQUAL_VALUE(str[0], unicode_char(u8"😊"));
+    ASSERT_EQUAL_VALUE(str[1], unicode_char(u8"😀"));
+    ASSERT_EQUAL_VALUE(str[2], unicode_char(u8"汉"));
+    ASSERT_EQUAL_VALUE(str[3], unicode_char(u8"字"));
+}
+
+extern "C" void cpp_string_iterator(void)
+{
+    mtfmt::string str = u8"😊😀汉字";
+    mtfmt::string str_output;
+    for (auto ch : str) {
+        str_output.push(ch);
+    }
+    ASSERT_EQUAL_VALUE(str, str_output);
+}
+
+extern "C" void cpp_string_const_iterator(void)
+{
+    const mtfmt::string str = u8"😊😀汉字";
+    mtfmt::string str_output;
+    for (auto ch : str) {
+        str_output.push(ch);
+    }
+    ASSERT_EQUAL_VALUE(str, str_output);
+}
+
+extern "C" void cpp_string_reverse_iterator(void)
+{
+}
+
+extern "C" void cpp_string_reverse_const_iterator(void)
+{
 }

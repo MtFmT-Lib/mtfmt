@@ -254,6 +254,17 @@ MSTR_EXPORT_API(void) mstr_iter(MStringIter* it, const MString* str);
 MSTR_EXPORT_API(void) mstr_iter_mut(MStringIterMut* it, MString* str);
 
 /**
+ * @brief 移动到下一个位置
+ *
+ */
+#define mstr_iter_move_next(it)                      \
+    do {                                             \
+        usize_t step = mstr_char_length(*((it).it)); \
+        (it).it += step;                             \
+        (it).rem_leng -= 1;                          \
+    } while (0)
+
+/**
  * @brief 判断迭代器是否已到末尾
  *
  */
@@ -267,6 +278,32 @@ MSTR_EXPORT_API(void) mstr_iter_mut(MStringIterMut* it, MString* str);
  *
  */
 MSTR_EXPORT_API(usize_t) mstr_char_length(char lead);
+
+/**
+ * @brief 转换为UTF-8
+ *
+ * @param code: 字符代码点
+ * @param result: 转换输出, 至少要有6个bytes
+ * @param result_len: 转换输出的有效长度
+ *
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_as_utf8(
+    mstr_codepoint_t code, mstr_char_t* result, usize_t* result_len
+);
+
+/**
+ * @brief 取得lead字符ch[0]所跟着的内容的unicode代码点值
+ *
+ * @param[out] code: 解码结果
+ * @param[in] ch: 字符串
+ * @param[in] byte_count: 字符的字节数
+ *
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_codepoint_of(
+    mstr_codepoint_t* code, const mstr_char_t* ch, usize_t byte_count
+);
 
 /**
  * @brief 释放一个字符串所占的内存

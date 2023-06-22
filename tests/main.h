@@ -39,6 +39,11 @@ extern "C"
     void cpp_string_not_equal(void);
     void cpp_string_push(void);
     void cpp_string_concat(void);
+    void cpp_string_index(void);
+    void cpp_string_iterator(void);
+    void cpp_string_const_iterator(void);
+    void cpp_string_reverse_iterator(void);
+    void cpp_string_reverse_const_iterator(void);
 
     void fmt_align_left(void);
     void fmt_align_left_fill(void);

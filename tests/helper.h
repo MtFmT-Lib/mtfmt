@@ -26,6 +26,17 @@
     } while (0)
 
 /**
+ * @brief 确定两个值不相等
+ *
+ */
+#define ASSERT_NOTEQUAL_VALUE(val1, val2)        \
+    do {                                         \
+        TEST_ASSERT_TRUE_MESSAGE(                \
+            (val1) != (val2), #val1 " == " #val2 \
+        );                                       \
+    } while (0)
+
+/**
  * @brief 确定2个字符串相等
  *
  */

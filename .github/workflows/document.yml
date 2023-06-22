@@ -2,6 +2,7 @@ name: Document
 
 on:
   push:
+    branches: [master]
     paths:
       - "src/**.c"
       - "inc/**.h"
