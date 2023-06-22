@@ -30,12 +30,6 @@ static void* mstr_realloc(void*, bool_t, usize_t, usize_t);
 static mstr_result_t mstr_expand_size(MString*, usize_t);
 static mstr_result_t
     mstr_strlen(usize_t*, usize_t*, const mstr_char_t*, const mstr_char_t*);
-#if _MSTR_USE_UTF_8
-static mstr_result_t mstr_as_utf8(mstr_codepoint_t, char*, usize_t*);
-static mstr_result_t mstr_codepoint_of(
-    mstr_codepoint_t*, const mstr_char_t*, usize_t
-);
-#endif // _MSTR_USE_UTF_8
 
 //
 // public:
@@ -385,76 +379,10 @@ MSTR_EXPORT_API(usize_t) mstr_char_length(char lead)
 #endif // _MSTR_USE_UTF_8
 }
 
-MSTR_EXPORT_API(void) mstr_free(MString* str)
-{
-    if (str->buff != NULL && str->buff != str->stack_region) {
-        mstr_heap_free(str->buff);
-    }
-    // else: stack上分配的, 不用管它
-    str->buff = NULL;
-    str->count = 0;
-    str->cap_size = 0;
-}
-
-/**
- * @brief 计算字符串长度
- *
- * @param len: 字符长度
- * @param count: 字符串占用的字节数
- * @param str: 字符串
- * @param str_end: 字符串结束, 为NULL表示'\0'自己算
- */
-static mstr_result_t mstr_strlen(
-    usize_t* len,
-    usize_t* count,
-    const mstr_char_t* str,
-    const mstr_char_t* str_end
-)
-{
-    usize_t len_val = 0, count_val = 0;
-    if (str_end == NULL) {
-        // 给一个大大的值让str < str_end恒为true
-        str_end = (const mstr_char_t*)(uptr_t)(-1);
-    }
 #if _MSTR_USE_UTF_8
-    while (*str && str < str_end) {
-        usize_t cnt = mstr_char_length(*str);
-        count_val += cnt;
-        len_val += 1;
-        str += cnt;
-    }
-    *len = len_val;
-    *count = count_val;
-    if (str > str_end) {
-        // 正常情况应该刚好相等
-        // 不然说明原字符串不完整
-        return MStr_Err_UnicodeEncodingNotCompleted;
-    }
-    else {
-        return MStr_Ok;
-    }
-#else
-    while (*str && str < str_end) {
-        count_val += 1;
-        len_val += 1;
-        str += 1;
-    }
-    *len = len_val;
-    *count = count_val;
-    return MStr_Ok;
-#endif // _MSTR_USE_UTF_8
-}
 
-#if _MSTR_USE_UTF_8
-/**
- * @brief 转换为UTF-8
- *
- * @param code: 字符代码点
- * @param result: 转换输出, 至少要有6个bytes
- * @param result_len: 转换输出的有效长度
- *
- */
-static mstr_result_t mstr_as_utf8(
+MSTR_EXPORT_API(mstr_result_t)
+mstr_as_utf8(
     mstr_codepoint_t code, mstr_char_t* result, usize_t* result_len
 )
 {
@@ -494,14 +422,8 @@ static mstr_result_t mstr_as_utf8(
     }
 }
 
-/**
- * @brief 取得lead字符ch[0]所跟着的内容的unicode代码点值
- *
- * @param[in] ch: 字符串
- * @param[in] byte_count: 字符的字节数
- *
- */
-static mstr_result_t mstr_codepoint_of(
+MSTR_EXPORT_API(mstr_result_t)
+mstr_codepoint_of(
     mstr_codepoint_t* code, const mstr_char_t* ch, usize_t byte_count
 )
 {
@@ -563,7 +485,81 @@ static mstr_result_t mstr_codepoint_of(
     }
     return res;
 }
+
+#else
+
+MSTR_EXPORT_API(mstr_result_t)
+mstr_as_utf8(mstr_codepoint_t, mstr_char_t*, usize_t*)
+{
+    return MStr_Err_NoImplemention;
+}
+
+MSTR_EXPORT_API(mstr_result_t)
+mstr_codepoint_of(mstr_codepoint_t*, const mstr_char_t*, usize_t)
+{
+    return MStr_Err_NoImplemention;
+}
 #endif // _MSTR_USE_UTF_8
+
+MSTR_EXPORT_API(void) mstr_free(MString* str)
+{
+    if (str->buff != NULL && str->buff != str->stack_region) {
+        mstr_heap_free(str->buff);
+    }
+    // else: stack上分配的, 不用管它
+    str->buff = NULL;
+    str->count = 0;
+    str->cap_size = 0;
+}
+
+/**
+ * @brief 计算字符串长度
+ *
+ * @param len: 字符长度
+ * @param count: 字符串占用的字节数
+ * @param str: 字符串
+ * @param str_end: 字符串结束, 为NULL表示'\0'自己算
+ */
+static mstr_result_t mstr_strlen(
+    usize_t* len,
+    usize_t* count,
+    const mstr_char_t* str,
+    const mstr_char_t* str_end
+)
+{
+    usize_t len_val = 0, count_val = 0;
+    if (str_end == NULL) {
+        // 给一个大大的值让str < str_end恒为true
+        str_end = (const mstr_char_t*)(uptr_t)(-1);
+    }
+#if _MSTR_USE_UTF_8
+    while (*str && str < str_end) {
+        usize_t cnt = mstr_char_length(*str);
+        count_val += cnt;
+        len_val += 1;
+        str += cnt;
+    }
+    *len = len_val;
+    *count = count_val;
+    if (str > str_end) {
+        // 正常情况应该刚好相等
+        // 不然说明原字符串不完整
+        return MStr_Err_UnicodeEncodingNotCompleted;
+    }
+    else {
+        return MStr_Ok;
+    }
+#else
+    while (*str && str < str_end) {
+        count_val += 1;
+        len_val += 1;
+        str += 1;
+    }
+    *len = len_val;
+    *count = count_val;
+    return MStr_Ok;
+#endif // _MSTR_USE_UTF_8
+}
 
 /**
  * @brief 扩展str的size
