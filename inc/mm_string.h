@@ -22,6 +22,93 @@
 #define MSTR_STACK_REGION_SIZE 16
 
 /**
+ * @brief 字符串替换选项
+ *
+ */
+typedef enum tagMStringReplaceOption
+{
+    /**
+     * @brief 仅替换开始位置
+     *
+     */
+    MStringReplaceOption_StartWith,
+
+    /**
+     * @brief 仅替换末尾位置
+     *
+     */
+    MStringReplaceOption_EndWith,
+
+    /**
+     * @brief 全部替换
+     *
+     */
+    MStringReplaceOption_All,
+} MStringReplaceOption;
+
+/**
+ * @brief 字符串替换信息
+ *
+ */
+typedef struct tagMStringReplaceTarget
+{
+    /**
+     * @brief 替换选项
+     *
+     */
+    MStringReplaceOption opt;
+
+    /**
+     * @brief 模式串
+     *
+     */
+    const char* substr;
+
+    /**
+     * @brief 模式串长度
+     *
+     */
+    usize_t substr_len;
+
+    /**
+     * @brief 替换为的目标字串
+     *
+     */
+    const char* replace_to;
+
+    /**
+     * @brief 目标串长度
+     *
+     */
+    usize_t replace_to_len;
+} MStringReplaceTarget;
+
+/**
+ * @brief 字符串匹配信息
+ *
+ */
+typedef struct tagMStringSubStrResult
+{
+    /**
+     * @brief 是否找到了目标
+     *
+     */
+    usize_t is_matched;
+
+    /**
+     * @brief 目标位置
+     *
+     */
+    usize_t begin_offset;
+
+    /**
+     * @brief 目标长度
+     *
+     */
+    usize_t substr_len;
+} MStringSubStrResult;
+
+/**
  * @brief 字符串
  *
  */
@@ -235,6 +322,81 @@ MSTR_EXPORT_API(const char*) mstr_as_cstr(MString* str);
  * @return bool_t: 字符串相等情况
  */
 MSTR_EXPORT_API(bool_t) mstr_equal(const MString* a, const MString* b);
+
+/**
+ * @brief 从字符串中移除idx位置的字符
+ *
+ * @param[inout] str: 字符串
+ * @param[out] remoed_ch: 被移除的字符, 可以为NULL
+ * @param[in] idx: 需要移除的字符,位置
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_remove(MString* str, mstr_codepoint_t* removed_ch, usize_t idx);
+
+/**
+ * @brief 从字符串中idx位置插入一个字符
+ *
+ * @param[inout] str: 字符串
+ * @param[in] ch: 需要插入的字符
+ * @param[in] idx: 需要移除的字符,位置
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_insert(MString* str, mstr_codepoint_t ch, usize_t idx);
+
+/**
+ * @brief 查找子串第一次出现的位置
+ *
+ * @param[in] str: 字符串a
+ * @param[out] res: 查找结果
+ * @param[in] pattern: 需要查找的子串
+ * @param[in] pattern_size: 子串长度, 留0表示处理到 pattern 的 '\0'
+ *
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_find(
+    const MString* str,
+    MStringSubStrResult* res,
+    const char* pattern,
+    usize_t pattern_size
+);
+
+/**
+ * @brief 从字符串中移除所有匹配substr的字符
+ *
+ * @param[inout] str: 字符串
+ * @param[in] substr: 需要移除的substr
+ * @param[in] substr_len: substr长度, 留0使用strlen(substr)
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_retain(MString* str, const char* substr, usize_t substr_len);
+
+/**
+ * @brief 进行字符串替换
+ *
+ * @param[inout] str: 字符串
+ * @param[in] target: 需要替换的目标
+ * @param[in] target_cnt: 需要替换的目标个数
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_replace(
+    MString* str, const MStringReplaceTarget* target, usize_t target_cnt
+);
+
+/**
+ * @brief 设置替换的目标
+ *
+ * @param[out] rep: 替换目标的结构
+ * @param[in] opt: 替换选项
+ * @param[in] patt: 模式串
+ * @param[in] target: 替换为的目标
+ */
+MSTR_EXPORT_API(void)
+mstr_replace_set_target(
+    MStringReplaceTarget* rep,
+    MStringReplaceOption opt,
+    const char* patt,
+    const char* target
+);
 
 /**
  * @brief 取得迭代器

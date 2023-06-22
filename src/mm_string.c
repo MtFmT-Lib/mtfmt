@@ -347,6 +347,18 @@ MSTR_EXPORT_API(bool_t) mstr_equal(const MString* a, const MString* b)
     }
 }
 
+MSTR_EXPORT_API(mstr_result_t)
+mstr_remove(MString* str, mstr_codepoint_t* removed_ch, usize_t idx)
+{
+    return MStr_Err_NoImplemention;
+}
+
+MSTR_EXPORT_API(mstr_result_t)
+mstr_insert(MString* str, mstr_codepoint_t ch, usize_t idx)
+{
+    return MStr_Err_NoImplemention;
+}
+
 MSTR_EXPORT_API(void) mstr_iter(MStringIter* it, const MString* str)
 {
     it->it = str->buff;
