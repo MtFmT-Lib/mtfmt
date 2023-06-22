@@ -2,6 +2,7 @@ name: "Build CMSIS pack"
 
 on:
   push:
+    branches: [master]
     paths:
       - "src/**.c"
       - "inc/**.h"
