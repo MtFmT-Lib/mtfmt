@@ -16,6 +16,7 @@
 #include "mm_string.h"
 #include <array>
 #include <cstddef>
+#include <iterator>
 #include <string>
 namespace mtfmt
 {
@@ -82,6 +83,153 @@ constexpr typename std::enable_if<N <= 2, unicode_t>::type unicode_char(
     return u8char[0];
 }
 
+/**
+ * @brief 字符串迭代器
+ *
+ */
+class string_iterator
+{
+    /**
+     * @brief 位置
+     *
+     */
+    const char* it;
+
+    /**
+     * @brief 剩余的长度
+     *
+     */
+    usize_t rem_length;
+
+public:
+    using value_type = unicode_t;
+    using pointer = const value_type*;
+    using reference = const value_type&;
+    using difference_type = iptr_t;
+    using iterator_category = std::forward_iterator_tag;
+
+    string_iterator(const mstr_char_t* buff, usize_t leng)
+    {
+        it = buff;
+        rem_length = leng;
+    }
+
+    string_iterator(string_iterator&&) = default;
+    string_iterator(const string_iterator&) = default;
+    string_iterator& operator=(string_iterator&&) = default;
+    string_iterator& operator=(const string_iterator&) = default;
+
+    value_type operator*() const
+    {
+        usize_t len = mstr_char_length(*it);
+        mstr_codepoint_t code;
+        mstr_result_t res = mstr_codepoint_of(&code, it, len);
+        if (MSTR_FAILED(res)) {
+            throw mtfmt_error(MStr_Err_UnicodeEncodingError);
+        }
+        return code;
+    }
+
+    string_iterator& operator++()
+    {
+        usize_t len = mstr_char_length(*it);
+        it += len;
+        rem_length -= 1;
+        return *this;
+    }
+
+    string_iterator operator++(int)
+    {
+        string_iterator tmp = *this;
+        ++*this;
+        return tmp;
+    }
+
+    bool operator==(const string_iterator& rhs) const noexcept
+    {
+        return it == rhs.it;
+    }
+
+    bool operator!=(const string_iterator& rhs) const noexcept
+    {
+        return it != rhs.it;
+    }
+};
+
+/**
+ * @brief 字符串迭代器(mut)
+ *
+ */
+class string_iterator_mut
+{
+    /**
+     * @brief 位置
+     *
+     */
+    char* it;
+
+    /**
+     * @brief 剩余的长度
+     *
+     */
+    usize_t rem_length;
+
+public:
+    using value_type = unicode_t;
+    using pointer = value_type*;
+    using reference = value_type&;
+    using difference_type = iptr_t;
+    using iterator_category = std::forward_iterator_tag;
+
+    string_iterator_mut(mstr_char_t* buff, usize_t leng)
+    {
+        it = buff;
+        rem_length = leng;
+    }
+
+    string_iterator_mut(string_iterator_mut&&) = default;
+    string_iterator_mut(const string_iterator_mut&) = default;
+    string_iterator_mut& operator=(string_iterator_mut&&) = default;
+    string_iterator_mut& operator=(const string_iterator_mut&) =
+        default;
+
+    value_type operator*() const
+    {
+        usize_t len = mstr_char_length(*it);
+        mstr_codepoint_t code;
+        mstr_result_t res = mstr_codepoint_of(&code, it, len);
+        if (MSTR_FAILED(res)) {
+            throw mtfmt_error(MStr_Err_UnicodeEncodingError);
+        }
+        return code;
+    }
+
+    string_iterator_mut& operator++()
+    {
+        usize_t len = mstr_char_length(*it);
+        it += len;
+        rem_length -= 1;
+        return *this;
+    }
+
+    string_iterator_mut operator++(int)
+    {
+        string_iterator_mut tmp = *this;
+        ++*this;
+        return tmp;
+    }
+
+    bool operator==(const string_iterator_mut& rhs) const noexcept
+    {
+        return it == rhs.it;
+    }
+
+    bool operator!=(const string_iterator_mut& rhs) const noexcept
+    {
+        return it != rhs.it;
+    }
+};
+
 } // namespace details
 
 /**
@@ -104,7 +252,11 @@ public:
     using const_reference = const value_t&;
     using size_type = size_t;
     using difference_type = ptrdiff_t;
-
+    using iterator = details::string_iterator_mut;
+    using const_iterator = details::string_iterator;
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator =
+        std::reverse_iterator<const_iterator>;
     /**
      * @brief 创建空的字符串
      *
@@ -366,6 +518,42 @@ public:
     std::string as_std_string()
     {
         return std::string(this_obj.buff, this_obj.count);
+    }
+
+    /**
+     * @brief 取得迭代器起始
+     *
+     */
+    iterator begin() noexcept
+    {
+        return iterator(this_obj.buff, this_obj.length);
+    }
+
+    /**
+     * @brief 取得迭代器起始 (const)
+     *
+     */
+    const_iterator begin() const noexcept
+    {
+        return const_iterator(this_obj.buff, this_obj.length);
+    }
+
+    /**
+     * @brief 取得迭代器结束
+     *
+     */
+    iterator end() noexcept
+    {
+        return iterator(this_obj.buff + this_obj.count, 0);
+    }
+
+    /**
+     * @brief 取得迭代器结束 (const)
+     *
+     */
+    const_iterator end() const noexcept
+    {
+        return const_iterator(this_obj.buff + this_obj.count, 0);
     }
 
     /**

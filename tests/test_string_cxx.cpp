@@ -87,8 +87,28 @@ extern "C" void cpp_string_index(void)
 
 extern "C" void cpp_string_iterator(void)
 {
+    mtfmt::string str = u8"😊😀汉字";
+    mtfmt::string str_output;
+    for (auto ch : str) {
+        str_output.push(ch);
+    }
+    ASSERT_EQUAL_VALUE(str, str_output);
 }
 
 extern "C" void cpp_string_const_iterator(void)
+{
+    const mtfmt::string str = u8"😊😀汉字";
+    mtfmt::string str_output;
+    for (auto ch : str) {
+        str_output.push(ch);
+    }
+    ASSERT_EQUAL_VALUE(str, str_output);
+}
+
+extern "C" void cpp_string_reverse_iterator(void)
+{
+}
+
+extern "C" void cpp_string_reverse_const_iterator(void)
 {
 }
