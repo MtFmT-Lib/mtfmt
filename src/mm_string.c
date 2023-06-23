@@ -26,11 +26,13 @@
 //
 // private:
 //
-static void* mstr_realloc(void*, bool_t, usize_t, usize_t);
+static mstr_bool_t mstr_compare_helper(
+    const char*, const char*, usize_t
+);
+static void* mstr_realloc(void*, mstr_bool_t, usize_t, usize_t);
 static mstr_result_t mstr_expand_size(MString*, usize_t);
 static mstr_result_t
     mstr_strlen(usize_t*, usize_t*, const mstr_char_t*, const mstr_char_t*);
-
 //
 // public:
 //
@@ -329,22 +331,73 @@ MSTR_EXPORT_API(const char*) mstr_as_cstr(MString* str)
     return str->buff;
 }
 
-MSTR_EXPORT_API(bool_t) mstr_equal(const MString* a, const MString* b)
+MSTR_EXPORT_API(mstr_bool_t)
+mstr_equal(const MString* a, const MString* b)
 {
     if (a->count != b->count) {
         return False;
     }
     else {
-        uint32_t bit = 0;
         usize_t len = a->count;
-        for (usize_t i = 0; i < len; i += 1) {
-            uint32_t ch_a = a->buff[i];
-            uint32_t ch_b = b->buff[i];
-            // equ
-            bit |= ch_a - ch_b;
-        }
-        return bit == 0;
+        return mstr_compare_helper(a->buff, b->buff, len);
     }
+}
+
+MSTR_EXPORT_API(mstr_bool_t)
+mstr_start_with(
+    const MString* str, const char* prefix, usize_t prefix_len
+)
+{
+    usize_t len = prefix_len;
+    if (str->count < len) {
+        return False;
+    }
+    else {
+        return mstr_compare_helper(str->buff, prefix, len);
+    }
+}
+
+MSTR_EXPORT_API(mstr_bool_t)
+mstr_end_with(
+    const MString* str, const char* suffix, usize_t suffix_len
+)
+{
+    usize_t len = suffix_len;
+    if (str->count < len) {
+        return False;
+    }
+    else {
+        usize_t offset = str->count - len;
+        return mstr_compare_helper(str->buff + offset, suffix, len);
+    }
+}
+
+MSTR_EXPORT_API(mstr_bool_t)
+mstr_contains(
+    const MString* str, const char* pattern, usize_t pattern_len
+)
+{
+    mstr_result_t match_ret;
+    MStringMatchResult match_res;
+    match_ret = mstr_find(str, &match_res, pattern, pattern_len);
+    if (MSTR_FAILED(match_ret)) {
+        return False;
+    }
+    else {
+        return match_res.is_matched;
+    }
+}
+
+MSTR_EXPORT_API(mstr_result_t)
+mstr_remove(MString* str, mstr_codepoint_t* removed_ch, usize_t idx)
+{
+    return MStr_Err_NoImplemention;
+}
+
+MSTR_EXPORT_API(mstr_result_t)
+mstr_insert(MString* str, mstr_codepoint_t ch, usize_t idx)
+{
+    return MStr_Err_NoImplemention;
 }
 
 MSTR_EXPORT_API(void) mstr_iter(MStringIter* it, const MString* str)
@@ -562,6 +615,29 @@ static mstr_result_t mstr_strlen(
 }
 
 /**
+ * @brief 比较相同长度len的字串a和b是否一致
+ *
+ * @param a: 字符串a
+ * @param b: 字符串b
+ * @param len: 字符串a和b的长度
+ *
+ * @return mstr_bool_t: 比较结果
+ */
+static mstr_bool_t mstr_compare_helper(
+    const char* a, const char* b, usize_t len
+)
+{
+    uint32_t bit = 0;
+    for (usize_t i = 0; i < len; i += 1) {
+        uint32_t ch_a = a[i];
+        uint32_t ch_b = b[i];
+        // equ
+        bit |= ch_a - ch_b;
+    }
+    return bit == 0;
+}
+
+/**
  * @brief 扩展str的size
  *
  * @param[inout] str: 需要调整大小的str
@@ -603,7 +679,10 @@ static mstr_result_t mstr_expand_size(MString* str, usize_t new_size)
  * @return void*: 新分配的地址, 失败返回NULL
  */
 static void* mstr_realloc(
-    void* old_ptr, bool_t is_stack, usize_t old_size, usize_t new_size
+    void* old_ptr,
+    mstr_bool_t is_stack,
+    usize_t old_size,
+    usize_t new_size
 )
 {
 #if _MSTR_USE_MALLOC

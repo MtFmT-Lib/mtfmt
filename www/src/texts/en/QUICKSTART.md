@@ -128,7 +128,7 @@ Define the macro equal to `1`  to enable it. Otherwise, the value is not equal t
 
 > Notes: UTF-8 Encoding
 >
-> In the C and the C++ programming language, the UTF-8 literal string includes the prefix `u8` such as `u8"UTF-8"`. The minimum support version is C11 and C++11. The literal string such as `"中文"` or `"😊"` is **not** a UTF-8 encoding string. Normally, the string encoding will follow your system. For example, **the Chinese string will be compiled into GB-2313 encoding** and it will cause an `MStr_Err_UnicodeEncodingError` when you enable UTF-8 support.
+> In the C and the C++ programming language, the UTF-8 literal string includes the prefix `u8` such as `u8"UTF-8"`. The minimum support version is C11 and C++11. The literal string such as `"中文"` or `"😊"` is **not** a UTF-8 encoding string. Normally, the string encoding will follow your system. For example, **the Chinese string will be compiled into GB-2312 encoding** and it will cause an `MStr_Err_UnicodeEncodingError` when you enable UTF-8 support.
 
 ## 3.2 Usage examples
 

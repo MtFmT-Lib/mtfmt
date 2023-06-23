@@ -49,13 +49,27 @@ int main()
         MSTR_CONFIGURE_CFG_VAL(cfg)
     );
 
+    RUN_TEST(monadic_result_flatten);
+    RUN_TEST(monadic_result_map);
+    RUN_TEST(monadic_result_map_err);
+    RUN_TEST(monadic_result_and_then);
+    RUN_TEST(monadic_result_or_else);
+    RUN_TEST(monadic_result_or_value);
+    RUN_TEST(monadic_result_or_exception);
+
     RUN_TEST(allocate_then_free);
 
     RUN_TEST(string_copy_create);
     RUN_TEST(string_move_create);
     RUN_TEST(string_length);
     RUN_TEST(string_char_at);
+    RUN_TEST(string_insert);
+    RUN_TEST(string_remove);
+
     RUN_TEST(string_equal);
+    RUN_TEST(string_not_equal);
+    RUN_TEST(string_end_with);
+    RUN_TEST(string_start_with);
 
     RUN_TEST(string_concat_object);
     RUN_TEST(string_concat_c_str);
@@ -68,10 +82,6 @@ int main()
     RUN_TEST(string_trans_reverse);
     RUN_TEST(string_trans_reverse_unicode);
 
-    RUN_TEST(cpp_string_equal);
-    RUN_TEST(cpp_string_not_equal);
-    RUN_TEST(cpp_string_push);
-    RUN_TEST(cpp_string_concat);
     RUN_TEST(cpp_string_index);
     RUN_TEST(cpp_string_iterator);
     RUN_TEST(cpp_string_const_iterator);
@@ -127,10 +137,6 @@ int main()
     RUN_TEST(fmt_escape_bracket);
 
     RUN_TEST(sync_io_write);
-
-    RUN_TEST(cpp_monadic_result_and_then);
-    RUN_TEST(cpp_monadic_result_or_value);
-    RUN_TEST(cpp_monadic_result_or_exception);
 
     RUN_TEST(cpp_wrap_fmt);
 

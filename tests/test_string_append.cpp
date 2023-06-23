@@ -11,8 +11,7 @@
  */
 #include "helper.h"
 #include "main.h"
-#include "mm_heap.h"
-#include "mm_string.h"
+#include "mtfmt.hpp"
 #include "unity.h"
 #include <stdio.h>
 
@@ -22,48 +21,42 @@
 // 因此使用C++ (mtfmt的C++ wrapper至少要求C++11)
 //
 
+template <std::size_t N>
+constexpr mtfmt::unicode_t unicode_char(const char (&u8char)[N])
+{
+    return mtfmt::string::unicode_char(u8char);
+}
+
 extern "C" void string_append(void)
 {
-    MString str_ch;
-    EVAL(mstr_create(&str_ch, u8"😀"));
-    mstr_codepoint_t ch = mstr_char_at(&str_ch, 0);
-    // 测试内容
-    MString str;
-    EVAL(mstr_create(&str, u8"Smile"));
-    ASSERT_EQUAL_VALUE(str.count, 5);
-    ASSERT_EQUAL_VALUE(str.length, 5);
-    EVAL(mstr_append(&str, ':'));
-    EVAL(mstr_create(&str, u8"Smile:"));
-    ASSERT_EQUAL_VALUE(str.count, 6);
-    ASSERT_EQUAL_VALUE(str.length, 6);
-    EVAL(mstr_append(&str, ch));
-    ASSERT_EQUAL_VALUE(str.count, 10);
-    ASSERT_EQUAL_VALUE(str.length, 7);
-    ASSERT_EQUAL_STRING(&str, u8"Smile:😀");
-    // free
-    mstr_free(&str);
-    mstr_free(&str_ch);
+    constexpr auto ch = unicode_char(u8"😀");
+    // @mstr_append
+    mtfmt::string str = u8"Smile";
+    ASSERT_EQUAL_VALUE(str.length(), 5);
+    ASSERT_EQUAL_VALUE(str.byte_count(), 5);
+    str += ':';
+    ASSERT_EQUAL_VALUE(str.length(), 6);
+    ASSERT_EQUAL_VALUE(str.byte_count(), 6);
+    ASSERT_EQUAL_VALUE(str, u8"Smile:");
+    str += ch;
+    ASSERT_EQUAL_VALUE(str.length(), 7);
+    ASSERT_EQUAL_VALUE(str.byte_count(), 10);
+    ASSERT_EQUAL_VALUE(str, u8"Smile:😀");
 }
 
 extern "C" void string_repeat_append(void)
 {
-    MString str_ch;
-    EVAL(mstr_create(&str_ch, u8"😀"));
-    mstr_codepoint_t ch = mstr_char_at(&str_ch, 0);
-    // 测试内容
-    MString str;
-    EVAL(mstr_create(&str, u8"Smile"));
-    ASSERT_EQUAL_VALUE(str.count, 5);
-    ASSERT_EQUAL_VALUE(str.length, 5);
-    EVAL(mstr_repeat_append(&str, ':', 3));
-    EVAL(mstr_create(&str, u8"Smile:::"));
-    ASSERT_EQUAL_VALUE(str.count, 8);
-    ASSERT_EQUAL_VALUE(str.length, 8);
-    EVAL(mstr_repeat_append(&str, ch, 3));
-    ASSERT_EQUAL_VALUE(str.count, 20);
-    ASSERT_EQUAL_VALUE(str.length, 11);
-    ASSERT_EQUAL_STRING(&str, u8"Smile:::😀😀😀");
-    // free
-    mstr_free(&str);
-    mstr_free(&str_ch);
+    constexpr auto ch = unicode_char(u8"😀");
+    // @mstr_repeat_append
+    mtfmt::string str = u8"Smile";
+    ASSERT_EQUAL_VALUE(str.length(), 5);
+    ASSERT_EQUAL_VALUE(str.byte_count(), 5);
+    str += mtfmt::string::repeat_char_t{':', 3};
+    ASSERT_EQUAL_VALUE(str, u8"Smile:::");
+    ASSERT_EQUAL_VALUE(str.length(), 8);
+    ASSERT_EQUAL_VALUE(str.byte_count(), 8);
+    str += mtfmt::string::repeat_char_t{ch, 3};
+    ASSERT_EQUAL_VALUE(str.length(), 11);
+    ASSERT_EQUAL_VALUE(str.byte_count(), 20);
+    ASSERT_EQUAL_VALUE(str, u8"Smile:::😀😀😀");
 }

@@ -16,6 +16,8 @@ The mini template formatting library, or MtFmt is an effective, small formatter 
 * Optional specific build-in divide operator implementing
 * Flexible syntax and clear error report.
 
+The minimum support C language standard is `ISO C99` and the C++ wrapper requires `ISO C11`.
+
 # 2 Providing API
 
 Formatting API includes four parts. The first one is the string API, which provides a dynamic string for the library. And the second one is the formatting API, which provides the formatting implements with `va_arg`. The third one is a scanner and the last one is an optional heap manager, it's designed for embedded systems without malloc and RTOS. The full documents of source codes are deployed at [HERE](https://mtfmt-lib.github.io/mtfmt/doxygen/html/ "Doxygen document").
@@ -32,13 +34,13 @@ The string API provides a dynamic string object, including optimizing the short 
 struct MString
 {
     char* buff;
-    usize_t length;
+    usize_t count;
     usize_t cap_size;
     char stack_region[MSTR_STACK_REGION_SIZE];
 };
 ```
 
-As you see, the implementation has four properties mainly. The first one, `buff`, is the pointer of the string memory region. The second one, `length`, is the count of buff. It indicates how many bytes of the buffer. And the third one, `cap_size`, also called capacity, is the amount of space in the underlying character buffer. And with the help of property `stack_region`, the string can be allocated on the stack located in the currently active record. So the string is located in the stack when the `stack_region` is equal for the `buff`. Otherwise, it's located in the heap. The main motivation is assuming that the string usually contains few characters, so it can reduce the heap usage in usual. The following sections descript the export API and the design details of `MString`. For the encoding of the string will be controlled by macro `_MSTR_USE_UTF8`, which determines which encoding (UTF-8 or NOT UTF-8) will be used. See more about string encoding in [section 2.5](#section_2_5).
+As you see, the implementation has four properties mainly. The first one, `buff`, is the pointer of the string memory region. The second one, `count`, is the count of buff. It indicates how many bytes of the buffer. And the third one, `cap_size`, also called capacity, is the amount of space in the underlying character buffer. And with the help of property `stack_region`, the string can be allocated on the stack located in the currently active record. So the string is located in the stack when the `stack_region` is equal for the `buff`. Otherwise, it's located in the heap. The main motivation is assuming that the string usually contains few characters, so it can reduce the heap usage in usual. The following sections descript the export API and the design details of `MString`. For the encoding of the string will be controlled by macro `_MSTR_USE_UTF8`, which determines which encoding (UTF-8 or NOT UTF-8) will be used. See more about string encoding in [section 2.5](#section_2_5).
 
 ### 2.2.1 Allocator
 
@@ -48,7 +50,58 @@ The allocator is fixed and can be selected by macro `_MSTR_USE_MALLOC`. For the 
 * `mstr_heap_alloc`: Allocate memory
 * `mstr_heap_free`: Release
 
-### 2.2.2 Transformation
+### 2.2.2 Constructor and Destructor
+
+#### 2.2.2.1 Constructor
+
+The construct functions of this object include three different versions. The first version, `mstr_create` is to create a string from a C-style string pointer directly. The second one, `mstr_copy_create` is to copy another string object to create. And the last one, `mstr_move_create` is to move memory from another object to create.
+
+The usage of `mstr_create` is simple and shows follow. After constructing from this function, the result must be called `mstr_free` by hand shown in [section 2.2.2.2](#section_2_2_2_2)
+
+```c
+MString str;
+mstr_create(&str, "string");
+// str == "string"
+```
+
+The `mstr_copy_create` is designed for copying another object. The following shows how to copy the source string to the destination string. After constructing from this function, the result must be called `mstr_free` by hand and more details show in [section 2.2.2.2](#section_2_2_2_2)
+
+```c
+MString str;
+mstr_create(&str, "string");
+// str == "string"
+MString another;
+mstr_copy_create(&str, &another);
+// another == "string"
+```
+
+The `mstr_move_create` means moving the memory from the other object. So that called `mstr_free`  is not necessary if constructed from this function. The following code shows how to move that.
+
+```c
+MString str;
+mstr_create(&str, "string");
+// str == "string"
+MString another;
+mstr_move_create(&str, &another);
+// another == "string"
+// And, str is empty now
+```
+
+#### 2.2.2.2 Destruct function
+
+The destruct function will release memory simply like the following code.
+
+```c
+MString str;
+mstr_create(&str, "string");
+// str == "string"
+mstr_free(&str);
+// str is empty.
+```
+
+This function must be called by hand after calling the most of construct function. Otherwise, it will cause a memory leak.
+
+### 2.2.3 Transformation
 
 The transformation functions provide reverse string and clear string. The transformation function has the same input and output, it will be run in situ, and the evaluation result always is `MStr_Ok`. So that has no return value. The prototype of those is the following.
 
@@ -65,26 +118,26 @@ mstr_reverse_self(&str);
 // now, str == 'elpmaxE'
 ```
 
-#### 2.2.2.1 Clear string
+#### 2.2.3.1 Clear string
 
 The clear function `mstr_clear` sets the `length` property to zero simply. It will make this object seem empty after this function is called.
 
 For a string that holds length $N$, this function implementation has $O(1)$ time complexity and spatial complexity.
 
-#### 2.2.2.1 Reverse string
+#### 2.2.3.1 Reverse string
 
 The reverse function `mstr_reverse_self` reverses all characters in the original string. This function will reverse one by one character rather than just reverse byte.
 
 For a string that holds length $N$, this function implementation has $\Theta(N)$ time complexity and $O(1)$ spatial complexity.
 
-### 2.2.3 Concatenation
+### 2.2.4 Concatenation
 
 The concatenating operator for string means that push one or more characters into the source string. The library provides three functions as follows.
 
 * Pushing functions: `mstr_append` and `mstr_repeat_append`
 * Concatenating functions: `mstr_concat` , `mstr_concat_cstr_slice` and `mstr_concat_cstr`
 
-#### 2.2.3.1 Push
+#### 2.2.4.1 Push
 
 The push function means append one character to the string. For example, the following code shows how to use `mstr_append` and the result.
 
@@ -106,7 +159,7 @@ mstr_repeat_append(&str, '#', 3);
 
 For $N$ characters and the $L$ length of a string, both two functions have $\Theta(N)$ time complexity.
 
-#### 2.2.3.2 Concatenation
+#### 2.2.4.2 Concatenation
 
 The concatenating function concatenates the string arguments to the calling string and returns the result code. The library provides three different specific versions.
 
@@ -137,9 +190,13 @@ mstr_concat_cstr_slice(&str, begin, end);
 
 For the $N$ length source string aka. `str` in the code and the $M$ length right side string, those operators have $\Theta(M)$ time complexity.
 
-### 2.2.4 Comparison operator
+### 2.2.5 Comparison operator
 
 The comparison function provides a way to compare two strings. If that is the same this function will return `true` otherwise return `false`. The following code shows how to compare two strings.
+
+#### 2.2.5.1 Compare all
+
+The function `mstr_equal` provides comparing two strings.
 
 ```c
 MString str1, str2;
@@ -156,11 +213,43 @@ The function holds two properties as follows where $S_1=S_2$ is `mstr_equal(&s1,
 
 For the $N$ length string and an $M$ length string, the comparison function has $\Theta\left(\min\left[N,M\right]\right)$ time complexity.
 
-### 2.2.5 Other functions
+#### 2.2.5.2 Compare the prefix
 
-The other functions include three parts. The type converts function, the construct function, and the destruct function.
+The function `mstr_start_with` returns `true` if the given pattern matches a prefix of this string.
 
-#### 2.2.5.1 Convert to C-style string
+```c
+MString str;
+mstr_create(&str, "Example");
+assert(mstr_start_with(&str, "Exa") == true);
+assert(mstr_start_with(&str, "Example") == true);
+assert(mstr_start_with(&str, "!Example") == false);
+```
+
+#### 2.2.5.3 Compare the suffix
+
+The function `mstr_end_with` returns `true` if the given pattern matches a suffix of this string.
+
+```c
+MString str;
+mstr_create(&str, "Example");
+assert(mstr_end_with(&str, "ample") == true);
+assert(mstr_end_with(&str, "Example") == true);
+assert(mstr_end_with(&str, "ample!") == false);
+```
+
+### 2.2.6 Substring matcher
+
+TODO
+
+### 2.2.7 Indexing operators
+
+TODO
+
+### 2.2.8 Other functions
+
+The other functions include the type converts function.
+
+#### 2.2.8.1 Convert to C-style string
 
 The function `mstr_as_cstr` provides a method that returns the c-style string pointer of the original string. Due to deliberate design reasons, the string capacity always contains one byte. That means the `cap_size` is greater than the `length` is true in all time. So that this function will append one byte in which the value is zero if necessary and return the c-style string pointer directly. The following code shows the usage.
 
@@ -171,55 +260,6 @@ mstr_create(&str, "string");
 const char* c_str = mstr_as_cstr(&str);
 // Now, c_str is pointing to "string" and terminated by '\0'
 ```
-
-#### 2.2.5.2 Construct functions
-
-The construct functions of this object include three different versions. The first version, `mstr_create` is to create a string from a C-style string pointer directly. The second one, `mstr_copy_create` is to copy another string object to create. And the last one, `mstr_move_create` is to move memory from another object to create.
-
-The usage of `mstr_create` is simple and shows follow. After constructing from this function, the result must be called `mstr_free` by hand shown in [section 2.2.5.3](#section_2_2_5_3)
-
-```c
-MString str;
-mstr_create(&str, "string");
-// str == "string"
-```
-
-The `mstr_copy_create` is designed for copying another object. The following shows how to copy the source string to the destination string. After constructing from this function, the result must be called `mstr_free` by hand and more details show in [section 2.2.5.3](#section_2_2_5_3).
-
-```c
-MString str;
-mstr_create(&str, "string");
-// str == "string"
-MString another;
-mstr_copy_create(&str, &another);
-// another == "string"
-```
-
-The `mstr_move_create` means moving the memory from the other object. So that called `mstr_free`  is not necessary if constructed from this function. The following code shows how to move that.
-
-```c
-MString str;
-mstr_create(&str, "string");
-// str == "string"
-MString another;
-mstr_move_create(&str, &another);
-// another == "string"
-// And, str is empty now
-```
-
-#### 2.2.5.3 Destruct function
-
-The destruct function will release memory simply like the following code.
-
-```c
-MString str;
-mstr_create(&str, "string");
-// str == "string"
-mstr_free(&str);
-// str is empty.
-```
-
-This function must be called by hand after calling the most of construct function. Otherwise, it will cause a memory leak.
 
 ## 2.3 Formatter
 
@@ -308,10 +348,24 @@ TODO
 
 This annex includes a summary of all export functions.
 
-# Annex B: syntax summary
+# Annex B: macro options
+
+Table 8.1 shows all available macros and the default value.
+
+!table-caption: Table 8.1 available macros
+
+| Macros                     | Default | Description                                           |
+| -------------------------- | :-----: | ----------------------------------------------------- |
+| `_MSTR_USE_HARDWARE_DIV`   |    0    | Enable to use hardware divider operator.              |
+| `_MSTR_USE_MALLOC `        |    0    | Enable to use `malloc` instead build-in heap manager. |
+| `_MSTR_RUNTIME_HEAP_ALIGN` |    4    | Specify the alignment of build-in heap manager.       |
+| `_MSTR_USE_STD_IO`         |    0    | Enable to use `stdout` support.                       |
+| `_MSTR_USE_UTF_8`          |    1    | Enable the UTF-8 support.                             |
+
+# Annex C: syntax summary
 
 TODO
 
-# Annex C: macro options
+# Annex D: the reference card
 
 TODO

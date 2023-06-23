@@ -11,10 +11,15 @@
  */
 #include "helper.h"
 #include "main.h"
-#include "mm_heap.h"
-#include "mm_string.h"
+#include "mtfmt.hpp"
 #include "unity.h"
 #include <stdio.h>
+
+template <std::size_t N>
+constexpr mtfmt::unicode_t unicode_char(const char (&u8char)[N])
+{
+    return mtfmt::string::unicode_char(u8char);
+}
 
 extern "C" void string_copy_create(void)
 {
@@ -27,17 +32,13 @@ extern "C" void string_move_create(void)
 extern "C" void string_length(void)
 {
     // ASCII
-    MString str1;
-    EVAL(mstr_create(&str1, u8"ASCII"));
-    ASSERT_EQUAL_VALUE(str1.count, 5);
-    ASSERT_EQUAL_VALUE(str1.length, 5);
-    mstr_free(&str1);
+    mtfmt::string str1 = u8"ASCII";
+    ASSERT_EQUAL_VALUE(str1.length(), 5);
+    ASSERT_EQUAL_VALUE(str1.byte_count(), 5);
     // UTF-8
-    MString str2;
-    EVAL(mstr_create(&str2, u8"😀😀😀"));
-    ASSERT_EQUAL_VALUE(str2.count, 12);
-    ASSERT_EQUAL_VALUE(str2.length, 3);
-    mstr_free(&str2);
+    mtfmt::string str2 = u8"😀😀😀";
+    ASSERT_EQUAL_VALUE(str2.length(), 3);
+    ASSERT_EQUAL_VALUE(str2.byte_count(), 12);
 }
 
 extern "C" void string_char_at(void)
@@ -57,15 +58,10 @@ extern "C" void string_char_at(void)
     mstr_free(&str_ch);
 }
 
-extern "C" void string_equal(void)
+extern "C" void string_insert(void)
 {
-    MString src;
-    EVAL(mstr_create(&src, "Example"));
-    // equal
-    ASSERT_EQUAL_STRING(&src, "Example");
-    // neq
-    ASSERT_NOT_EQUAL_STRING(&src, "Exampl");
-    ASSERT_NOT_EQUAL_STRING(&src, "Example1");
-    ASSERT_NOT_EQUAL_STRING(&src, "ExAmple");
-    mstr_free(&src);
+}
+
+extern "C" void string_remove(void)
+{
 }

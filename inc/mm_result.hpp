@@ -15,6 +15,9 @@
 #include "mm_result.h"
 namespace mtfmt
 {
+// class decl
+template <typename T, typename E> class result;
+
 namespace details
 {
 /**
@@ -46,6 +49,9 @@ protected:
     };
 
 public:
+    using succ_t = T;
+    using err_t = E;
+
     constexpr result_base(T succ_val)
         : type_tag(TypeTag::SuccTag), t_val(succ_val)
     {
@@ -65,6 +71,29 @@ public:
             e_val.~E();
         }
     }
+};
+
+/**
+ * @brief 判断T是不是一个result类型
+ *
+ */
+template <typename T> struct is_result
+{
+    static constexpr bool value =
+        details::is_instance_of<result, T>::value;
+};
+
+/**
+ * @brief 继承该类型为result增加合适的拷贝, 移动constructor/assign
+ *
+ */
+template <typename T, typename E>
+struct result_add_ctrl : result_base<T, E>
+{
+    using base_t = details::result_base<T, E>;
+    using base_t::base_t;
+
+    // TODO
 };
 
 } // namespace details
@@ -93,12 +122,12 @@ public:
  * @tparam E: 失败时的结果
  */
 template <typename T, typename E>
-class result final : public details::result_base<T, E>
+class result final : public details::result_add_ctrl<T, E>
 {
 public:
-    using succ_t = T;
-    using err_t = E;
-    using base_t = details::result_base<T, E>;
+    using base_t = details::result_add_ctrl<T, E>;
+    using succ_t = typename base_t::succ_t;
+    using err_t = typename base_t::err_t;
     using base_t::base_t;
 
     /**
@@ -140,23 +169,100 @@ public:
     }
 
     /**
+     * @brief 压扁
+     *
+     * @note 将result<result<T, E>, E>变成result<T, E>,
+     * 当内部为err的时候, 输出是err, 内部是succ的时候, 返回succ
+     */
+    template <typename T1 = T>
+    details::enable_if_t<
+        details::is_result<T1>::value,
+        result<typename T1::succ_t, E>>
+        flatten() const
+    {
+        static_assert(std::is_same<typename T1::err_t, E>::value);
+        if (is_succ()) {
+            const auto& ref_succ = base_t::t_val;
+            if (ref_succ.is_succ()) {
+                return ref_succ.unsafe_get_succ_value();
+            }
+            else {
+                return ref_succ.unsafe_get_err_value();
+            }
+        }
+        else {
+            return base_t::e_val;
+        }
+    }
+
+    /**
+     * @brief 压扁(T并不是result<T, E>)
+     *
+     */
+    template <typename T1 = T>
+    details::enable_if_t<!details::is_result<T1>::value, result<T1, E>>
+        flatten() const
+    {
+        return *this;
+    }
+
+    /**
+     * @brief 在result是succ的时候执行map, 转换result
+     *
+     * @param[in] map_to: 映射函数, 拥有类型 T -> R
+     *
+     */
+    template <
+        typename F,
+        typename R = details::function_return_type_t<F>>
+    details::enable_if_t<
+        details::holds_prototype<F, R, T>::value,
+        result<R, E>>
+        map(F map_to) const
+    {
+        if (is_succ()) {
+            return map_to(base_t::t_val);
+        }
+        else {
+            return base_t::e_val;
+        }
+    }
+
+    /**
+     * @brief 在result是err的时候执行map, 转换result
+     *
+     * @param[in] map_to: 映射函数, 拥有类型 E -> R
+     */
+    template <
+        typename F,
+        typename R = details::function_return_type_t<F>>
+    details::enable_if_t<
+        details::holds_prototype<F, R, E>::value,
+        result<T, R>>
+        map_err(F map_to) const
+    {
+        if (is_succ()) {
+            return base_t::t_val;
+        }
+        else {
+            return map_to(base_t::e_val);
+        }
+    }
+
+    /**
      * @brief 在self是succ的时候执行then do, 否则返回err
      *
      * @param then_do: 接下来要做的事情, 拥有类型 T -> result<R, E>
      */
     template <
         typename F,
-        typename R = typename std::enable_if<
-            true &&
-                // 返回值应该是result的实例
-                details::is_instance_of<
-                    result,
-                    details::function_return_type_t<F>>::value,
-            typename details::function_return_type_t<F>::succ_t>::type>
-    typename std::enable_if<
-        // 函数拥有类型 T -> result<R, E>
+        typename R1 = details::function_return_type_t<F>,
+        typename R = details::enable_if_t<
+            details::is_result<R1>::value,
+            typename R1::succ_t>>
+    details::enable_if_t<
         details::holds_prototype<F, result<R, E>, T>::value,
-        result<R, E>>::type
+        result<R, E>>
         and_then(F then_do) const
     {
         if (is_succ()) {
@@ -164,6 +270,30 @@ public:
         }
         else {
             return base_t::e_val;
+        }
+    }
+
+    /**
+     * @brief 在self是err的时候执行else_do, 否则返回succ
+     *
+     * @param[in] else_do: 接下来要做的事情, 拥有类型 E -> result<R, E>
+     */
+    template <
+        typename F,
+        typename R1 = details::function_return_type_t<F>,
+        typename R = details::enable_if_t<
+            details::is_result<R1>::value,
+            typename R1::err_t>>
+    details::enable_if_t<
+        details::holds_prototype<F, result<T, R>, E>::value,
+        result<T, R>>
+        or_else(F else_do) const
+    {
+        if (is_succ()) {
+            return base_t::t_val;
+        }
+        else {
+            return else_do(base_t::e_val);
         }
     }
 
@@ -188,16 +318,10 @@ public:
      */
     template <
         typename F,
-        typename R = typename std::enable_if<
-            // 抛出的异常继承自 std::exception
-            std::is_base_of<
-                std::exception,
-                details::function_return_type_t<F>>::value,
-            details::function_return_type_t<F>>::type>
-    typename std::enable_if<
-        // 函数拥有类型 E -> Exception
-        details::holds_prototype<F, R, E>::value,
-        T>::type
+        typename R1 = details::function_return_type_t<F>,
+        typename R = details::
+            enable_if_t<std::is_base_of<std::exception, R1>::value, R1>>
+    details::enable_if_t<details::holds_prototype<F, R, E>::value, T>
         or_exception(F cont) const
     {
         if (is_succ()) {

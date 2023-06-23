@@ -42,7 +42,7 @@ typedef intptr_t isize_t, iptr_t;
  * @brief 布尔值
  *
  */
-typedef bool bool_t;
+typedef bool mstr_bool_t;
 enum
 {
     True = true,
