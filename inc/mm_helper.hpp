@@ -166,6 +166,14 @@ template <typename F, typename R, typename... T> struct holds_prototype
         std::is_same<_Ret, R>::value &&
         std::is_same<_Args, Targs>::value;
 };
+
+/**
+ * @brief enable_if_t, 和cpp14一样(但是这里是cpp11呜呜呜)
+ *
+ */
+template <bool cond, typename T>
+using enable_if_t = typename std::enable_if<cond, T>::type;
+
 } // namespace details
 } // namespace mtfmt
 #endif // _INCLUDE_MM_HELPER_HPP_

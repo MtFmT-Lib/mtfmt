@@ -16,7 +16,11 @@
 extern "C"
 {
 #endif
+    void monadic_result_flatten(void);
+    void monadic_result_map(void);
+    void monadic_result_map_err(void);
     void monadic_result_and_then(void);
+    void monadic_result_or_else(void);
     void monadic_result_or_value(void);
     void monadic_result_or_exception(void);
 

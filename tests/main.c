@@ -49,7 +49,11 @@ int main()
         MSTR_CONFIGURE_CFG_VAL(cfg)
     );
 
+    RUN_TEST(monadic_result_flatten);
+    RUN_TEST(monadic_result_map);
+    RUN_TEST(monadic_result_map_err);
     RUN_TEST(monadic_result_and_then);
+    RUN_TEST(monadic_result_or_else);
     RUN_TEST(monadic_result_or_value);
     RUN_TEST(monadic_result_or_exception);
 

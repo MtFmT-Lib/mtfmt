@@ -44,6 +44,60 @@ public:
     }
 };
 
+extern "C" void monadic_result_flatten(void)
+{
+    using Result = mtfmt::result<SuccType, ErrorType>;
+    using ResultNest = mtfmt::result<Result, ErrorType>;
+    // succ, 没有套娃
+    auto val1 = Result{SuccType{1}};
+    auto r1 = val1.flatten();
+    TEST_ASSERT_TRUE(r1.is_succ());
+    TEST_ASSERT_TRUE(r1.unsafe_get_succ_value().value == 1);
+    // succ, 有套娃
+    auto val2 = ResultNest{Result{SuccType{2}}};
+    auto r2 = val2.flatten();
+    TEST_ASSERT_TRUE(r2.is_succ());
+    TEST_ASSERT_TRUE(r2.unsafe_get_succ_value().value == 2);
+    // 套娃, 但是err
+    auto val3 = ResultNest{Result{ErrorType{3}}};
+    auto r3 = val3.flatten();
+    TEST_ASSERT_TRUE(r3.is_err());
+    TEST_ASSERT_TRUE(r3.unsafe_get_err_value().value == 3);
+    // 套娃, 但是另一边err
+    auto val4 = ResultNest{ErrorType{4}};
+    auto r4 = val4.flatten();
+    TEST_ASSERT_TRUE(r4.is_err());
+    TEST_ASSERT_TRUE(r4.unsafe_get_err_value().value == 4);
+}
+
+extern "C" void monadic_result_map(void)
+{
+    // succ
+    mtfmt::result<SuccType, ErrorType> val1 = SuccType{1};
+    auto r1 = val1.map([](SuccType val) { return 2; });
+    TEST_ASSERT_TRUE(r1.is_succ());
+    TEST_ASSERT_TRUE(r1.unsafe_get_succ_value() == 2);
+    // err
+    mtfmt::result<SuccType, ErrorType> val2 = ErrorType{1};
+    auto r2 = val2.map([](SuccType val) { return 2; });
+    TEST_ASSERT_TRUE(r2.is_err());
+    TEST_ASSERT_TRUE(r2.unsafe_get_err_value().value == 1);
+}
+
+extern "C" void monadic_result_map_err(void)
+{
+    // succ
+    mtfmt::result<SuccType, ErrorType> val1 = SuccType{1};
+    auto r1 = val1.map_err([](ErrorType val) { return 2; });
+    TEST_ASSERT_TRUE(r1.is_succ());
+    TEST_ASSERT_TRUE(r1.unsafe_get_succ_value().value == 1);
+    // err
+    mtfmt::result<SuccType, ErrorType> val2 = ErrorType{1};
+    auto r2 = val2.map_err([](ErrorType val) { return 2; });
+    TEST_ASSERT_TRUE(r2.is_err());
+    TEST_ASSERT_TRUE(r2.unsafe_get_err_value() == 2);
+}
+
 extern "C" void monadic_result_and_then(void)
 {
     // succ
@@ -62,6 +116,26 @@ extern "C" void monadic_result_and_then(void)
     });
     TEST_ASSERT_TRUE(r2.is_err());
     TEST_ASSERT_TRUE(r2.unsafe_get_err_value().value == 1);
+}
+
+extern "C" void monadic_result_or_else(void)
+{
+    // succ
+    mtfmt::result<SuccType, ErrorType> val1 = SuccType{1};
+    auto r1 = val1.or_else([](ErrorType val) {
+        ErrorType2 next_val = {val.value + 1};
+        return mtfmt::result<SuccType, ErrorType2>(next_val);
+    });
+    TEST_ASSERT_TRUE(r1.is_succ());
+    TEST_ASSERT_TRUE(r1.unsafe_get_succ_value().value == 1);
+    // err
+    mtfmt::result<SuccType, ErrorType> val2 = ErrorType{1};
+    auto r2 = val2.or_else([](ErrorType val) {
+        ErrorType2 next_val = {val.value + 1};
+        return mtfmt::result<SuccType, ErrorType2>(next_val);
+    });
+    TEST_ASSERT_TRUE(r2.is_err());
+    TEST_ASSERT_TRUE(r2.unsafe_get_err_value().value == 2);
 }
 
 extern "C" void monadic_result_or_value(void)
