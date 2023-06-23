@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    test_monad_cxx.cpp
+ * @file    test_monad.cpp
  * @author  向阳 (hinata.hoshino@foxmail.com)
  * @brief   Monadic result
  * @version 1.0
@@ -44,7 +44,7 @@ public:
     }
 };
 
-extern "C" void cpp_monadic_result_and_then(void)
+extern "C" void monadic_result_and_then(void)
 {
     // succ
     mtfmt::result<SuccType, ErrorType> val1 = SuccType{1};
@@ -64,7 +64,7 @@ extern "C" void cpp_monadic_result_and_then(void)
     TEST_ASSERT_TRUE(r2.unsafe_get_err_value().value == 1);
 }
 
-extern "C" void cpp_monadic_result_or_value(void)
+extern "C" void monadic_result_or_value(void)
 {
     // succ
     mtfmt::result<SuccType, ErrorType> val1 = SuccType{1};
@@ -76,7 +76,7 @@ extern "C" void cpp_monadic_result_or_value(void)
     TEST_ASSERT_TRUE(r2.value == 2);
 }
 
-extern "C" void cpp_monadic_result_or_exception(void)
+extern "C" void monadic_result_or_exception(void)
 {
     // succ
     bool cond1 = false;

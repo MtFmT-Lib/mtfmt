@@ -18,7 +18,7 @@
 static void div_mod_10(uint32_t, uint32_t*, uint32_t*);
 static void div_mod_10_u64(uint64_t, uint64_t*, uint32_t*);
 static mstr_result_t bcdtoa(
-    MString*, uint32_t, uint32_t, uint32_t, bool_t
+    MString*, uint32_t, uint32_t, uint32_t, mstr_bool_t
 );
 static mstr_result_t uqtoa_impl(MString*, uint32_t, uint32_t);
 static mstr_result_t uqtoa_helper_dpart(MString*, uint32_t, uint32_t);
@@ -268,7 +268,7 @@ static mstr_result_t uqtoa_helper_dpart(
         uint64_t acc;
         uint32_t mask;
         usize_t cv_sz = 0;
-        bool_t tail_0 = True;
+        mstr_bool_t tail_0 = True;
         uint64_t dpart_value;
         usize_t fill_len;
         // 转换值
@@ -342,7 +342,7 @@ static mstr_result_t bcdtoa(
     uint32_t bcd,
     uint32_t len,
     uint32_t max_len,
-    bool_t fixed
+    mstr_bool_t fixed
 )
 {
     usize_t counter = max_len;

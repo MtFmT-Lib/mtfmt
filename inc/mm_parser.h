@@ -229,7 +229,7 @@ typedef struct tagMStrFmtValueFormatSpec
 typedef struct tagMStrFmtChronoValueFormatSpec
 {
     //! 是否以固定长度进行格式化
-    bool_t fixed_length;
+    mstr_bool_t fixed_length;
 
     //! 进行格式化的长度
     uint8_t format_length;

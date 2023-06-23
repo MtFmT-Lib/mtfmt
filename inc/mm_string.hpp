@@ -17,6 +17,7 @@
 #include <array>
 #include <cstddef>
 #include <iterator>
+#include <string.h>
 #include <string>
 namespace mtfmt
 {
@@ -257,6 +258,9 @@ public:
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator =
         std::reverse_iterator<const_iterator>;
+
+    using repeat_char_t = std::tuple<unicode_t, std::size_t>;
+
     /**
      * @brief 创建空的字符串
      *
@@ -309,6 +313,24 @@ public:
         mstr_clear(&this_obj);
         mstr_concat(&this_obj, &str.this_obj);
         return *this;
+    }
+
+    /**
+     * @brief 取得字符串长度
+     *
+     */
+    usize_t length() const noexcept
+    {
+        return this_obj.length;
+    }
+
+    /**
+     * @brief 取得字符串占用的字节数
+     *
+     */
+    usize_t byte_count() const noexcept
+    {
+        return this_obj.count;
     }
 
     /**
@@ -373,6 +395,66 @@ public:
     ) noexcept
     {
         return !(pthis == str);
+    }
+
+    /**
+     * @brief 判断字符串是否以另一个字串开始(c_str buffer)
+     *
+     */
+    template <std::size_t N>
+    bool start_with(const value_t (&prefix)[N]) const noexcept
+    {
+        return !!mstr_start_with(&this_obj, prefix, N);
+    }
+
+    /**
+     * @brief 判断字符串是否以另一个字串开始(c_str)
+     *
+     */
+    bool start_with(const char* prefix) const noexcept
+    {
+        return !!mstr_start_with(&this_obj, prefix, strlen(prefix));
+    }
+
+    /**
+     * @brief 判断字符串是否以另一个字串开始(MString)
+     *
+     */
+    bool start_with(const string* prefix) const noexcept
+    {
+        const char* buff = prefix->this_obj.buff;
+        usize_t buff_len = prefix->this_obj.count;
+        return !!mstr_start_with(&this_obj, buff, buff_len);
+    }
+
+    /**
+     * @brief 判断字符串是否以另一个字串结束(c_str buffer)
+     *
+     */
+    template <std::size_t N>
+    bool end_with(const value_t (&suffix)[N]) const noexcept
+    {
+        return !!mstr_end_with(&this_obj, suffix, N);
+    }
+
+    /**
+     * @brief 判断字符串是否以另一个字串结束(c_str)
+     *
+     */
+    bool end_with(const char* suffix) const noexcept
+    {
+        return !!mstr_end_with(&this_obj, suffix, strlen(suffix));
+    }
+
+    /**
+     * @brief 判断字符串是否以另一个字串结束(MString)
+     *
+     */
+    bool end_with(const string* suffix) const noexcept
+    {
+        const char* buff = suffix->this_obj.buff;
+        usize_t buff_len = suffix->this_obj.count;
+        return !!mstr_end_with(&this_obj, buff, buff_len);
     }
 
     /**
@@ -476,9 +558,25 @@ public:
      * @attention 无法完成操作会抛出异常
      *
      */
-    string& operator+=(mstr_codepoint_t rhs)
+    string& operator+=(unicode_t rhs)
     {
         push(rhs).or_exception([](error_code_t e) {
+            return mtfmt_error(e);
+        });
+        return *this;
+    }
+
+    /**
+     * @brief 字符串拼接 (重复n个)
+     *
+     * @attention 无法完成操作会抛出异常
+     *
+     */
+    string& operator+=(const repeat_char_t& rhs)
+    {
+        auto ch = std::get<0>(rhs);
+        auto cnt = std::get<1>(rhs);
+        push(ch, cnt).or_exception([](error_code_t e) {
             return mtfmt_error(e);
         });
         return *this;

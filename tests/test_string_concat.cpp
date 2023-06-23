@@ -11,39 +11,38 @@
  */
 #include "helper.h"
 #include "main.h"
-#include "mm_heap.h"
-#include "mm_string.h"
+#include "mtfmt.hpp"
 #include "unity.h"
 #include <stdio.h>
 
+template <std::size_t N>
+constexpr mtfmt::unicode_t unicode_char(const char (&u8char)[N])
+{
+    return mtfmt::string::unicode_char(u8char);
+}
+
 extern "C" void string_concat_object(void)
 {
-    MString str_rhs;
-    EVAL(mstr_create(&str_rhs, u8"😀"));
-    // append到一个现有的字符串
-    MString str_lhs;
-    EVAL(mstr_create(&str_lhs, u8"Smile:"));
-    ASSERT_EQUAL_VALUE(str_lhs.count, 6);
-    ASSERT_EQUAL_VALUE(str_lhs.length, 6);
-    EVAL(mstr_concat(&str_lhs, &str_rhs));
-    ASSERT_EQUAL_VALUE(str_lhs.count, 10);
-    ASSERT_EQUAL_VALUE(str_lhs.length, 7);
-    ASSERT_EQUAL_STRING(&str_lhs, u8"Smile:😀");
-    mstr_free(&str_lhs);
-    mstr_free(&str_rhs);
+    mtfmt::string str_rhs = u8"😀";
+    // @mstr_concat
+    mtfmt::string str_lhs = u8"Smile:";
+    ASSERT_EQUAL_VALUE(str_lhs.length(), 6);
+    ASSERT_EQUAL_VALUE(str_lhs.byte_count(), 6);
+    str_lhs += str_rhs;
+    ASSERT_EQUAL_VALUE(str_lhs.length(), 7);
+    ASSERT_EQUAL_VALUE(str_lhs.byte_count(), 10);
+    ASSERT_EQUAL_VALUE(str_lhs, u8"Smile:😀");
 }
 
 extern "C" void string_concat_c_str(void)
 {
-    MString str_lhs;
-    EVAL(mstr_create(&str_lhs, u8"Smile:"));
-    ASSERT_EQUAL_VALUE(str_lhs.count, 6);
-    ASSERT_EQUAL_VALUE(str_lhs.length, 6);
-    EVAL(mstr_concat_cstr(&str_lhs, u8"😀"));
-    ASSERT_EQUAL_VALUE(str_lhs.count, 10);
-    ASSERT_EQUAL_VALUE(str_lhs.length, 7);
-    ASSERT_EQUAL_STRING(&str_lhs, u8"Smile:😀");
-    mstr_free(&str_lhs);
+    mtfmt::string str_lhs = u8"Smile:";
+    ASSERT_EQUAL_VALUE(str_lhs.length(), 6);
+    ASSERT_EQUAL_VALUE(str_lhs.byte_count(), 6);
+    str_lhs += u8"😀";
+    ASSERT_EQUAL_VALUE(str_lhs.length(), 7);
+    ASSERT_EQUAL_VALUE(str_lhs.byte_count(), 10);
+    ASSERT_EQUAL_VALUE(str_lhs, u8"Smile:😀");
 }
 
 extern "C" void string_concat_c_slice(void)

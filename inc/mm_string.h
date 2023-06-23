@@ -87,7 +87,7 @@ typedef struct tagMStringReplaceTarget
  * @brief 字符串匹配信息
  *
  */
-typedef struct tagMStringSubStrResult
+typedef struct tagMStringMatchResult
 {
     /**
      * @brief 是否找到了目标
@@ -106,7 +106,7 @@ typedef struct tagMStringSubStrResult
      *
      */
     usize_t substr_len;
-} MStringSubStrResult;
+} MStringMatchResult;
 
 /**
  * @brief 字符串
@@ -319,9 +319,48 @@ MSTR_EXPORT_API(const char*) mstr_as_cstr(MString* str);
  * @param[in] a: 字符串a
  * @param[in] b: 字符串b
  *
- * @return bool_t: 字符串相等情况
+ * @return mstr_bool_t: 字符串相等情况
  */
-MSTR_EXPORT_API(bool_t) mstr_equal(const MString* a, const MString* b);
+MSTR_EXPORT_API(mstr_bool_t)
+mstr_equal(const MString* a, const MString* b);
+
+/**
+ * @brief 判断字符串是否以某个字串开始
+ *
+ * @param[in] str: 字符串
+ * @param[in] prefix: 需要确认其开始的内容
+ * @param[in] prefix_len: prefix长度
+ */
+MSTR_EXPORT_API(mstr_bool_t)
+mstr_start_with(
+    const MString* str, const char* prefix, usize_t prefix_len
+);
+
+/**
+ * @brief 判断字符串是否以某个字串结束
+ *
+ * @param[in] str: 字符串
+ * @param[in] suffix: 需要确认其结束的内容
+ * @param[in] suffix_len: suffix长度
+ */
+MSTR_EXPORT_API(mstr_bool_t)
+mstr_end_with(
+    const MString* str, const char* suffix, usize_t suffix_len
+);
+
+/**
+ * @brief 判断字符串是否含有pattern
+ *
+ * @param[in] str: 字符串
+ * @param[in] pattern: 需要包含的内容
+ *
+ * @attention 在发生意外的错误(如编码问题, 内存分配失败)时,
+ * 该函数也会返回False
+ */
+MSTR_EXPORT_API(mstr_bool_t)
+mstr_contains(
+    const MString* str, const char* pattern, usize_t pattern_len
+);
 
 /**
  * @brief 从字符串中移除idx位置的字符
@@ -349,26 +388,15 @@ mstr_insert(MString* str, mstr_codepoint_t ch, usize_t idx);
  * @param[in] str: 字符串a
  * @param[out] res: 查找结果
  * @param[in] pattern: 需要查找的子串
- * @param[in] pattern_size: 子串长度, 留0表示处理到 pattern 的 '\0'
  *
  */
 MSTR_EXPORT_API(mstr_result_t)
 mstr_find(
     const MString* str,
-    MStringSubStrResult* res,
+    MStringMatchResult* res,
     const char* pattern,
-    usize_t pattern_size
+    usize_t pattern_len
 );
-
-/**
- * @brief 从字符串中移除所有匹配substr的字符
- *
- * @param[inout] str: 字符串
- * @param[in] substr: 需要移除的substr
- * @param[in] substr_len: substr长度, 留0使用strlen(substr)
- */
-MSTR_EXPORT_API(mstr_result_t)
-mstr_retain(MString* str, const char* substr, usize_t substr_len);
 
 /**
  * @brief 进行字符串替换
@@ -378,7 +406,7 @@ mstr_retain(MString* str, const char* substr, usize_t substr_len);
  * @param[in] target_cnt: 需要替换的目标个数
  */
 MSTR_EXPORT_API(mstr_result_t)
-mstr_replace(
+mstr_replace_multi(
     MString* str, const MStringReplaceTarget* target, usize_t target_cnt
 );
 
@@ -394,9 +422,28 @@ MSTR_EXPORT_API(void)
 mstr_replace_set_target(
     MStringReplaceTarget* rep,
     MStringReplaceOption opt,
-    const char* patt,
+    const char* pattern,
     const char* target
 );
+
+/**
+ * @brief 从字符串中移除所有匹配substr的字符
+ *
+ * @param[inout] str: 字符串
+ * @param[in] pattern: 需要移除的pattern
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_retain(MString* str, const char* pattern);
+
+/**
+ * @brief 进行字符串替换(单个目标)
+ *
+ * @param[inout] str: 字符串
+ * @param[in] target: 需要替换的子串
+ * @param[in] replace_to: 需要替换为的结果
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_replace(MString* str, const char* pattern, const char* replace_to);
 
 /**
  * @brief 取得迭代器

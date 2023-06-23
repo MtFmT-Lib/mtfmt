@@ -44,7 +44,7 @@
     do {                                                      \
         MString target;                                       \
         mstr_create(&target, (target_str));                   \
-        bool_t res = mstr_equal(str, &target);                \
+        mstr_bool_t res = mstr_equal(str, &target);           \
         mstr_free(&target);                                   \
         TEST_ASSERT_TRUE_MESSAGE(res, " str != " target_str); \
     } while (0)
@@ -53,13 +53,13 @@
  * @brief 确定2个字符串不相等
  *
  */
-#define ASSERT_NOT_EQUAL_STRING(str, target_str) \
-    do {                                         \
-        MString target;                          \
-        mstr_create(&target, (target_str));      \
-        bool_t res = mstr_equal(str, &target);   \
-        mstr_free(&target);                      \
-        TEST_ASSERT_FALSE(res);                  \
+#define ASSERT_NOT_EQUAL_STRING(str, target_str)    \
+    do {                                            \
+        MString target;                             \
+        mstr_create(&target, (target_str));         \
+        mstr_bool_t res = mstr_equal(str, &target); \
+        mstr_free(&target);                         \
+        TEST_ASSERT_FALSE(res);                     \
     } while (0)
 
 /**

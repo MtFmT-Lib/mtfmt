@@ -22,60 +22,6 @@ constexpr mtfmt::unicode_t unicode_char(const char (&u8char)[N])
     return mtfmt::string::unicode_char(u8char);
 }
 
-extern "C" void cpp_string_equal(void)
-{
-    mtfmt::string str1("String");
-    mtfmt::string str2 = str1;
-    TEST_ASSERT_TRUE(str1 == "String");
-    TEST_ASSERT_TRUE(str2 == "String");
-    TEST_ASSERT_TRUE("String" == str1);
-    TEST_ASSERT_TRUE("String" == str2);
-    TEST_ASSERT_TRUE(str1 == str2);
-    TEST_ASSERT_TRUE(str2 == str1);
-}
-
-extern "C" void cpp_string_not_equal(void)
-{
-    mtfmt::string str1("String1");
-    mtfmt::string str2("String2");
-    TEST_ASSERT_TRUE(str2 != str1);
-    TEST_ASSERT_TRUE(str1 != str2);
-    TEST_ASSERT_TRUE(str1 != "String2");
-    TEST_ASSERT_TRUE(str2 != "String1");
-    TEST_ASSERT_TRUE("String2" != str1);
-    TEST_ASSERT_TRUE("String1" != str2);
-}
-
-extern "C" void cpp_string_push(void)
-{
-    mtfmt::string str;
-    ASSERT_EQUAL_VALUE(str, "");
-    // 'M'
-    str.push('M');
-    ASSERT_EQUAL_VALUE(str, "M");
-    // '@' * 7
-    str.push('@', 7);
-    ASSERT_EQUAL_VALUE(str, "M@@@@@@@");
-    // emoji
-    str.push(unicode_char(u8"😊"));
-    ASSERT_EQUAL_VALUE(str, "M@@@@@@@😊");
-    // '😀' * 3
-    str.push(unicode_char(u8"😀"), 3);
-    ASSERT_EQUAL_VALUE(str, "M@@@@@@@😊😀😀😀");
-}
-
-extern "C" void cpp_string_concat(void)
-{
-    mtfmt::string str;
-    TEST_ASSERT_TRUE(str == "");
-    // 'MtF'
-    str.concat("MtF");
-    TEST_ASSERT_TRUE(str == "MtF");
-    // 'mt''
-    str += "mt";
-    TEST_ASSERT_TRUE(str == "MtFmt");
-}
-
 extern "C" void cpp_string_index(void)
 {
     mtfmt::string str = u8"😊😀汉字";

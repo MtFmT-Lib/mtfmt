@@ -16,13 +16,23 @@
 extern "C"
 {
 #endif
+    void monadic_result_and_then(void);
+    void monadic_result_or_value(void);
+    void monadic_result_or_exception(void);
+
     void allocate_then_free(void);
 
     void string_copy_create(void);
     void string_move_create(void);
     void string_length(void);
     void string_char_at(void);
+    void string_insert(void);
+    void string_remove(void);
+
     void string_equal(void);
+    void string_not_equal(void);
+    void string_end_with(void);
+    void string_start_with(void);
 
     void string_concat_object(void);
     void string_concat_c_str(void);
@@ -35,10 +45,6 @@ extern "C"
     void string_trans_reverse(void);
     void string_trans_reverse_unicode(void);
 
-    void cpp_string_equal(void);
-    void cpp_string_not_equal(void);
-    void cpp_string_push(void);
-    void cpp_string_concat(void);
     void cpp_string_index(void);
     void cpp_string_iterator(void);
     void cpp_string_const_iterator(void);
@@ -95,10 +101,6 @@ extern "C"
     void fmt_escape_bracket(void);
 
     void sync_io_write(void);
-
-    void cpp_monadic_result_and_then(void);
-    void cpp_monadic_result_or_value(void);
-    void cpp_monadic_result_or_exception(void);
 
     void cpp_wrap_fmt(void);
 #if __cplusplus

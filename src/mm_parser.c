@@ -744,7 +744,7 @@ static mstr_result_t parse_format_spec(
 {
     const Token* cur_token = &LEX_CURRENT_TOKEN(state);
     // assert: cur_token->type == TokenType_OtherChar
-    bool_t be_matched;
+    mstr_bool_t be_matched;
     char ch = *cur_token->beg;
     switch (ch) {
     case 'b':
@@ -859,7 +859,8 @@ static mstr_result_t parse_chrono_spec(
             const char* split_beg = (const char*)packed_lut_ptr[i];
             MStrFmtChronoItemFormatSpec format_spec = {
                 .value_type = (MStrFmtChronoValueType)values[0],
-                .chrono_spec = {(bool_t)values[1], (uint8_t)values[2]},
+                .chrono_spec =
+                    {(mstr_bool_t)values[1], (uint8_t)values[2]},
                 .split_beg = split_beg,
                 .split_end = split_beg + (usize_t)values[3],
             };
@@ -985,7 +986,7 @@ static mstr_result_t parse_chrono_spec_item(
         uint32_t idx = (uint32_t)cur_token->type - off;
         const uint8_t* values = packed_lut[idx];
         item->value_type = (MStrFmtChronoValueType)values[0];
-        item->chrono_spec.fixed_length = (bool_t)values[1];
+        item->chrono_spec.fixed_length = (mstr_bool_t)values[1];
         item->chrono_spec.format_length = (uint8_t)values[2];
     }
     else {
@@ -1190,7 +1191,7 @@ static mstr_result_t parse_arg_type(
     MStrFmtArgProperty* arg_prop
 )
 {
-    bool_t valid_type = True;
+    mstr_bool_t valid_type = True;
     MStrFmtArgType typ;
     const Token* cur_token = &LEX_CURRENT_TOKEN(state);
     switch (cur_token->type) {
