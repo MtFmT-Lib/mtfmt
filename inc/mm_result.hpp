@@ -82,6 +82,20 @@ template <typename T> struct is_result
     static constexpr bool value =
         details::is_instance_of<result, T>::value;
 };
+
+/**
+ * @brief 继承该类型为result增加合适的拷贝, 移动constructor/assign
+ *
+ */
+template <typename T, typename E>
+struct result_add_ctrl : result_base<T, E>
+{
+    using base_t = details::result_base<T, E>;
+    using base_t::base_t;
+
+    // TODO
+};
+
 } // namespace details
 
 /**
@@ -108,10 +122,10 @@ public:
  * @tparam E: 失败时的结果
  */
 template <typename T, typename E>
-class result final : public details::result_base<T, E>
+class result final : public details::result_add_ctrl<T, E>
 {
 public:
-    using base_t = details::result_base<T, E>;
+    using base_t = details::result_add_ctrl<T, E>;
     using succ_t = typename base_t::succ_t;
     using err_t = typename base_t::err_t;
     using base_t::base_t;
@@ -242,10 +256,10 @@ public:
      */
     template <
         typename F,
+        typename R1 = details::function_return_type_t<F>,
         typename R = details::enable_if_t<
-            details::is_result<
-                details::function_return_type_t<F>>::value,
-            typename details::function_return_type_t<F>::succ_t>>
+            details::is_result<R1>::value,
+            typename R1::succ_t>>
     details::enable_if_t<
         details::holds_prototype<F, result<R, E>, T>::value,
         result<R, E>>
@@ -266,10 +280,10 @@ public:
      */
     template <
         typename F,
+        typename R1 = details::function_return_type_t<F>,
         typename R = details::enable_if_t<
-            details::is_result<
-                details::function_return_type_t<F>>::value,
-            typename details::function_return_type_t<F>::err_t>>
+            details::is_result<R1>::value,
+            typename R1::err_t>>
     details::enable_if_t<
         details::holds_prototype<F, result<T, R>, E>::value,
         result<T, R>>
@@ -304,11 +318,9 @@ public:
      */
     template <
         typename F,
-        typename R = details::enable_if_t<
-            std::is_base_of<
-                std::exception,
-                details::function_return_type_t<F>>::value,
-            details::function_return_type_t<F>>>
+        typename R1 = details::function_return_type_t<F>,
+        typename R = details::
+            enable_if_t<std::is_base_of<std::exception, R1>::value, R1>>
     details::enable_if_t<details::holds_prototype<F, R, E>::value, T>
         or_exception(F cont) const
     {
