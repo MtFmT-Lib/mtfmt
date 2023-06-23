@@ -82,11 +82,9 @@ int main()
     RUN_TEST(string_trans_reverse);
     RUN_TEST(string_trans_reverse_unicode);
 
-    RUN_TEST(cpp_string_index);
-    RUN_TEST(cpp_string_iterator);
-    RUN_TEST(cpp_string_const_iterator);
-    RUN_TEST(cpp_string_reverse_iterator);
-    RUN_TEST(cpp_string_reverse_const_iterator);
+    RUN_TEST(string_index);
+    RUN_TEST(string_const_iterator);
+    RUN_TEST(string_reverse_const_iterator);
 
     RUN_TEST(fmt_align_left);
     RUN_TEST(fmt_align_left_fill);

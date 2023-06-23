@@ -489,6 +489,20 @@ MSTR_EXPORT_API(void) mstr_iter_mut(MStringIterMut* it, MString* str);
 MSTR_EXPORT_API(usize_t) mstr_char_length(char lead);
 
 /**
+ * @brief 判断buff的lead字符偏移量(取反)
+ *
+ * @note 在UTF-8功能启用的情况下, 其判断UTF-8编码的字符长度, 错误返回0,
+ * 否则, 该函数永远返回1
+ *
+ * @param[in] buff: 字符数组
+ * @param[in] hist_len: 字符数组允许往前查找的长度, 大于等于0
+ * (不然就返回0啦), 如果大于6, 那么最大会被限制到6(1个utf-8编码的长度)
+ *
+ */
+MSTR_EXPORT_API(usize_t)
+mstr_lead_char_offset(const mstr_char_t* buff, usize_t hist_len);
+
+/**
  * @brief 转换为UTF-8
  *
  * @param code: 字符代码点

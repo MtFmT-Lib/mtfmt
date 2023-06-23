@@ -49,11 +49,9 @@ extern "C"
     void string_trans_reverse(void);
     void string_trans_reverse_unicode(void);
 
-    void cpp_string_index(void);
-    void cpp_string_iterator(void);
-    void cpp_string_const_iterator(void);
-    void cpp_string_reverse_iterator(void);
-    void cpp_string_reverse_const_iterator(void);
+    void string_index(void);
+    void string_const_iterator(void);
+    void string_reverse_const_iterator(void);
 
     void fmt_align_left(void);
     void fmt_align_left_fill(void);

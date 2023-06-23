@@ -432,6 +432,38 @@ MSTR_EXPORT_API(usize_t) mstr_char_length(char lead)
 #endif // _MSTR_USE_UTF_8
 }
 
+MSTR_EXPORT_API(usize_t)
+mstr_lead_char_offset(const mstr_char_t* buff, usize_t hist_len)
+{
+#if _MSTR_USE_UTF_8
+    usize_t find_len = hist_len > 6 ? 6 : hist_len;
+    const mstr_char_t* it = buff;
+    while (find_len > 0) {
+        mstr_char_t ch = *it;
+        if ((ch & 0x80) == 0) {
+            // ASCII
+            it -= 1;
+            break;
+        }
+        else if ((ch & 0xc0) == 0xc0) {
+            // utf8前导字符
+            it -= 1;
+            break;
+        }
+        else {
+            // utf8内容
+            it -= 1;
+            find_len -= 1;
+        }
+    }
+    return (usize_t)(buff - it);
+#else
+    (void)buff;
+    (void)hist_len;
+    return 1;
+#endif // _MSTR_USE_UTF_8
+}
+
 #if _MSTR_USE_UTF_8
 
 MSTR_EXPORT_API(mstr_result_t)
