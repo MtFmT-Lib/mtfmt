@@ -1,3 +1,5 @@
+[!timestamp!]
+
 TODO FAQ
 
 [toc]

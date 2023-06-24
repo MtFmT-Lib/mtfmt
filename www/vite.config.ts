@@ -24,7 +24,7 @@ export default defineConfig({
     server: {
         fs: {
             allow: ['./wasm/target'],
-        },
+        }
     }
 })
 
@@ -44,6 +44,8 @@ function markdown_preprocess(): MarkdownIt {
     })
     // katex
     markdown.use(katex)
+    // 时间戳
+    markdown.use(plugin_replace_timestamp)
     // 表格标头
     markdown.use(plugin_table_caption)
     // 嵌入图片
@@ -58,9 +60,36 @@ function markdown_preprocess(): MarkdownIt {
 }
 
 /**
+ * 时间戳
+ * 
+ * 该插件识别"[!timestamp!]"的第一个位置并替换为打包的时间戳
+ */
+function plugin_replace_timestamp(md: MarkdownIt): void {
+    md.core.ruler.push('replace-timestamp', state => {
+        for (const token of state.tokens) {
+            if (token.type !== 'inline') {
+                continue
+            }
+            const caption = token.content.match('[!timestamp!]')
+            if (caption === null) {
+                continue
+            }
+            // 重新生成内容
+            token.children = []
+            token.children.push(make_html_token('<span id="markdown-timestamp" style="display:none">'))
+            token.children.push(make_text_token(new Date().getTime().toString()))
+            token.children.push(make_html_token('</span>'))
+            // 只处理第一个
+            break
+        }
+    })
+    md.enable(['replace-timestamp'])
+}
+
+/**
  * 表格标头
  * 
- * 该插件识别"!table-caption=XXX"开头的段落, 并替换为合适的表格标头
+ * 该插件识别"!table-caption:XXX"开头的段落, 并替换为合适的表格标头
  */
 function plugin_table_caption(md: MarkdownIt): void {
     md.core.ruler.push('table-caption', state => {

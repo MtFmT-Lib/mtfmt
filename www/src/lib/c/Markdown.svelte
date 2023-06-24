@@ -3,12 +3,14 @@
 -->
 <script lang="ts">
     import { writable } from 'svelte/store'
-    import generate_toc from './markdown_toc'
     import { into_boolean } from '$lib/fp/cast'
     import * as Storager from '$lib/local_storager'
     import { set_language_attrs } from './theme_lang'
-    import { set_theme, type Theme } from './theme_storager'
-    import theme_info, { get_storager_theme } from './theme_storager'
+    import { get_build_in_html } from './markdown_trans'
+    import theme_info, { type Theme } from './theme_storager'
+    import { set_theme, get_storager_theme } from './theme_storager'
+    import type { BuildinContent, LanguageKey } from './markdown_trans'
+    import get_content_html, { get_support_languages } from './markdown_trans'
 
     /**
      * 文本颜色
@@ -18,18 +20,12 @@
     /**
      * 内容
      */
-    export let contents: Record<
-        string,
-        {
-            html: string
-            toc: { level: string; content: string }[]
-        }
-    >
+    export let contents: BuildinContent
 
     /**
-     * 语言表
+     * 支持的语言
      */
-    export let language: string[]
+    let support_languages = get_support_languages(contents)
 
     /**
      * 语言配置项
@@ -42,9 +38,9 @@
     const BIO_READING_ITEM_KEY = 'bio-reading'
 
     /**
-     * 当前的主题名
+     * html内容
      */
-    let cur_theme: Theme = get_storager_theme()
+    let html_content = writable<string>(get_build_in_html('en', contents))
 
     /**
      * 文本颜色
@@ -87,16 +83,9 @@
             // 恢复上次的选项
             enable_bio_reader.set(las)
         }
+        // 加载内容
+        get_content_html(html_content, language, contents)
     })
-
-    /**
-     * 设置语言
-     */
-    function set_language(lang: string) {
-        const language = lang.toLowerCase()
-        cur_language.set(language)
-        Storager.write_local_storager(LANGUAGE_ITEM_KEY, language)
-    }
 
     /**
      * 切换bio reading
@@ -109,29 +98,43 @@
     /**
      * 更新选中的主题
      */
-    function update_cur_theme() {
+    function update_cur_theme(arg: { currentTarget: HTMLSelectElement }) {
+        const target = arg.currentTarget
+        const cur_theme = target.value as Theme
         set_theme(cur_theme)
+    }
+
+    /**
+     * 更新选中的语言
+     */
+    function update_cur_language(arg: { currentTarget: HTMLSelectElement }) {
+        const target = arg.currentTarget
+        const language = target.value as LanguageKey
+        cur_language.set(language)
+        Storager.write_local_storager(LANGUAGE_ITEM_KEY, language)
     }
 
     /**
      * 取得默认的语言
      */
-    function get_default_language(): string {
-        return Storager.read_local_storager(LANGUAGE_ITEM_KEY).or_map(() => {
-            let language: string
-            if (typeof navigator === 'undefined') {
-                language = 'en'
-            } else {
-                const lut = new Map([
-                    ['en', 'en'],
-                    ['en-US', 'en'],
-                    ['zh-CN', 'zh'],
-                ])
-                language = lut.get(navigator.language) ?? 'en'
-            }
-            Storager.write_local_storager(LANGUAGE_ITEM_KEY, language)
-            return language
-        })
+    function get_default_language(): LanguageKey {
+        return Storager.read_local_storager(LANGUAGE_ITEM_KEY)
+            .map((s) => s as LanguageKey)
+            .or_map(() => {
+                let language: LanguageKey
+                if (typeof navigator === 'undefined') {
+                    language = 'en'
+                } else {
+                    const lut = new Map<string, LanguageKey>([
+                        ['en', 'en'],
+                        ['en-US', 'en'],
+                        ['zh-CN', 'zh'],
+                    ])
+                    language = lut.get(navigator.language) ?? 'en'
+                }
+                Storager.write_local_storager(LANGUAGE_ITEM_KEY, language)
+                return language
+            })
     }
 </script>
 
@@ -162,7 +165,7 @@
             <!-- 主题 -->
             <select
                 title="Choice theme"
-                bind:value={cur_theme}
+                value={get_storager_theme()}
                 on:change={update_cur_theme}
             >
                 {#each $theme_info.themes as t}
@@ -172,23 +175,21 @@
                 {/each}
             </select>
             <!-- 语言 -->
-            {#each language as lang}
-                <button
-                    title="Select language {lang.toUpperCase()}"
-                    on:click={() => set_language(lang)}
-                >
-                    {lang.toUpperCase()}
-                </button>
-            {/each}
-            <!-- 翻译 -->
-            <button>ADD</button>
+            <select
+                title="Choice language"
+                value={get_default_language()}
+                on:change={update_cur_language}
+            >
+                {#each support_languages as lang}
+                    <option value={lang.language_key}>
+                        <span>{lang.display_name}</span>
+                    </option>
+                {/each}
+            </select>
         </div>
     </div>
     <div class="markdown-box" style="color: {$text_color}">
-        {@html generate_toc(
-            contents[$cur_language].html,
-            contents[$cur_language].toc
-        )}
+        {@html $html_content}
     </div>
 </div>
 
@@ -223,8 +224,7 @@
     }
 
     .reader-tools button,
-    .reader-language select,
-    .reader-language button {
+    .reader-language select {
         outline: 0;
         display: block;
 

@@ -34,8 +34,12 @@
     // 行距
     --text-font-size: 1.1rem;
     --text-line-height: 150%;
+    --text-space: 0;
     --text-caption-space: 0.5px;
     --text-bold-weight: 500;
+
+    // 首行缩进
+    --text-indent: 2em;
 }
 
 // dark theme
@@ -85,8 +89,9 @@
     --image-caption-font: #{$text-font-zh};
 
     // 行距
-    --text-font-size: 1.15rem;
+    --text-font-size: 1.1rem;
     --text-line-height: 160%;
+    --text-space: 0.25px;
     --text-caption-space: 1.25px;
-    --text-bold-weight: 600;
+    --text-bold-weight: 500;
 }
