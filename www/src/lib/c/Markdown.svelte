@@ -6,6 +6,7 @@
     import generate_toc from './markdown_toc'
     import { into_boolean } from '$lib/fp/cast'
     import * as Storager from '$lib/local_storager'
+    import { set_language_attrs } from './theme_lang'
     import { set_theme, type Theme } from './theme_storager'
     import theme_info, { get_storager_theme } from './theme_storager'
 
@@ -73,6 +74,9 @@
     let cur_language = writable(get_default_language())
 
     cur_language.subscribe((language) => {
+        // 设置语言attrs
+        set_language_attrs(language)
+        // 更新bio-reading模式
         if ($enable_bio_reader && language !== 'en') {
             // 仅在英文下允许使用bio reading
             enable_bio_reader.set(false)
@@ -270,10 +274,5 @@
 
     .reader-tools button[id='actived-button'] {
         background-color: var(--button-actived-bg-color);
-    }
-
-    .markdown-box {
-        line-height: 150%;
-        font-size: 1.1rem;
     }
 </style>
