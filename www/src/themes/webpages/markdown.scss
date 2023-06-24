@@ -7,7 +7,10 @@
 .markdown-box {
     font-size: var(--text-font-size);
     font-family: var(--text-font);
+    font-weight: 400;
     line-height: var(--text-line-height);
+    letter-spacing: var(--text-space);
+    vertical-align: baseline;
 
     // 西文连字和连字符
     // 参考: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_text/Wrapping_breaking_text
@@ -33,7 +36,7 @@
     // 段落文本
     p {
         margin: 0;
-        text-indent: 2em;
+        text-indent: var(--text-indent);
         word-wrap: break-word;
 
         img {
@@ -61,6 +64,8 @@
 
     ul,
     ol {
+        padding-left: 4em;
+
         li code {
             color: var(--text-color);
         }
