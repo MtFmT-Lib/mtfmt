@@ -1,4 +1,5 @@
 import generate_toc from './markdown_toc'
+import type { Writable } from 'svelte/store'
 
 /**
 * 内建支持的语言key
@@ -57,23 +58,29 @@ export function get_support_languages(build_in: BuildinContent): Language[] {
 }
 
 /**
- * 取得翻译过来的内容
+ * 加载内建的内容
  */
-export function get_content(language: LanguageKey, build_in: BuildinContent): MarkdownContent {
-    const keys = [...Object.keys(build_in)]
-    if (keys.findIndex(s => s === language) != -1) {
-        return build_in[language as BuildinLanguageKey]
-    } else {
-        return translate(language, build_in['en'])
-    }
+export function get_build_in_html(language: BuildinLanguageKey, build_in: BuildinContent): string {
+    const content = build_in[language]
+    return generate_toc(content.html, content.toc)
 }
 
 /**
  * 取得翻译出来的html
  */
-export default function get_content_html(language: LanguageKey, build_in: BuildinContent): string {
-    const markdown = get_content(language, build_in)
-    return generate_toc(markdown.html, markdown.toc)
+export default function get_content_html(result: Writable<string>, language: LanguageKey, build_in: BuildinContent) {
+    const keys = [...Object.keys(build_in)]
+    if (keys.findIndex(s => s === language) != -1) {
+        const html = get_build_in_html(language as BuildinLanguageKey, build_in)
+        result.set(html)
+    }
+    else {
+        result.set('Loading...')
+        translate(language, build_in['en']).then(markdown => {
+            const html = generate_toc(markdown.html, markdown.toc)
+            result.set(html)
+        })
+    }
 }
 
 /**
@@ -91,15 +98,17 @@ function language_display_name(language: LanguageKey): string {
 /**
  * 进行翻译
  */
-function translate(language: LanguageKey, content: MarkdownContent): MarkdownContent {
+function translate(language: LanguageKey, content: MarkdownContent): Promise<MarkdownContent> {
     const html_content = content.html
     const tocs_content = content.toc
-    // 增加机翻提示
-    const trans_hint = translate_hint(language)
-    return {
-        html: trans_hint + html_content,
-        toc: tocs_content
-    }
+    return new Promise<MarkdownContent>(resolve => {
+        // 增加机翻提示
+        const trans_hint = translate_hint(language)
+        resolve({
+            html: trans_hint + html_content,
+            toc: tocs_content
+        })
+    })
 }
 
 /**

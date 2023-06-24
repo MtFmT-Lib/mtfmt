@@ -6,16 +6,11 @@
     import { into_boolean } from '$lib/fp/cast'
     import * as Storager from '$lib/local_storager'
     import { set_language_attrs } from './theme_lang'
-    import get_content_html, {
-        get_support_languages,
-        type BuildinContent,
-        type LanguageKey,
-    } from './markdown_trans'
-    import theme_info, {
-        set_theme,
-        get_storager_theme,
-        type Theme,
-    } from './theme_storager'
+    import { get_build_in_html } from './markdown_trans'
+    import theme_info, { type Theme } from './theme_storager'
+    import { set_theme, get_storager_theme } from './theme_storager'
+    import type { BuildinContent, LanguageKey } from './markdown_trans'
+    import get_content_html, { get_support_languages } from './markdown_trans'
 
     /**
      * 文本颜色
@@ -41,6 +36,11 @@
      * bio-reading模式配置项
      */
     const BIO_READING_ITEM_KEY = 'bio-reading'
+
+    /**
+     * html内容
+     */
+    let html_content = writable<string>(get_build_in_html('en', contents))
 
     /**
      * 文本颜色
@@ -83,6 +83,8 @@
             // 恢复上次的选项
             enable_bio_reader.set(las)
         }
+        // 加载内容
+        get_content_html(html_content, language, contents)
     })
 
     /**
@@ -187,7 +189,7 @@
         </div>
     </div>
     <div class="markdown-box" style="color: {$text_color}">
-        {@html get_content_html($cur_language, contents)}
+        {@html $html_content}
     </div>
 </div>
 
