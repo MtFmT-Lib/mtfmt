@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    test_string_cxx.cpp
+ * @file    test_string_iterator.cpp
  * @author  向阳 (hinata.hoshino@foxmail.com)
- * @brief   字符串(cxx)
+ * @brief   字符串迭代器
  * @version 1.0
  * @date    2023-06-03
  *
@@ -22,7 +22,7 @@ constexpr mtfmt::unicode_t unicode_char(const char (&u8char)[N])
     return mtfmt::string::unicode_char(u8char);
 }
 
-extern "C" void cpp_string_index(void)
+extern "C" void string_index(void)
 {
     mtfmt::string str = u8"😊😀汉字";
     ASSERT_EQUAL_VALUE(str[0], unicode_char(u8"😊"));
@@ -31,7 +31,7 @@ extern "C" void cpp_string_index(void)
     ASSERT_EQUAL_VALUE(str[3], unicode_char(u8"字"));
 }
 
-extern "C" void cpp_string_iterator(void)
+extern "C" void string_const_iterator(void)
 {
     mtfmt::string str = u8"😊😀汉字";
     mtfmt::string str_output;
@@ -41,20 +41,15 @@ extern "C" void cpp_string_iterator(void)
     ASSERT_EQUAL_VALUE(str, str_output);
 }
 
-extern "C" void cpp_string_const_iterator(void)
+extern "C" void string_reverse_const_iterator(void)
 {
-    const mtfmt::string str = u8"😊😀汉字";
+    mtfmt::string str = u8"😊😀汉字";
     mtfmt::string str_output;
-    for (auto ch : str) {
-        str_output.push(ch);
+    auto it = str.rbegin();
+    auto it_end = str.rend();
+    for (; it != it_end; ++it) {
+        str_output.push(*it);
     }
+    str_output.reverse();
     ASSERT_EQUAL_VALUE(str, str_output);
-}
-
-extern "C" void cpp_string_reverse_iterator(void)
-{
-}
-
-extern "C" void cpp_string_reverse_const_iterator(void)
-{
 }

@@ -49,6 +49,7 @@ int main()
         MSTR_CONFIGURE_CFG_VAL(cfg)
     );
 
+    RUN_TEST(monadic_result_conjugate);
     RUN_TEST(monadic_result_flatten);
     RUN_TEST(monadic_result_map);
     RUN_TEST(monadic_result_map_err);
@@ -82,11 +83,14 @@ int main()
     RUN_TEST(string_trans_reverse);
     RUN_TEST(string_trans_reverse_unicode);
 
-    RUN_TEST(cpp_string_index);
-    RUN_TEST(cpp_string_iterator);
-    RUN_TEST(cpp_string_const_iterator);
-    RUN_TEST(cpp_string_reverse_iterator);
-    RUN_TEST(cpp_string_reverse_const_iterator);
+    RUN_TEST(string_index);
+    RUN_TEST(string_const_iterator);
+    RUN_TEST(string_reverse_const_iterator);
+
+    RUN_TEST(string_find);
+    RUN_TEST(string_contain);
+    RUN_TEST(string_retain);
+    RUN_TEST(string_replace);
 
     RUN_TEST(fmt_align_left);
     RUN_TEST(fmt_align_left_fill);

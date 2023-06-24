@@ -16,6 +16,7 @@
 extern "C"
 {
 #endif
+    void monadic_result_conjugate(void);
     void monadic_result_flatten(void);
     void monadic_result_map(void);
     void monadic_result_map_err(void);
@@ -49,11 +50,14 @@ extern "C"
     void string_trans_reverse(void);
     void string_trans_reverse_unicode(void);
 
-    void cpp_string_index(void);
-    void cpp_string_iterator(void);
-    void cpp_string_const_iterator(void);
-    void cpp_string_reverse_iterator(void);
-    void cpp_string_reverse_const_iterator(void);
+    void string_index(void);
+    void string_const_iterator(void);
+    void string_reverse_const_iterator(void);
+
+    void string_find(void);
+    void string_contain(void);
+    void string_retain(void);
+    void string_replace(void);
 
     void fmt_align_left(void);
     void fmt_align_left_fill(void);

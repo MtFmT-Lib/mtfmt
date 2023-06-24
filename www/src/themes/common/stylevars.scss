@@ -22,8 +22,13 @@ $hpyer-link-color: #198619;
 $button-color: #198619;
 $button-bg-color: $bg-color;
 
-// 文本字体
-$text-font: "Overpass", -apple-system,
+// 中文字体
+$text-font-zh: "TIBch", "Diatype T", "Segoe UI", "Helvetica Neue",
+    arial, "Hiragino Sans GB", "PingFang SC", "Heiti SC", "Noto Sans CJK SC",
+    "Source Han Sans SC", "Microsoft YaHei UI", "Microsoft YaHei";
+
+// 西文字体
+$text-font-en: "Overpass", -apple-system,
     blinkmacsystemfont, "Segoe UI", roboto, oxygen,
     ubuntu, cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 
@@ -31,4 +36,4 @@ $text-font: "Overpass", -apple-system,
 $mono-text-font: 'Cascadia Mono', consolas, 'Courier New', monospace;
 
 // 文本颜色
-$text-color: #2c2f31;
+$text-color: #4c4c4c;

@@ -33,6 +33,9 @@ MSTR_EXPORT_API(uint32_t) mstr_configure(void)
 #if _MSTR_USE_UTF_8
     configure |= MSTRCFG_USE_UTF_8;
 #endif // _MSTR_USE_UTF_8
+#if _MSTR_USE_CPP_EXCEPTION
+    configure |= MSTRCFG_USE_CXX_EXCEPTION;
+#endif // _MSTR_USE_CPP_EXCEPTION
     // 使用的编译器信息
     configure |= MSTR_BUILD_CC << 12;
     // ret

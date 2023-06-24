@@ -91,6 +91,12 @@ constexpr typename std::enable_if<N <= 2, unicode_t>::type unicode_char(
 class string_iterator
 {
     /**
+     * @brief 起始位置
+     *
+     */
+    const char* beg;
+
+    /**
      * @brief 位置
      *
      */
@@ -107,12 +113,13 @@ public:
     using pointer = const value_type*;
     using reference = const value_type&;
     using difference_type = iptr_t;
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::bidirectional_iterator_tag;
 
-    string_iterator(const mstr_char_t* buff, usize_t leng)
+    string_iterator(
+        const mstr_char_t* _beg, const mstr_char_t* _buff, usize_t _leng
+    )
+        : beg(_beg), it(_buff), rem_length(_leng)
     {
-        it = buff;
-        rem_length = leng;
     }
 
     string_iterator(string_iterator&&) = default;
@@ -120,22 +127,37 @@ public:
     string_iterator& operator=(string_iterator&&) = default;
     string_iterator& operator=(const string_iterator&) = default;
 
-    value_type operator*() const
+    reference operator*() const
     {
+        static mstr_codepoint_t code;
         usize_t len = mstr_char_length(*it);
-        mstr_codepoint_t code;
         mstr_result_t res = mstr_codepoint_of(&code, it, len);
         if (MSTR_FAILED(res)) {
+#if _MSTR_USE_CPP_EXCEPTION
             throw mtfmt_error(MStr_Err_UnicodeEncodingError);
+#else
+            mstr_cause_exception(MStr_Err_UnicodeEncodingError);
+#endif // _MSTR_USE_CPP_EXCEPTION
         }
+        // 因为code是计算出来的
+        // 因此用static吧...c++11似乎无法延续const reference&的lifetime
         return code;
     }
 
     string_iterator& operator++()
     {
-        usize_t len = mstr_char_length(*it);
-        it += len;
-        rem_length -= 1;
+        if (rem_length > 0) {
+            usize_t len = mstr_char_length(*it);
+            it += len;
+            rem_length -= 1;
+        }
+        else {
+#if _MSTR_USE_CPP_EXCEPTION
+            throw mtfmt_error(MStr_Err_IteratorOutOfBound);
+#else
+            mstr_cause_exception(MStr_Err_IteratorOutOfBound);
+#endif // _MSTR_USE_CPP_EXCEPTION
+        }
         return *this;
     }
 
@@ -146,86 +168,39 @@ public:
         return tmp;
     }
 
+    string_iterator& operator--()
+    {
+        if (it > beg) {
+            usize_t run = static_cast<usize_t>(it - beg);
+            // 因为迭代器是[begin, end)
+            // 因此先减掉1
+            usize_t len = mstr_lead_char_offset(it - 1, run);
+            it -= len;
+            rem_length += 1;
+        }
+        else {
+#if _MSTR_USE_CPP_EXCEPTION
+            throw mtfmt_error(MStr_Err_IteratorOutOfBound);
+#else
+            mstr_cause_exception(MStr_Err_IteratorOutOfBound);
+#endif // _MSTR_USE_CPP_EXCEPTION
+        }
+        return *this;
+    }
+
+    string_iterator operator--(int)
+    {
+        string_iterator tmp = *this;
+        --*this;
+        return tmp;
+    }
+
     bool operator==(const string_iterator& rhs) const noexcept
     {
         return it == rhs.it;
     }
 
     bool operator!=(const string_iterator& rhs) const noexcept
-    {
-        return it != rhs.it;
-    }
-};
-
-/**
- * @brief 字符串迭代器(mut)
- *
- */
-class string_iterator_mut
-{
-    /**
-     * @brief 位置
-     *
-     */
-    char* it;
-
-    /**
-     * @brief 剩余的长度
-     *
-     */
-    usize_t rem_length;
-
-public:
-    using value_type = unicode_t;
-    using pointer = value_type*;
-    using reference = value_type&;
-    using difference_type = iptr_t;
-    using iterator_category = std::forward_iterator_tag;
-
-    string_iterator_mut(mstr_char_t* buff, usize_t leng)
-    {
-        it = buff;
-        rem_length = leng;
-    }
-
-    string_iterator_mut(string_iterator_mut&&) = default;
-    string_iterator_mut(const string_iterator_mut&) = default;
-    string_iterator_mut& operator=(string_iterator_mut&&) = default;
-    string_iterator_mut& operator=(const string_iterator_mut&) =
-        default;
-
-    value_type operator*() const
-    {
-        usize_t len = mstr_char_length(*it);
-        mstr_codepoint_t code;
-        mstr_result_t res = mstr_codepoint_of(&code, it, len);
-        if (MSTR_FAILED(res)) {
-            throw mtfmt_error(MStr_Err_UnicodeEncodingError);
-        }
-        return code;
-    }
-
-    string_iterator_mut& operator++()
-    {
-        usize_t len = mstr_char_length(*it);
-        it += len;
-        rem_length -= 1;
-        return *this;
-    }
-
-    string_iterator_mut operator++(int)
-    {
-        string_iterator_mut tmp = *this;
-        ++*this;
-        return tmp;
-    }
-
-    bool operator==(const string_iterator_mut& rhs) const noexcept
-    {
-        return it == rhs.it;
-    }
-
-    bool operator!=(const string_iterator_mut& rhs) const noexcept
     {
         return it != rhs.it;
     }
@@ -253,9 +228,7 @@ public:
     using const_reference = const value_t&;
     using size_type = size_t;
     using difference_type = ptrdiff_t;
-    using iterator = details::string_iterator_mut;
     using const_iterator = details::string_iterator;
-    using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator =
         std::reverse_iterator<const_iterator>;
 
@@ -600,6 +573,39 @@ public:
     }
 
     /**
+     * @brief 在idx位置插入字符
+     *
+     */
+    result<details::unit_t, error_code_t> insert(
+        usize_t idx, unicode_t ch
+    ) noexcept
+    {
+        error_code_t res = mstr_insert(&this_obj, idx, ch);
+        if (MSTR_SUCC(res)) {
+            return details::unit_t{};
+        }
+        else {
+            return res;
+        }
+    }
+
+    /**
+     * @brief 移除idx位置的字符, 并返回被移除的字符
+     *
+     */
+    result<unicode_t, error_code_t> remove(usize_t idx) noexcept
+    {
+        unicode_t value = 0;
+        error_code_t res = mstr_remove(&this_obj, &value, idx);
+        if (MSTR_SUCC(res)) {
+            return value;
+        }
+        else {
+            return res;
+        }
+    }
+
+    /**
      * @brief 取得C风格字符串
      *
      * @return const element_t*: c风格字符串指针吗
@@ -619,30 +625,14 @@ public:
     }
 
     /**
-     * @brief 取得迭代器起始
-     *
-     */
-    iterator begin() noexcept
-    {
-        return iterator(this_obj.buff, this_obj.length);
-    }
-
-    /**
      * @brief 取得迭代器起始 (const)
      *
      */
     const_iterator begin() const noexcept
     {
-        return const_iterator(this_obj.buff, this_obj.length);
-    }
-
-    /**
-     * @brief 取得迭代器结束
-     *
-     */
-    iterator end() noexcept
-    {
-        return iterator(this_obj.buff + this_obj.count, 0);
+        return const_iterator(
+            this_obj.buff, this_obj.buff, this_obj.length
+        );
     }
 
     /**
@@ -651,7 +641,27 @@ public:
      */
     const_iterator end() const noexcept
     {
-        return const_iterator(this_obj.buff + this_obj.count, 0);
+        return const_iterator(
+            this_obj.buff, this_obj.buff + this_obj.count, 0
+        );
+    }
+
+    /**
+     * @brief 取得反向迭代器起始 (const)
+     *
+     */
+    const_reverse_iterator rbegin() const noexcept
+    {
+        return const_reverse_iterator(end());
+    }
+
+    /**
+     * @brief 取得反向迭代器结束 (const)
+     *
+     */
+    const_reverse_iterator rend() const noexcept
+    {
+        return const_reverse_iterator(begin());
     }
 
     /**
@@ -664,7 +674,11 @@ public:
     {
         unicode_t code = mstr_char_at(&this_obj, i);
         if (code == 0) {
+#if _MSTR_USE_CPP_EXCEPTION
             throw mtfmt_error(MStr_Err_IndexOutOfBound);
+#else
+            mstr_cause_exception(MStr_Err_IndexOutOfBound);
+#endif // _MSTR_USE_CPP_EXCEPTION
         }
         return code;
     }

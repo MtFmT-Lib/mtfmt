@@ -1,10 +1,13 @@
+@import "@theme/themevar";
 @import "@theme/stylevars";
 @import "@style/syntaxhighlight";
 
 // SPDX-License-Identifier: LGPL-3.0
 
 .markdown-box {
-    font-family: $text-font;
+    font-size: var(--text-font-size);
+    font-family: var(--text-font);
+    line-height: var(--text-line-height);
 
     // 西文连字和连字符
     // 参考: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_text/Wrapping_breaking_text
@@ -68,9 +71,11 @@
     h3,
     h4,
     h5 {
-        font-weight: 500;
         margin-top: 0.6em;
         margin-bottom: 0.6em;
+        font-weight: 600;
+        font-family: var(--caption-font);
+        letter-spacing: var(--text-caption-space);
     }
 
     h1 {
@@ -104,6 +109,7 @@
     // 引用块
     blockquote {
         font-size: 0.9em;
+        font-family: var(--quote-text-font);
         box-sizing: border-box;
         padding: 0.5em;
 
@@ -125,12 +131,14 @@
         p:first-child {
             text-indent: initial;
             text-align: center;
-            font-weight: 500;
             color: var(--quote-caption-color);
+            font-weight: var(--text-bold-weight);
+            font-family: var(--caption-font);
+            letter-spacing: var(--text-caption-space);
         }
 
         strong {
-            font-weight: 500;
+            font-weight: var(--text-bold-weight);
         }
     }
 
@@ -148,15 +156,11 @@
     }
 
     // 目录
-    .toc {
-        margin-top: 1em;
-        margin-bottom: 1em;
-    }
-
     .toc-tree {
         padding: 0;
         padding-left: 2em;
         list-style: none;
+        font-family: var(--caption-font);
 
         .toc-tree {
             padding-left: 1.5em;
@@ -169,17 +173,19 @@
 
     .toc-level1-content {
         font-weight: 600;
+        letter-spacing: 0.5px;
     }
 
     // 图注
     .img-caption {
         display: block;
-        font-size: 0.9em;
-        text-align: center;
         margin-top: 0.4em;
         margin-bottom: 0.5em;
         color: var(--text-color);
         text-indent: 0;
+        text-align: center;
+        font-size: 0.9em;
+        font-family: var(--image-caption-font);
     }
 
     // 表格
@@ -207,6 +213,7 @@
 
         th {
             text-align: center;
+            font-weight: var(--text-bold-weight);
             border-top: 2px solid var(--table-border-color);
             border-bottom: 1px solid var(--table-border-color);
         }
@@ -219,11 +226,12 @@
     // 表标题
     .table-caption {
         display: block;
-        font-size: 0.9em;
         text-align: center;
         margin-top: 0.5em;
         color: var(--text-color);
         text-indent: 0;
+        font-size: 0.9em;
+        font-family: var(--table-caption-font);
     }
 }
 

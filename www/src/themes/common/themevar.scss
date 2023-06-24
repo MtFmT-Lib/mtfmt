@@ -23,6 +23,19 @@
     --button-color: #{$button-color};
     --button-hover-bg-color: #{mix($bg-color, $text-color, 80%)};
     --button-actived-bg-color: #{mix($bg-color, $text-color, 75%)};
+
+    // 字体
+    --text-font: #{$text-font-en};
+    --caption-font: #{$text-font-en};
+    --quote-text-font: #{$text-font-en};
+    --table-caption-font: #{$text-font-en};
+    --image-caption-font: #{$text-font-en};
+
+    // 行距
+    --text-font-size: 1.1rem;
+    --text-line-height: 150%;
+    --text-caption-space: 0.5px;
+    --text-bold-weight: 500;
 }
 
 // dark theme
@@ -60,4 +73,20 @@
     // 按钮
     --button-hover-bg-color: #{mix($bg-color-warm, black, 90%)};
     --button-actived-bg-color: #{mix($bg-color-warm, black, 85%)};
+}
+
+// lang: 中文
+[page-lang='zh'] {
+    // 字体
+    --text-font: #{$text-font-zh};
+    --caption-font: #{$text-font-zh};
+    --quote-text-font: #{$text-font-zh};
+    --table-caption-font: #{$text-font-zh};
+    --image-caption-font: #{$text-font-zh};
+
+    // 行距
+    --text-font-size: 1.15rem;
+    --text-line-height: 160%;
+    --text-caption-space: 1.25px;
+    --text-bold-weight: 600;
 }

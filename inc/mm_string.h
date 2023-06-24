@@ -167,31 +167,6 @@ typedef struct tagMStringIter
 } MStringIter;
 
 /**
- * @brief 字符串迭代器 (可变的)
- *
- */
-typedef struct tagMStringIterMut
-{
-    /**
-     * @brief 位置
-     *
-     */
-    char* it;
-
-    /**
-     * @brief 结束位置
-     *
-     */
-    const char* it_end;
-
-    /**
-     * @brief 剩余的长度
-     *
-     */
-    usize_t rem_length;
-} MStringIterMut;
-
-/**
  * @brief 创建字符串
  *
  * @param[out] str: 需要创建的字符串结构
@@ -222,15 +197,6 @@ mstr_move_create(MString* str, MString* other);
  */
 MSTR_EXPORT_API(mstr_result_t)
 mstr_copy_create(MString* str, const MString* other);
-
-/**
- * @brief 取得第idx位置的字符ch
- *
- * @attention 边界检查失败会造成assert false, 函数失败会返回0
- * 而不是返回mstr_result
- */
-MSTR_EXPORT_API(mstr_codepoint_t)
-mstr_char_at(const MString* str, usize_t idx);
 
 /**
  * @brief 拼接字符串
@@ -363,11 +329,20 @@ mstr_contains(
 );
 
 /**
+ * @brief 取得第idx位置的字符ch
+ *
+ * @attention 边界检查失败会造成assert false, 函数失败会返回0
+ * 而不是返回mstr_result
+ */
+MSTR_EXPORT_API(mstr_codepoint_t)
+mstr_char_at(const MString* str, usize_t idx);
+
+/**
  * @brief 从字符串中移除idx位置的字符
  *
  * @param[inout] str: 字符串
  * @param[out] remoed_ch: 被移除的字符, 可以为NULL
- * @param[in] idx: 需要移除的字符,位置
+ * @param[in] idx: 需要移除的字符位置
  */
 MSTR_EXPORT_API(mstr_result_t)
 mstr_remove(MString* str, mstr_codepoint_t* removed_ch, usize_t idx);
@@ -376,11 +351,11 @@ mstr_remove(MString* str, mstr_codepoint_t* removed_ch, usize_t idx);
  * @brief 从字符串中idx位置插入一个字符
  *
  * @param[inout] str: 字符串
+ * @param[in] idx: 需要插入的字符位置
  * @param[in] ch: 需要插入的字符
- * @param[in] idx: 需要移除的字符,位置
  */
 MSTR_EXPORT_API(mstr_result_t)
-mstr_insert(MString* str, mstr_codepoint_t ch, usize_t idx);
+mstr_insert(MString* str, usize_t idx, mstr_codepoint_t ch);
 
 /**
  * @brief 查找子串第一次出现的位置
@@ -455,14 +430,6 @@ mstr_replace(MString* str, const char* pattern, const char* replace_to);
 MSTR_EXPORT_API(void) mstr_iter(MStringIter* it, const MString* str);
 
 /**
- * @brief 取得可变迭代器
- *
- * @param[out] it: 迭代器输出
- * @param[in] str: 原字符串
- */
-MSTR_EXPORT_API(void) mstr_iter_mut(MStringIterMut* it, MString* str);
-
-/**
  * @brief 移动到下一个位置
  *
  */
@@ -489,7 +456,21 @@ MSTR_EXPORT_API(void) mstr_iter_mut(MStringIterMut* it, MString* str);
 MSTR_EXPORT_API(usize_t) mstr_char_length(char lead);
 
 /**
- * @brief 转换为UTF-8
+ * @brief 判断buff的lead字符偏移量(取反)
+ *
+ * @note 在UTF-8功能启用的情况下, 其判断UTF-8编码的字符长度, 错误返回0,
+ * 否则, 该函数永远返回1
+ *
+ * @param[in] buff: 字符数组
+ * @param[in] hist_len: 字符数组允许往前查找的长度, 大于等于0
+ * (不然就返回0啦), 如果大于6, 那么最大会被限制到6(1个utf-8编码的长度)
+ *
+ */
+MSTR_EXPORT_API(usize_t)
+mstr_lead_char_offset(const mstr_char_t* buff, usize_t hist_len);
+
+/**
+ * @brief 转换为UTF-8, 如果未启用UTF-8, 该函数返回未实现错误
  *
  * @param code: 字符代码点
  * @param result: 转换输出, 至少要有6个bytes
@@ -503,6 +484,7 @@ mstr_as_utf8(
 
 /**
  * @brief 取得lead字符ch[0]所跟着的内容的unicode代码点值
+ * 如果未启用UTF-8, 该函数返回未实现错误
  *
  * @param[out] code: 解码结果
  * @param[in] ch: 字符串

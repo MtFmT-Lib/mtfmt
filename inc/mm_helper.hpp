@@ -11,6 +11,7 @@
  */
 #if !defined(_INCLUDE_MM_HELPER_HPP_)
 #define _INCLUDE_MM_HELPER_HPP_ 1
+#include "mm_cfg.h"
 #include <cstddef>
 #include <exception>
 #include <tuple>

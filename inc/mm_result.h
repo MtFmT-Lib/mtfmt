@@ -26,9 +26,11 @@ typedef enum tagMStrResult
     // ERR: 编码错误
     MStr_Err_UnicodeEncodingError,
     // ERR: 源字符串不完整
-    MStr_Err_UnicodeEncodingNotCompleted,
+    MStr_Err_EncodingNotCompleted,
     // ERR: 越界
     MStr_Err_IndexOutOfBound,
+    // ERR: 越界(迭代器)
+    MStr_Err_IteratorOutOfBound,
     // ERR: buff太短
     MStr_Err_BufferTooSmall,
     // ERR: 格式化: 索引太多

@@ -29,6 +29,7 @@
 static mstr_bool_t mstr_compare_helper(
     const char*, const char*, usize_t
 );
+static usize_t mstr_char_offset_at(const MString*, usize_t);
 static void* mstr_realloc(void*, mstr_bool_t, usize_t, usize_t);
 static mstr_result_t mstr_expand_size(MString*, usize_t);
 static mstr_result_t
@@ -104,35 +105,6 @@ mstr_copy_create(MString* str, const MString* other)
     MSTR_AND_THEN(result, mstr_create(str, ""));
     MSTR_AND_THEN(result, mstr_concat(str, other));
     return result;
-}
-
-MSTR_EXPORT_API(mstr_codepoint_t)
-mstr_char_at(const MString* str, usize_t idx)
-{
-#if _MSTR_USE_UTF_8
-    usize_t cur_idx = 0;
-    usize_t rem_bytes = 0;
-    mstr_result_t res = MStr_Ok;
-    mstr_codepoint_t out_code = 0;
-    const char* it = str->buff;
-    mstr_bounding_check(idx < str->length);
-    while (cur_idx != idx) {
-        usize_t cnt = mstr_char_length(*it);
-        it += cnt;
-        cur_idx += 1;
-    }
-    rem_bytes = str->count - (usize_t)(it - str->buff);
-    res = mstr_codepoint_of(&out_code, it, rem_bytes);
-    if (MSTR_SUCC(res)) {
-        return out_code;
-    }
-    else {
-        return 0;
-    }
-#else
-    mstr_bounding_check(idx < str->length);
-    return (mstr_codepoint_t)str->buff[idx];
-#endif // _MSTR_USE_UTF_8
 }
 
 MSTR_EXPORT_API(mstr_result_t)
@@ -388,26 +360,117 @@ mstr_contains(
     }
 }
 
+MSTR_EXPORT_API(mstr_codepoint_t)
+mstr_char_at(const MString* str, usize_t idx)
+{
+#if _MSTR_USE_UTF_8
+    usize_t offset;
+    mstr_result_t res = MStr_Ok;
+    mstr_codepoint_t out_code = 0;
+    mstr_bounding_check(idx < str->length);
+    offset = mstr_char_offset_at(str, idx);
+    res = mstr_codepoint_of(
+        &out_code, str->buff + offset, str->count - offset
+    );
+    if (MSTR_SUCC(res)) {
+        return out_code;
+    }
+    else {
+        return 0;
+    }
+#else
+    mstr_bounding_check(idx < str->length);
+    return (mstr_codepoint_t)str->buff[idx];
+#endif // _MSTR_USE_UTF_8
+}
+
 MSTR_EXPORT_API(mstr_result_t)
 mstr_remove(MString* str, mstr_codepoint_t* removed_ch, usize_t idx)
 {
-    return MStr_Err_NoImplemention;
+    mstr_result_t res = MStr_Ok;
+    // 找到需要移除的位置
+    usize_t offset = mstr_char_offset_at(str, idx);
+    // 记录返回的字符
+    if (removed_ch != NULL) {
+#if _MSTR_USE_UTF_8
+        mstr_codepoint_t out_code = 0;
+        res = mstr_codepoint_of(
+            &out_code, str->buff + offset, str->count - offset
+        );
+        if (MSTR_SUCC(res)) {
+            *removed_ch = out_code;
+        }
+        else {
+            *removed_ch = 0;
+        }
+#else
+        *removed_ch = str->buff[offset];
+#endif // _MSTR_USE_UTF_8
+    }
+    // 移除掉该字符
+    if (MSTR_SUCC(res)) {
+        usize_t ccnt = mstr_char_length(*(str->buff + offset));
+        usize_t rems = offset + ccnt;
+        memmove(
+            str->buff + offset, str->buff + rems, str->count - rems
+        );
+        str->count -= ccnt;
+        str->length -= 1;
+    }
+    return res;
 }
 
 MSTR_EXPORT_API(mstr_result_t)
-mstr_insert(MString* str, mstr_codepoint_t ch, usize_t idx)
+mstr_insert(MString* str, usize_t idx, mstr_codepoint_t ch)
 {
-    return MStr_Err_NoImplemention;
+    if (idx == str->length) {
+        // 等效为append
+        // 数组末尾插入的时间复杂度是O(1)的, 因此单独分开一个case
+        return mstr_append(str, ch);
+    }
+    else {
+        mstr_result_t res = MStr_Ok;
+        // 找到需要插入的位置
+        usize_t offset = mstr_char_offset_at(str, idx);
+        // 对需要插入的字符进行转码
+        char insert_data[8];
+        usize_t insert_data_len;
+#if _MSTR_USE_UTF_8
+        res = mstr_as_utf8(ch, insert_data, &insert_data_len);
+#else
+        insert_data[0] = (char)ch;
+        insert_data_len = 1;
+#endif // _MSTR_USE_UTF_8
+       // 保证空间足够
+        if (str->count + insert_data_len + 1 >= str->cap_size) {
+            // 保证length < cap_size + 1
+            // 且有足够的空间存放下一个字符
+            MSTR_AND_THEN(
+                res,
+                mstr_expand_size(
+                    str,
+                    str->cap_size + insert_data_len + MSTR_CAP_SIZE_STEP
+                )
+            );
+        }
+        // 插入该字符
+        if (MSTR_SUCC(res)) {
+            // 留出空间
+            memmove(
+                str->buff + offset + insert_data_len,
+                str->buff + offset,
+                str->count - offset
+            );
+            // 然后复制内容过去
+            memcpy(str->buff + offset, insert_data, insert_data_len);
+            str->count += insert_data_len;
+            str->length += 1;
+        }
+        return res;
+    }
 }
 
 MSTR_EXPORT_API(void) mstr_iter(MStringIter* it, const MString* str)
-{
-    it->it = str->buff;
-    it->it_end = str->buff + str->count;
-    it->rem_length = str->length;
-}
-
-MSTR_EXPORT_API(void) mstr_iter_mut(MStringIterMut* it, MString* str)
 {
     it->it = str->buff;
     it->it_end = str->buff + str->count;
@@ -428,6 +491,38 @@ MSTR_EXPORT_API(usize_t) mstr_char_length(char lead)
     return map[((v * 232) >> 8) & 0x7];
 #else
     (void)lead;
+    return 1;
+#endif // _MSTR_USE_UTF_8
+}
+
+MSTR_EXPORT_API(usize_t)
+mstr_lead_char_offset(const mstr_char_t* buff, usize_t hist_len)
+{
+#if _MSTR_USE_UTF_8
+    usize_t find_len = hist_len > 6 ? 6 : hist_len;
+    const mstr_char_t* it = buff;
+    while (find_len > 0) {
+        mstr_char_t ch = *it;
+        if ((ch & 0x80) == 0) {
+            // ASCII
+            it -= 1;
+            break;
+        }
+        else if ((ch & 0xc0) == 0xc0) {
+            // utf8前导字符
+            it -= 1;
+            break;
+        }
+        else {
+            // utf8内容
+            it -= 1;
+            find_len -= 1;
+        }
+    }
+    return (usize_t)(buff - it);
+#else
+    (void)buff;
+    (void)hist_len;
     return 1;
 #endif // _MSTR_USE_UTF_8
 }
@@ -490,7 +585,7 @@ mstr_codepoint_of(
             res = MStr_Ok;
         }
         else {
-            res = MStr_Err_UnicodeEncodingNotCompleted;
+            res = MStr_Err_EncodingNotCompleted;
         }
     }
     else if (lead_char <= 0xdf) {
@@ -501,7 +596,7 @@ mstr_codepoint_of(
             res = MStr_Ok;
         }
         else {
-            res = MStr_Err_UnicodeEncodingNotCompleted;
+            res = MStr_Err_EncodingNotCompleted;
         }
     }
     else if (lead_char <= 0xef) {
@@ -513,7 +608,7 @@ mstr_codepoint_of(
             res = MStr_Ok;
         }
         else {
-            res = MStr_Err_UnicodeEncodingNotCompleted;
+            res = MStr_Err_EncodingNotCompleted;
         }
     }
     else if (lead_char <= 0xf7) {
@@ -526,7 +621,7 @@ mstr_codepoint_of(
             res = MStr_Ok;
         }
         else {
-            res = MStr_Err_UnicodeEncodingNotCompleted;
+            res = MStr_Err_EncodingNotCompleted;
         }
     }
     else {
@@ -538,7 +633,6 @@ mstr_codepoint_of(
     }
     return res;
 }
-
 #else
 
 MSTR_EXPORT_API(mstr_result_t)
@@ -597,7 +691,7 @@ static mstr_result_t mstr_strlen(
     if (str > str_end) {
         // 正常情况应该刚好相等
         // 不然说明原字符串不完整
-        return MStr_Err_UnicodeEncodingNotCompleted;
+        return MStr_Err_EncodingNotCompleted;
     }
     else {
         return MStr_Ok;
@@ -635,6 +729,28 @@ static mstr_bool_t mstr_compare_helper(
         bit |= ch_a - ch_b;
     }
     return bit == 0;
+}
+
+/**
+ * @brief 找到第idx个字符的偏移量
+ *
+ */
+static usize_t mstr_char_offset_at(const MString* str, usize_t idx)
+{
+#if _MSTR_USE_UTF_8
+    usize_t cur_idx = 0;
+    const char* it = str->buff;
+    mstr_bounding_check(idx < str->length);
+    while (cur_idx != idx) {
+        usize_t cnt = mstr_char_length(*it);
+        it += cnt;
+        cur_idx += 1;
+    }
+    return (usize_t)(it - str->buff);
+#else
+    mstr_bounding_check(idx < str->length);
+    return idx;
+#endif // _MSTR_USE_UTF_8
 }
 
 /**

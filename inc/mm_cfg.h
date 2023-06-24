@@ -181,24 +181,57 @@
  * @brief 标记不可达的分支
  *
  */
-#define mstr_unreachable()        assert_param(0)
+#define mstr_unreachable()         assert_param(0)
 /**
  * @brief 边界检查
  *
  */
-#define mstr_bounding_check(expr) assert_param(!!(expr))
+#define mstr_bounding_check(expr)  assert_param(!!(expr))
+/**
+ * @brief 造成异常
+ *
+ */
+#define mstr_cause_exception(code) assert_param(0)
 #elif defined(_MSTR_RUNTIME_ASSERT)
 #include <assert.h>
-#define mstr_unreachable()        assert(0)
-#define mstr_bounding_check(expr) assert(!!(expr))
+#define mstr_unreachable()         assert(0)
+#define mstr_bounding_check(expr)  assert(!!(expr))
+#define mstr_cause_exception(code) assert(0)
 #else
-#define mstr_unreachable()        ((void)0U)
-#define mstr_bounding_check(expr) ((void)0U)
+#define mstr_unreachable()         ((void)0U)
+#define mstr_bounding_check(expr)  ((void)0U)
+#define mstr_cause_exception(code) ((void)0U)
 #endif
 #else
-#define mstr_unreachable()        ((void)0U)
-#define mstr_bounding_check(expr) ((void)0U)
+#define mstr_unreachable()         ((void)0U)
+#define mstr_bounding_check(expr)  ((void)0U)
+#define mstr_cause_exception(code) ((void)0U)
 #endif // _MSTR_RUNTIME_CTRLFLOW_MARKER
+
+#if !defined(_MSTR_USE_CPP_EXCEPTION)
+#if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
+    MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
+#if defined(__EXCEPTIONS)
+/**
+ * @brief 指定是否使用异常(跟随arm cc, 使用)
+ *
+ */
+#define _MSTR_USE_CPP_EXCEPTION 1
+#else
+/**
+ * @brief 指定是否使用异常(跟随arm cc, 不使用)
+ *
+ */
+#define _MSTR_USE_CPP_EXCEPTION 0
+#endif // __EXCEPTIONS
+#else
+/**
+ * @brief 指定是否使用异常 (默认打开)
+ *
+ */
+#define _MSTR_USE_CPP_EXCEPTION 1
+#endif // MSTR_BUILD_CC
+#endif // _MSTR_USE_CPP_EXCEPTION
 
 #if !defined(_MSTR_USE_UTF_8)
 /**
@@ -266,6 +299,12 @@
  *
  */
 #define MSTRCFG_USE_UTF_8          0x10
+
+/**
+ * @brief 标记是否使用了CXX异常
+ *
+ */
+#define MSTRCFG_USE_CXX_EXCEPTION  0x20
 
 /**
  * @brief 取得库版本信息

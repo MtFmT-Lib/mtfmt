@@ -60,6 +60,6 @@ extern "C" void string_concat_c_slice(void)
     // 拼接不完整的字符串
     mstr_result_t res;
     res = mstr_concat_cstr_slice(&str_lhs, c_str + 0, c_str + 3);
-    ASSERT_EQUAL_VALUE(res, MStr_Err_UnicodeEncodingNotCompleted);
+    ASSERT_EQUAL_VALUE(res, MStr_Err_EncodingNotCompleted);
     mstr_free(&str_lhs);
 }
