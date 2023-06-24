@@ -133,7 +133,11 @@ public:
         usize_t len = mstr_char_length(*it);
         mstr_result_t res = mstr_codepoint_of(&code, it, len);
         if (MSTR_FAILED(res)) {
+#if _MSTR_USE_CPP_EXCEPTION
             throw mtfmt_error(MStr_Err_UnicodeEncodingError);
+#else
+            mstr_cause_exception(MStr_Err_UnicodeEncodingError);
+#endif // _MSTR_USE_CPP_EXCEPTION
         }
         // 因为code是计算出来的
         // 因此用static吧...c++11似乎无法延续const reference&的lifetime
@@ -146,11 +150,15 @@ public:
             usize_t len = mstr_char_length(*it);
             it += len;
             rem_length -= 1;
-            return *this;
         }
         else {
+#if _MSTR_USE_CPP_EXCEPTION
             throw mtfmt_error(MStr_Err_IteratorOutOfBound);
+#else
+            mstr_cause_exception(MStr_Err_IteratorOutOfBound);
+#endif // _MSTR_USE_CPP_EXCEPTION
         }
+        return *this;
     }
 
     string_iterator operator++(int)
@@ -169,11 +177,15 @@ public:
             usize_t len = mstr_lead_char_offset(it - 1, run);
             it -= len;
             rem_length += 1;
-            return *this;
         }
         else {
+#if _MSTR_USE_CPP_EXCEPTION
             throw mtfmt_error(MStr_Err_IteratorOutOfBound);
+#else
+            mstr_cause_exception(MStr_Err_IteratorOutOfBound);
+#endif // _MSTR_USE_CPP_EXCEPTION
         }
+        return *this;
     }
 
     string_iterator operator--(int)
@@ -662,7 +674,11 @@ public:
     {
         unicode_t code = mstr_char_at(&this_obj, i);
         if (code == 0) {
+#if _MSTR_USE_CPP_EXCEPTION
             throw mtfmt_error(MStr_Err_IndexOutOfBound);
+#else
+            mstr_cause_exception(MStr_Err_IndexOutOfBound);
+#endif // _MSTR_USE_CPP_EXCEPTION
         }
         return code;
     }

@@ -314,7 +314,8 @@ public:
     /**
      * @brief 如果为T则返回T, 不然抛出异常
      *
-     * @attention 抛出的异常必须继承自 std::exception
+     * @attention 抛出的异常必须继承自 std::exception, 如果未启用异常,
+     * 会触发assert(false)
      */
     template <
         typename F,
@@ -328,7 +329,12 @@ public:
             return base_t::t_val;
         }
         else {
+#if _MSTR_USE_CPP_EXCEPTION
             throw cont(base_t::e_val);
+#else
+            (void)cont;
+            mstr_cause_exception(base_t::e_val);
+#endif // _MSTR_USE_CPP_EXCEPTION
         }
     }
 };
