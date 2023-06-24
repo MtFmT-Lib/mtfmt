@@ -1,6 +1,7 @@
 ---
 typora-root-url: ..\
 ---
+[!timestamp!]
 
 This page shows how to add the `MtFmt` library to your project.
 
@@ -45,11 +46,11 @@ After that, we can find the `mtfmt` package in the package list.
 
 Now open your project and click the "Manage Run-time Environment" button.
 
-![Figure 2.4: The "Manage Run-time Enviroment" button](./img/keil_opt_manager_env.png)
+![Figure 2.4: The ](./img/keil_opt_manager_env.png)
 
 And found the `mtfmt` package in the `Utility` item. Click the check box and you add the library succeeded. [Go to the next section](#section_3) to see how to customize the library.
 
-![Figure 2.5: The "Manage Run-time Enviroment" button](./img/keil_run_env.png)
+![Figure 2.5: The ](./img/keil_run_env.png)
 
 ### 2.1.2 Add sources manually
 
@@ -63,7 +64,7 @@ Then, add all files in the folder `src` into your project.
 
 Now you add all source files succeeded. The next step is that add the including directory. The preprocessor must know where the file locates in that the preprocessor of the C compiler will copy the header into the source file simply. To add that to the project, click the "Options for Target" button in the toolbar.
 
-![Figure 2.8: The "Options for Target" button](./img/keil_opt_for_target_btn.png)
+![Figure 2.8: The ](./img/keil_opt_for_target_btn.png)
 
 Then find the "C/C++" tab and click the "..." button on the right side of the edit box.
 
@@ -116,15 +117,15 @@ The following [table 3.1](#table_3_1) shows all available macros.
 
 !table-caption: Table 3.1 available macros
 
-| Macros                     | Default | Description                                           |
-| -------------------------- | :-----: | ----------------------------------------------------- |
-| `_MSTR_USE_HARDWARE_DIV`   |    0    | Enable to use hardware divider operator.              |
+| Macros                       | Default | Description                                             |
+| ---------------------------- | :-----: | ------------------------------------------------------- |
+| `_MSTR_USE_HARDWARE_DIV`   |    0    | Enable to use hardware divider operator.                |
 | `_MSTR_USE_MALLOC `        |    0    | Enable to use `malloc` instead build-in heap manager. |
-| `_MSTR_RUNTIME_HEAP_ALIGN` |    4    | Specify the alignment of build-in heap manager.       |
+| `_MSTR_RUNTIME_HEAP_ALIGN` |    4    | Specify the alignment of build-in heap manager.         |
 | `_MSTR_USE_STD_IO`         |    0    | Enable to use `stdout` support.                       |
-| `_MSTR_USE_UTF_8`          |    1    | Enable the UTF-8 support.                             |
+| `_MSTR_USE_UTF_8`          |    1    | Enable the UTF-8 support.                               |
 
-Define the macro equal to `1`  to enable it. Otherwise, the value is not equal to `1` or the macro is undefined means disabling it. 
+Define the macro equal to `1`  to enable it. Otherwise, the value is not equal to `1` or the macro is undefined means disabling it.
 
 > Notes: UTF-8 Encoding
 >

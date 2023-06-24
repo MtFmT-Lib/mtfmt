@@ -1,3 +1,5 @@
+[!timestamp!]
+
 MtFmt is a formatter library. It's another implementation for the dialect of PEP-3101 and written in pure C language and optimized for the embedded system.
 
 [toc]
@@ -354,13 +356,13 @@ Table 8.1 shows all available macros and the default value.
 
 !table-caption: Table 8.1 available macros
 
-| Macros                     | Default | Description                                           |
-| -------------------------- | :-----: | ----------------------------------------------------- |
-| `_MSTR_USE_HARDWARE_DIV`   |    0    | Enable to use hardware divider operator.              |
+| Macros                       | Default | Description                                             |
+| ---------------------------- | :-----: | ------------------------------------------------------- |
+| `_MSTR_USE_HARDWARE_DIV`   |    0    | Enable to use hardware divider operator.                |
 | `_MSTR_USE_MALLOC `        |    0    | Enable to use `malloc` instead build-in heap manager. |
-| `_MSTR_RUNTIME_HEAP_ALIGN` |    4    | Specify the alignment of build-in heap manager.       |
+| `_MSTR_RUNTIME_HEAP_ALIGN` |    4    | Specify the alignment of build-in heap manager.         |
 | `_MSTR_USE_STD_IO`         |    0    | Enable to use `stdout` support.                       |
-| `_MSTR_USE_UTF_8`          |    1    | Enable the UTF-8 support.                             |
+| `_MSTR_USE_UTF_8`          |    1    | Enable the UTF-8 support.                               |
 
 # Annex C: syntax summary
 
