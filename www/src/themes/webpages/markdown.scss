@@ -233,6 +233,14 @@
         font-size: 0.9em;
         font-family: var(--table-caption-font);
     }
+
+    // 机器翻译提示信息
+    .translate-hint {
+        width: 100%;
+        font-size: 0.9em;
+        margin-bottom: 1em;
+        text-align: right;
+    }
 }
 
 @media screen and (width < 1280px) {
