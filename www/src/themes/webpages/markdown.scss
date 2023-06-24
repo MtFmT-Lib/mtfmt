@@ -132,13 +132,13 @@
             text-indent: initial;
             text-align: center;
             color: var(--quote-caption-color);
-            font-weight: 500;
+            font-weight: var(--text-bold-weight);
             font-family: var(--caption-font);
             letter-spacing: var(--text-caption-space);
         }
 
         strong {
-            font-weight: 500;
+            font-weight: var(--text-bold-weight);
         }
     }
 
@@ -213,6 +213,7 @@
 
         th {
             text-align: center;
+            font-weight: var(--text-bold-weight);
             border-top: 2px solid var(--table-border-color);
             border-bottom: 1px solid var(--table-border-color);
         }
