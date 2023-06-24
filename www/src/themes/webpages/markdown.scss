@@ -64,7 +64,8 @@
 
     ul,
     ol {
-        padding-left: 4em;
+        padding-left: 3em;
+        list-style-type: circle;
 
         li code {
             color: var(--text-color);
