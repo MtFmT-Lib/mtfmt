@@ -169,7 +169,21 @@ public:
     }
 
     /**
-     * @brief 压扁
+     * @brief 交换succ和err的情况以及值
+     *
+     */
+    result<E, T> conjugate() const noexcept
+    {
+        if (is_succ()) {
+            return unsafe_get_succ_value();
+        }
+        else {
+            return unsafe_get_err_value();
+        }
+    }
+
+    /**
+     * @brief 扁平化
      *
      * @note 将result<result<T, E>, E>变成result<T, E>,
      * 当内部为err的时候, 输出是err, 内部是succ的时候, 返回succ
@@ -178,7 +192,7 @@ public:
     details::enable_if_t<
         details::is_result<T1>::value,
         result<typename T1::succ_t, E>>
-        flatten() const
+        flatten() const noexcept
     {
         static_assert(std::is_same<typename T1::err_t, E>::value);
         if (is_succ()) {
@@ -196,12 +210,12 @@ public:
     }
 
     /**
-     * @brief 压扁(T并不是result<T, E>)
+     * @brief 扁平化 (T不是result<T, E>的情况)
      *
      */
     template <typename T1 = T>
     details::enable_if_t<!details::is_result<T1>::value, result<T1, E>>
-        flatten() const
+        flatten() const noexcept
     {
         return *this;
     }

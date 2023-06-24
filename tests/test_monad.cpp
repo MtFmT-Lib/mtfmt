@@ -44,6 +44,20 @@ public:
     }
 };
 
+extern "C" void monadic_result_conjugate(void)
+{
+    // succ
+    mtfmt::result<SuccType, ErrorType> val1 = SuccType{1};
+    auto r1 = val1.conjugate();
+    TEST_ASSERT_TRUE(r1.is_err());
+    TEST_ASSERT_TRUE(r1.unsafe_get_err_value().value == 1);
+    // err
+    mtfmt::result<SuccType, ErrorType> val2 = ErrorType{1};
+    auto r2 = val2.conjugate();
+    TEST_ASSERT_TRUE(r2.is_succ());
+    TEST_ASSERT_TRUE(r2.unsafe_get_succ_value().value == 1);
+}
+
 extern "C" void monadic_result_flatten(void)
 {
     using Result = mtfmt::result<SuccType, ErrorType>;
