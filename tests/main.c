@@ -86,6 +86,11 @@ int main()
     RUN_TEST(string_const_iterator);
     RUN_TEST(string_reverse_const_iterator);
 
+    RUN_TEST(string_find);
+    RUN_TEST(string_contain);
+    RUN_TEST(string_retain);
+    RUN_TEST(string_replace);
+
     RUN_TEST(fmt_align_left);
     RUN_TEST(fmt_align_left_fill);
     RUN_TEST(fmt_align_left_long);

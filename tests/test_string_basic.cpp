@@ -43,25 +43,56 @@ extern "C" void string_length(void)
 
 extern "C" void string_char_at(void)
 {
-    MString str_ch;
-    mstr_codepoint_t ch = 0x1f600;
-    EVAL(mstr_create(&str_ch, u8"😀"));
-    ASSERT_EQUAL_VALUE(mstr_char_at(&str_ch, 0), ch);
-    // 测试内容
-    MString str;
-    EVAL(mstr_create(&str, u8"S😀s"));
-    ASSERT_EQUAL_VALUE(mstr_char_at(&str, 0), 'S');
-    ASSERT_EQUAL_VALUE(mstr_char_at(&str, 1), ch);
-    ASSERT_EQUAL_VALUE(mstr_char_at(&str, 2), 's');
-    // free
-    mstr_free(&str_ch);
-    mstr_free(&str_ch);
+    mtfmt::string str = u8"S😀s";
+    // @mstr_char_at
+    ASSERT_EQUAL_VALUE(str[0], 'S');
+    ASSERT_EQUAL_VALUE(str[1], unicode_char(u8"😀"));
+    ASSERT_EQUAL_VALUE(str[2], 's');
 }
 
 extern "C" void string_insert(void)
 {
+    mtfmt::string str = u8"A😀C";
+    // insert中间位置
+    mtfmt::string str_test_1 = str;
+    str_test_1.insert(1, unicode_char(u8"😊"));
+    ASSERT_EQUAL_VALUE(str_test_1, u8"A😊😀C");
+    // insert起始位置
+    mtfmt::string str_test_2 = str;
+    str_test_2.insert(0, unicode_char(u8"😊"));
+    ASSERT_EQUAL_VALUE(str_test_2, u8"😊A😀C");
+    // insert末尾位置
+    mtfmt::string str_test_3 = str;
+    str_test_3.insert(2, unicode_char(u8"😊"));
+    ASSERT_EQUAL_VALUE(str_test_3, u8"A😀😊C");
+    // insert结束位置
+    mtfmt::string str_test_4 = str;
+    str_test_4.insert(3, unicode_char(u8"😊"));
+    ASSERT_EQUAL_VALUE(str_test_4, u8"A😀C😊");
+    // insert触发堆分配
+    mtfmt::string str_large = u8"😀🍥🌈";
+    str_large.insert(1, unicode_char(u8"😊"));
+    ASSERT_EQUAL_VALUE(str_large, u8"😀😊🍥🌈");
+    str_large.insert(2, unicode_char(u8"😙"));
+    ASSERT_EQUAL_VALUE(str_large, u8"😀😊😙🍥🌈");
 }
 
 extern "C" void string_remove(void)
 {
+    mtfmt::string str = u8"A😀C";
+    // remove中间位置
+    mtfmt::string str_test_1 = str;
+    mtfmt::unicode_t ch1 = str_test_1.remove(1).or_value(0);
+    ASSERT_EQUAL_VALUE(ch1, unicode_char(u8"😀"));
+    ASSERT_EQUAL_VALUE(str_test_1, u8"AC");
+    // remove起始位置
+    mtfmt::string str_test_2 = str;
+    mtfmt::unicode_t ch2 = str_test_2.remove(0).or_value(0);
+    ASSERT_EQUAL_VALUE(ch2, unicode_char(u8"A"));
+    ASSERT_EQUAL_VALUE(str_test_2, u8"😀C");
+    // remove结束位置
+    mtfmt::string str_test_3 = str;
+    mtfmt::unicode_t ch3 = str_test_3.remove(2).or_value(0);
+    ASSERT_EQUAL_VALUE(ch3, unicode_char(u8"C"));
+    ASSERT_EQUAL_VALUE(str_test_3, u8"A😀");
 }

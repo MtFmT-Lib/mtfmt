@@ -561,6 +561,39 @@ public:
     }
 
     /**
+     * @brief 在idx位置插入字符
+     *
+     */
+    result<details::unit_t, error_code_t> insert(
+        usize_t idx, unicode_t ch
+    ) noexcept
+    {
+        error_code_t res = mstr_insert(&this_obj, idx, ch);
+        if (MSTR_SUCC(res)) {
+            return details::unit_t{};
+        }
+        else {
+            return res;
+        }
+    }
+
+    /**
+     * @brief 移除idx位置的字符, 并返回被移除的字符
+     *
+     */
+    result<unicode_t, error_code_t> remove(usize_t idx) noexcept
+    {
+        unicode_t value = 0;
+        error_code_t res = mstr_remove(&this_obj, &value, idx);
+        if (MSTR_SUCC(res)) {
+            return value;
+        }
+        else {
+            return res;
+        }
+    }
+
+    /**
      * @brief 取得C风格字符串
      *
      * @return const element_t*: c风格字符串指针吗
