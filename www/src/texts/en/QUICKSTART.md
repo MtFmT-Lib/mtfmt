@@ -63,7 +63,7 @@ Then, add all files in the folder `src` into your project.
 
 Now you add all source files succeeded. The next step is that add the including directory. The preprocessor must know where the file locates in that the preprocessor of the C compiler will copy the header into the source file simply. To add that to the project, click the "Options for Target" button in the toolbar.
 
-![Figure 2.8: The ](./img/keil_opt_for_target_btn.png)
+![Figure 2.8: The project options button ](./img/keil_opt_for_target_btn.png)
 
 Then find the "C/C++" tab and click the "..." button on the right side of the edit box.
 
@@ -79,11 +79,7 @@ Finally, we must set the C99 standard.
 
 Now you completed this section! Click the "Build" button or press the `F7` key to build your project and check the output has not any errors. Then, you can [go to the next section](#section_3)!
 
-## 2.2 CCS IDE
-
-TODO
-
-## 2.3 CMake
+## 2.2 CMake
 
 The archive includes the CMake file. Using the [git submodule](https://git-scm.com/docs/git-submodule) is a good choice if you use that version control system. [Section 1](#section_1) shows how to add the library by git submodule. Otherwise, copy the file to a suitable directory first.
 
@@ -102,7 +98,7 @@ target_include_directories(your_target PRIVATE "./mtfmt/inc")
 
 Now you completed this section. [Go to the next section](#section_3)!
 
-## 2.4 Others
+## 2.3 Others
 
 TODO
 

@@ -67,6 +67,32 @@ git submodule add git@github.com:MtFmT-Lib/mtfmt.git
 
 ![图 2.6 添加已有文件的菜单项](./img/keil_add_ext_src_nlfs.png)
 
+接着把所有在`src`目录下的文件添加进去，如[图2.7](#figure_2_7)所示。
+
+![图 2.7 添加文件到源代码组](./img/keil_add_ext_src_step2_nlfs.png)
+
+最后，在工程选项中添加包含目录。添加包含目录的目的是为了告诉编译器头文件的查找位置，是不可或缺的一步。首先打开工程选项的对话，[图2.8](#figure_2_8)给出了打开该对话框需要单击的按钮。
+
+![图 2.8 工程选项对话框](./img/keil_opt_for_target_btn.png)
+
+在 C/C++ 选项卡中找到“Including Path”标签，并添加包含路径，过程如[图2.9](#figure_2_9)所示。
+
+![图 2.9 添加包含路径的方式](./img/keil_cxx_opt_tab.png)
+
+接着添加包含路径，如[图2.10](#figure_2_10)。
+
+![图 2.10 添加包含路径](./img/keil_cxx_add_inc_path_step2.png)
+
+最后，由于库至少要求 C99 标准，在同一个选项卡下选择该支持，如[图2.11](#figure_2_11)。
+
+![图 2.11 选择 C99 标准](./img/keil_c_standard.png)
+
+现在对工程进行编译，检查所有步骤是否正确完成。接下来，推荐阅读[第三章](#section_3)了解如何对库进行配置。
+
+## 2.2 CMake
+
+库本身携带了 CMake 的构建清单，故仅需添加库所在的目录到构建的子目录中即可。TODO
+
 # 3 客制化
 
-本章描述了几个可选功能如何开启或者关闭。
+本章描述了几个可选功能如何开启或者关闭。TODO
