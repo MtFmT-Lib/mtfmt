@@ -32,8 +32,14 @@ $text-font-en: "Overpass", -apple-system,
     blinkmacsystemfont, "Segoe UI", roboto, oxygen,
     ubuntu, cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 
-// 等宽字符
-$mono-text-font: 'Cascadia Mono', consolas, 'Courier New', monospace;
+// 代码块的等宽字符
+$mono-text-font: 'Cascadia Mono', 'Consolas', 'Courier New', monospace;
+
+// 内联代码块的字体(en)
+$inline-code-text-font-en: 'Consolas', 'Courier New', monospace;
+
+// 内联代码块的字体(zh)
+$inline-code-text-font-zh: $inline-code-text-font-en;
 
 // 文本颜色
 $text-color: #4f4f4f;

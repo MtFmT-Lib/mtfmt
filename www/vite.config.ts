@@ -175,7 +175,7 @@ function as_section_id_name(content: string): string {
  * 否则会生成完整的内容
  */
 function as_figure_id_name(content: string): string {
-    const patt = content.match(/(F|f)igure( *)([0-9](\.[0-9]+)*)/)
+    const patt = content.match(/(Figure|figure|图)( *)([0-9](\.[0-9]+)*)/)
     const figure_id = patt ? patt[3] : content
     return 'figure_' + replace_escape_char(figure_id.toLowerCase())
 }
@@ -187,7 +187,7 @@ function as_figure_id_name(content: string): string {
  * 否则会生成完整的内容
  */
 function as_table_id_name(content: string): string {
-    const patt = content.match(/(T|t)able( *)([0-9](\.[0-9]+)*)/)
+    const patt = content.match(/(Table|table|表)( *)([0-9](\.[0-9]+)*)/)
     const table_id = patt ? patt[3] : content
     return 'table_' + replace_escape_char(table_id.toLowerCase())
 }

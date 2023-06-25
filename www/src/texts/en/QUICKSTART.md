@@ -45,11 +45,11 @@ After that, we can find the `mtfmt` package in the package list.
 
 Now open your project and click the "Manage Run-time Environment" button.
 
-![Figure 2.4: The ](./img/keil_opt_manager_env.png)
+![Figure 2.4: The options manager](./img/keil_opt_manager_env.png)
 
 And found the `mtfmt` package in the `Utility` item. Click the check box and you add the library succeeded. [Go to the next section](#section_3) to see how to customize the library.
 
-![Figure 2.5: The ](./img/keil_run_env.png)
+![Figure 2.5: The envoriment](./img/keil_run_env.png)
 
 ### 2.1.2 Add sources manually
 

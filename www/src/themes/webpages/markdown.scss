@@ -50,11 +50,12 @@
         }
 
         code {
-            color: var(--text-color);
+            border-radius: 2px;
             padding-left: 0.1em;
             padding-right: 0.1em;
+            color: var(--text-color);
             background-color: var(--text-block-bg-color);
-            border-radius: 2px;
+            font-family: var(--inline-code-block-font);
         }
 
         .bio-reading-bold {
@@ -64,11 +65,13 @@
 
     ul,
     ol {
-        padding-left: 3em;
-        list-style-type: circle;
-
         li code {
+            border-radius: 2px;
+            padding-left: 0.1em;
+            padding-right: 0.1em;
             color: var(--text-color);
+            background-color: var(--text-block-bg-color);
+            font-family: var(--inline-code-block-font);
         }
     }
 
@@ -79,7 +82,7 @@
     h5 {
         margin-top: 0.6em;
         margin-bottom: 0.6em;
-        font-weight: 600;
+        font-weight: var(--caption-text-weight);
         font-family: var(--caption-font);
         letter-spacing: var(--text-caption-space);
     }
@@ -178,7 +181,7 @@
     }
 
     .toc-level1-content {
-        font-weight: 600;
+        font-weight: var(--caption-text-weight);
         letter-spacing: 0.5px;
     }
 

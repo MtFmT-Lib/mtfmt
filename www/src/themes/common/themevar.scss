@@ -30,13 +30,15 @@
     --quote-text-font: #{$text-font-en};
     --table-caption-font: #{$text-font-en};
     --image-caption-font: #{$text-font-en};
+    --inline-code-block-font: #{$inline-code-text-font-en};
 
-    // 行距
+    // 行距和字体weight
     --text-font-size: 1.1rem;
     --text-line-height: 150%;
     --text-space: 0;
     --text-caption-space: 0.5px;
     --text-bold-weight: 500;
+    --caption-text-weight: 600;
 
     // 首行缩进
     --text-indent: 2em;
@@ -87,6 +89,7 @@
     --quote-text-font: #{$text-font-zh};
     --table-caption-font: #{$text-font-zh};
     --image-caption-font: #{$text-font-zh};
+    --inline-code-block-font: #{$inline-code-text-font-zh};
 
     // 行距
     --text-font-size: 1.1rem;
