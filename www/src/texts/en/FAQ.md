@@ -1,5 +1,3 @@
-[!timestamp!]
-
 TODO FAQ
 
 [toc]

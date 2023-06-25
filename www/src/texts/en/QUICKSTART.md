@@ -1,7 +1,6 @@
 ---
 typora-root-url: ..\
 ---
-[!timestamp!]
 
 This page shows how to add the `MtFmt` library to your project.
 

@@ -1,5 +1,3 @@
-[!timestamp!]
-
 MtFmt is a formatter library. It's another implementation for the dialect of PEP-3101 and written in pure C language and optimized for the embedded system.
 
 [toc]
