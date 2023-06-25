@@ -1,7 +1,6 @@
 ---
 typora-root-url: ..\
 ---
-[!timestamp!]
 
 This page shows how to add the `MtFmt` library to your project.
 
@@ -46,11 +45,11 @@ After that, we can find the `mtfmt` package in the package list.
 
 Now open your project and click the "Manage Run-time Environment" button.
 
-![Figure 2.4: The ](./img/keil_opt_manager_env.png)
+![Figure 2.4: The options manager](./img/keil_opt_manager_env.png)
 
 And found the `mtfmt` package in the `Utility` item. Click the check box and you add the library succeeded. [Go to the next section](#section_3) to see how to customize the library.
 
-![Figure 2.5: The ](./img/keil_run_env.png)
+![Figure 2.5: The envoriment](./img/keil_run_env.png)
 
 ### 2.1.2 Add sources manually
 
@@ -64,7 +63,7 @@ Then, add all files in the folder `src` into your project.
 
 Now you add all source files succeeded. The next step is that add the including directory. The preprocessor must know where the file locates in that the preprocessor of the C compiler will copy the header into the source file simply. To add that to the project, click the "Options for Target" button in the toolbar.
 
-![Figure 2.8: The ](./img/keil_opt_for_target_btn.png)
+![Figure 2.8: The project options button ](./img/keil_opt_for_target_btn.png)
 
 Then find the "C/C++" tab and click the "..." button on the right side of the edit box.
 
@@ -80,11 +79,7 @@ Finally, we must set the C99 standard.
 
 Now you completed this section! Click the "Build" button or press the `F7` key to build your project and check the output has not any errors. Then, you can [go to the next section](#section_3)!
 
-## 2.2 CCS IDE
-
-TODO
-
-## 2.3 CMake
+## 2.2 CMake
 
 The archive includes the CMake file. Using the [git submodule](https://git-scm.com/docs/git-submodule) is a good choice if you use that version control system. [Section 1](#section_1) shows how to add the library by git submodule. Otherwise, copy the file to a suitable directory first.
 
@@ -103,7 +98,7 @@ target_include_directories(your_target PRIVATE "./mtfmt/inc")
 
 Now you completed this section. [Go to the next section](#section_3)!
 
-## 2.4 Others
+## 2.3 Others
 
 TODO
 

@@ -44,8 +44,6 @@ function markdown_preprocess(): MarkdownIt {
     })
     // katex
     markdown.use(katex)
-    // 时间戳
-    markdown.use(plugin_replace_timestamp)
     // 表格标头
     markdown.use(plugin_table_caption)
     // 嵌入图片
@@ -57,33 +55,6 @@ function markdown_preprocess(): MarkdownIt {
     // bionic reading
     markdown.use(plugin_bionic_reading)
     return markdown
-}
-
-/**
- * 时间戳
- * 
- * 该插件识别"[!timestamp!]"的第一个位置并替换为打包的时间戳
- */
-function plugin_replace_timestamp(md: MarkdownIt): void {
-    md.core.ruler.push('replace-timestamp', state => {
-        for (const token of state.tokens) {
-            if (token.type !== 'inline') {
-                continue
-            }
-            const caption = token.content.match('[!timestamp!]')
-            if (caption === null) {
-                continue
-            }
-            // 重新生成内容
-            token.children = []
-            token.children.push(make_html_token('<span id="markdown-timestamp" style="display:none">'))
-            token.children.push(make_text_token(new Date().getTime().toString()))
-            token.children.push(make_html_token('</span>'))
-            // 只处理第一个
-            break
-        }
-    })
-    md.enable(['replace-timestamp'])
 }
 
 /**
@@ -204,7 +175,7 @@ function as_section_id_name(content: string): string {
  * 否则会生成完整的内容
  */
 function as_figure_id_name(content: string): string {
-    const patt = content.match(/(F|f)igure( *)([0-9](\.[0-9]+)*)/)
+    const patt = content.match(/(Figure|figure|图)( *)([0-9](\.[0-9]+)*)/)
     const figure_id = patt ? patt[3] : content
     return 'figure_' + replace_escape_char(figure_id.toLowerCase())
 }
@@ -216,7 +187,7 @@ function as_figure_id_name(content: string): string {
  * 否则会生成完整的内容
  */
 function as_table_id_name(content: string): string {
-    const patt = content.match(/(T|t)able( *)([0-9](\.[0-9]+)*)/)
+    const patt = content.match(/(Table|table|表)( *)([0-9](\.[0-9]+)*)/)
     const table_id = patt ? patt[3] : content
     return 'table_' + replace_escape_char(table_id.toLowerCase())
 }
@@ -290,8 +261,14 @@ function plugin_bionic_reading(md: MarkdownIt): void {
                             if (token.children != null) {
                                 throw 'Markdown parser: Cannot process a text with children'
                             }
-                            const result = add_bionic_reading(token.content)
-                            children.push(...result)
+                            const content = token.content
+                            if (/^[\x00-\x7f]+$/.test(content)) {
+                                const result = add_bionic_reading(token.content)
+                                children.push(...result)
+                            } else {
+                                // 非ascii
+                                children.push(token)
+                            }
                         } else {
                             children.push(token)
                         }
