@@ -111,6 +111,19 @@ if(MTFMT_BUILD_SHARED)
     target_compile_definitions(${TARGET_NAME} PRIVATE _MSTR_BUILD_DLL)
 endif()
 
+install(TARGETS mtfmt
+        EXPORT mtfmt-targets
+        LIBRARY DESTINATION lib  # 动态库安装路径
+        ARCHIVE DESTINATION lib  # 静态库安装路径
+        PUBLIC_HEADER DESTINATION include()  # 头文件安装路径
+        )
+
+# 导出 CMake 配置文件
+install(EXPORT mtfmt-targets
+    FILE mtfmt-config.cmake
+    NAMESPACE mtfmt::
+    DESTINATION lib/cmake/mtfmt)
+
 # 测试
 # enable_testing()
 
