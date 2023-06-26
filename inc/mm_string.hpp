@@ -384,7 +384,7 @@ public:
      * @brief 判断字符串是否以另一个字串开始(c_str)
      *
      */
-    bool start_with(const char* prefix) const noexcept
+    bool start_with(const value_t* prefix) const noexcept
     {
         return !!mstr_start_with(&this_obj, prefix, strlen(prefix));
     }
@@ -414,7 +414,7 @@ public:
      * @brief 判断字符串是否以另一个字串结束(c_str)
      *
      */
-    bool end_with(const char* suffix) const noexcept
+    bool end_with(const value_t* suffix) const noexcept
     {
         return !!mstr_end_with(&this_obj, suffix, strlen(suffix));
     }
@@ -603,6 +603,150 @@ public:
         else {
             return res;
         }
+    }
+
+    /**
+     * @brief 判断字符串是否包括字符串B
+     *
+     * @attention 该函数在字符串B出现编码错误,
+     * 或者实现过程出现堆分配失败时依然会返回 false
+     *
+     */
+    bool contains(const value_t* patt) const noexcept
+    {
+        return mstr_contains(&this_obj, patt, strlen(patt));
+    }
+
+    /**
+     * @brief 判断字符串是否包括字符串B (cstr数组)
+     *
+     * @attention 该函数在字符串B出现编码错误,
+     * 或者实现过程出现堆分配失败时依然会返回 false
+     *
+     */
+    template <std::size_t N>
+    bool contains(const value_t (&patt)[N]) const noexcept
+    {
+        return mstr_contains(&this_obj, patt, N);
+    }
+
+    /**
+     * @brief 判断字符串是否包括字符串B (string对象)
+     *
+     * @attention 该函数在字符串B出现编码错误,
+     * 或者实现过程出现堆分配失败时依然会返回 false
+     *
+     */
+    bool contains(const string& patt) const noexcept
+    {
+        return mstr_contains(
+            &this_obj, patt.this_obj.buff, patt.this_obj.count
+        );
+    }
+
+    /**
+     * @brief 查找字符串 (c_str)
+     *
+     * @note 该函数会在找不到的时候返回succ,
+     * 但是index是-1。使用find_or_err在找不到的时候返回Error
+     */
+    result<isize_t, error_code_t> find(
+        const value_t* patt, usize_t patt_len = 0
+    ) const noexcept
+    {
+        mstr_result_t res;
+        MStringMatchResult find_result;
+        res = mstr_find(
+            &this_obj,
+            &find_result,
+            patt,
+            patt_len == 0 ? strlen(patt) : patt_len
+        );
+        if (MSTR_FAILED(res)) {
+            return res;
+        }
+        else if (find_result.is_matched) {
+            return static_cast<isize_t>(find_result.begin_offset);
+        }
+        else {
+            return static_cast<isize_t>(-1);
+        }
+    }
+
+    /**
+     * @brief 查找字符串 (c_str array)
+     *
+     * @note 该函数会在找不到的时候返回succ,
+     * 但是index是-1。使用find_or_err在找不到的时候返回Error
+     */
+    template <std::size_t N>
+    result<isize_t, error_code_t> find(const value_t (&patt)[N]
+    ) const noexcept
+    {
+        return find(patt, N);
+    }
+
+    /**
+     * @brief 查找字符串 (mtfmt::string)
+     *
+     * @note 该函数会在找不到的时候返回succ,
+     * 但是index是-1。使用find_or_err在找不到的时候返回Error
+     */
+    result<isize_t, error_code_t> find(const mtfmt::string& patt
+    ) const noexcept
+    {
+        return find(patt.this_obj.buff, patt.this_obj.count);
+    }
+
+    /**
+     * @brief 查找字符串 (c_str)
+     *
+     * @note 该函数会在找不到的时候返回Error, 使用 find 返回-1
+     */
+    result<usize_t, error_code_t> find_or_err(
+        const value_t* patt, usize_t patt_len = 0
+    ) const noexcept
+    {
+        mstr_result_t res;
+        MStringMatchResult find_result;
+        res = mstr_find(
+            &this_obj,
+            &find_result,
+            patt,
+            patt_len == 0 ? strlen(patt) : patt_len
+        );
+        if (MSTR_FAILED(res)) {
+            return res;
+        }
+        else if (find_result.is_matched) {
+            return static_cast<isize_t>(find_result.begin_offset);
+        }
+        else {
+            return MStr_Err_NoSubstrFound;
+        }
+    }
+
+    /**
+     * @brief 查找字符串 (c_str array)
+     *
+     * @note 该函数会在找不到的时候返回Error, 使用 find 返回-1
+     */
+    template <std::size_t N>
+    result<usize_t, error_code_t> find_or_err(const value_t (&patt)[N]
+    ) const noexcept
+    {
+        return find_or_err(patt, N);
+    }
+
+    /**
+     * @brief 查找字符串 (mtfmt::string)
+     *
+     * @note 该函数会在找不到的时候返回Error, 使用 find 返回-1
+     */
+    result<usize_t, error_code_t> find_or_err(const mtfmt::string& patt
+    ) const noexcept
+    {
+        return find_or_err(patt.this_obj.buff, patt.this_obj.count);
     }
 
     /**

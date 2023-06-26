@@ -100,12 +100,6 @@ typedef struct tagMStringMatchResult
      *
      */
     usize_t begin_offset;
-
-    /**
-     * @brief 目标长度
-     *
-     */
-    usize_t substr_len;
 } MStringMatchResult;
 
 /**

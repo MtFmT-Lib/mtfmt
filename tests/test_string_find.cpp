@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    test_string_match.cpp
+ * @file    test_string_find.cpp
  * @author  向阳 (hinata.hoshino@foxmail.com)
- * @brief   模式串匹配在内的东东
+ * @brief   字符串查找
  * @version 1.0
- * @date    2023-06-24
+ * @date    2023-06-26
  *
  * @copyright Copyright (c) 向阳, all rights reserved.
  *
@@ -13,7 +13,6 @@
 #include "main.h"
 #include "mtfmt.hpp"
 #include "unity.h"
-#include <stddef.h>
 #include <stdio.h>
 
 template <std::size_t N>
@@ -26,14 +25,18 @@ extern "C" void string_find(void)
 {
 }
 
+extern "C" void string_find_large(void)
+{
+}
+
+extern "C" void string_find_or_error(void)
+{
+}
+
 extern "C" void string_retain(void)
 {
 }
 
 extern "C" void string_contain(void)
-{
-}
-
-extern "C" void string_replace(void)
 {
 }

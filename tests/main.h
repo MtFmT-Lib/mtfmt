@@ -57,7 +57,8 @@ extern "C"
     void string_find(void);
     void string_contain(void);
     void string_retain(void);
-    void string_replace(void);
+    void string_find_large(void);
+    void string_find_or_error(void);
 
     void fmt_align_left(void);
     void fmt_align_left_fill(void);
