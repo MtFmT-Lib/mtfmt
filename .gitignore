@@ -36,6 +36,7 @@ target_coverage
 
 cmake-build-debug/
 .idea/
+!*_resource.rc
 
 */internal/*
 
