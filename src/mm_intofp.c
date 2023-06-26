@@ -1,13 +1,16 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    mm_scan.c
+ * @file    mm_intofp.c
  * @author  向阳 (hinata.hoshino@foxmail.com)
- * @brief   喵喵输入
+ * @brief   浮点格式化的函数实现
  * @version 1.0
- * @date    2023-05-17
+ * @date    2023-03-24
  *
  * @copyright Copyright (c) 向阳, all rights reserved.
  *
  */
+
+#define MSTR_IMP_SOURCES 1
+
 #include "mm_fmt.h"
-#include "mm_string.h"
+#include "mm_typedef.h"

@@ -9,39 +9,18 @@
  * @copyright Copyright (c) 向阳, all rights reserved.
  *
  */
+
+#define MSTR_IMP_SOURCES 1
+
 #include "mm_fmt.h"
 #include "mm_typedef.h"
-// #include "runtime_system.h"
-#include <stdarg.h>
-#include <string.h>
 
 /**
  * @brief 将元素类型T转换为对应的数组类型值
  *
  */
 #define AS_ARRAY_TYPE(t) \
-    ((MStrFmtArgType)((u32_t)(t) | MStrFmtArgType_Array_Bit))
-
-/**
- * @brief 格式化参数
- *
- */
-typedef struct tagMStrFmtFormatArgument
-{
-    iptr_t value;
-    MStrFmtArgType type;
-} MStrFmtFormatArgument;
-
-/**
- * @brief 格式化参数的context
- *
- */
-typedef struct tagMStrFmtArgsContext
-{
-    va_list* p_ap;
-    usize_t max_place;
-    MStrFmtFormatArgument cache[MFMT_PLACE_MAX_NUM];
-} MStrFmtArgsContext;
+    ((MStrFmtArgType)((uint32_t)(t) | MStrFmtArgType_Array_Bit))
 
 //
 // private:
@@ -52,8 +31,6 @@ static mstr_result_t
 static mstr_result_t load_value(
     MStrFmtFormatArgument*, MStrFmtArgsContext*, usize_t, MStrFmtArgType
 );
-static mstr_result_t
-    format_impl(const char*, MString*, MStrFmtArgsContext*);
 static mstr_result_t
     format_value(MString*, const MStrFmtParseResult*, const MStrFmtFormatArgument*);
 static mstr_result_t
@@ -68,15 +45,17 @@ static mstr_result_t
 static mstr_result_t
     convert_time(MString*, iptr_t, const MStrFmtFormatSpec*);
 static mstr_result_t convert_int(
-    MString*, i32_t, MStrFmtSignDisplay, MStrFmtFormatType
+    MString*, int32_t, MStrFmtSignDisplay, MStrFmtFormatType
 );
 static mstr_result_t convert_quat(
-    MString*, i32_t, u32_t, MStrFmtSignDisplay
+    MString*, int32_t, uint32_t, MStrFmtSignDisplay
 );
-static mstr_result_t convert_uquat(MString*, u32_t, u32_t);
-static mstr_result_t convert_uint(MString*, u32_t, MStrFmtFormatType);
+static mstr_result_t convert_uquat(MString*, uint32_t, uint32_t);
+static mstr_result_t convert_uint(
+    MString*, uint32_t, MStrFmtFormatType
+);
 static mstr_result_t convert_sign_helper(
-    MString*, i32_t, MStrFmtSignDisplay
+    MString*, int32_t, MStrFmtSignDisplay
 );
 
 //
@@ -84,44 +63,41 @@ static mstr_result_t convert_sign_helper(
 //
 
 MSTR_EXPORT_API(mstr_result_t)
-mstr_format(const char* fmt, MString* res_str, usize_t fmt_place, ...)
+mstr_format(MString* res_str, const char* fmt, usize_t fmt_place, ...)
 {
+    mstr_result_t res;
     va_list ap;
     va_start(ap, fmt_place);
-    mstr_result_t res;
-    MStrFmtArgsContext context = {NULL, 0, {{MStrFmtArgType_Unknown}}};
-    context.max_place = fmt_place;
-    context.p_ap = &ap;
-    res = format_impl(fmt, res_str, &context);
+    res = mstr_vformat(fmt, res_str, fmt_place, &ap);
     va_end(ap);
     return res;
 }
 
 MSTR_EXPORT_API(mstr_result_t)
 mstr_vformat(
-    const char* fmt, MString* res_str, usize_t fmt_place, isize_t ap_ptr
+    const char* fmt,
+    MString* res_str,
+    usize_t fmt_place,
+    va_list* ap_ptr
 )
 {
-    MStrFmtArgsContext context = {NULL, 0, {{MStrFmtArgType_Unknown}}};
+    MStrFmtArgsContext context = {0};
     context.max_place = fmt_place;
     context.p_ap = (va_list*)ap_ptr;
-    return format_impl(fmt, res_str, &context);
+    return mstr_context_format(res_str, fmt, &context);
 }
 
-/**
- * @brief 格式化函数的实现
- *
- */
-static mstr_result_t format_impl(
-    const char* fmt, MString* res_str, MStrFmtArgsContext* ctx
+MSTR_EXPORT_API(mstr_result_t)
+mstr_context_format(
+    MString* res_str, const char* fmt, MStrFmtArgsContext* ctx
 )
 {
+    mstr_result_t result = MStr_Ok;
     // 处理格式化串
     if (ctx->max_place > MFMT_PLACE_MAX_NUM) {
         return MStr_Err_IndexTooLarge;
     }
     // else:
-    mstr_result_t result = MStr_Ok;
     while (!!*fmt && MSTR_SUCC(result)) {
         if (*fmt != '{' && *fmt != '}') {
             // 非格式化内容, 正常copy走
@@ -131,21 +107,23 @@ static mstr_result_t format_impl(
         }
         else {
             // 解析格式化串
+            uint32_t arg_id;
+            MStrFmtArgClass arg_class;
+            MStrFmtFormatArgument arg = {0};
+            MStrFmtFormatArgument arg_attach = {0};
             MStrFmtParseResult parser_result;
             MSTR_AND_THEN(
                 result, process_replacement_field(&fmt, &parser_result)
             );
             // 处理结果
-            u32_t arg_id = parser_result.arg_id;
-            MStrFmtArgClass arg_class = parser_result.arg_class;
-            MStrFmtFormatArgument arg = {0};
-            MStrFmtFormatArgument arg_attach = {0};
+            arg_id = parser_result.val.val.id;
+            arg_class = parser_result.arg_class;
             switch (arg_class) {
             case MStrFmtArgClass_EscapeChar:
                 // 转义字符, 直接append
                 MSTR_AND_THEN(
                     result,
-                    mstr_append(res_str, parser_result.escape_char)
+                    mstr_append(res_str, parser_result.val.escape_char)
                 );
                 break;
             case MStrFmtArgClass_Value:
@@ -153,7 +131,7 @@ static mstr_result_t format_impl(
                 MSTR_AND_THEN(
                     result,
                     load_value(
-                        &arg, ctx, arg_id, parser_result.arg_type
+                        &arg, ctx, arg_id, parser_result.val.val.typ
                     )
                 );
                 // 进行格式化
@@ -169,7 +147,7 @@ static mstr_result_t format_impl(
                         &arg,
                         ctx,
                         arg_id,
-                        AS_ARRAY_TYPE(parser_result.array_ele_type)
+                        AS_ARRAY_TYPE(parser_result.val.arr.ele_typ)
                     )
                 );
                 // (数组长度)
@@ -211,7 +189,7 @@ static mstr_result_t load_value(
     MStrFmtArgType spec_type
 )
 {
-    u32_t max_place = ctx->max_place;
+    uint32_t max_place = (uint32_t)ctx->max_place;
     mstr_result_t result = MStr_Ok;
     MStrFmtFormatArgument* cache = ctx->cache;
     if (arg_id >= max_place) {
@@ -254,8 +232,11 @@ static mstr_result_t format_array(
     const MStrFmtFormatArgument* sz_arg
 )
 {
+    MString buff;
+    mstr_result_t result;
+    usize_t array_len, array_index;
     if (arg->type !=
-        (parser_result->array_ele_type | MStrFmtArgType_Array_Bit)) {
+        (parser_result->val.arr.ele_typ | MStrFmtArgType_Array_Bit)) {
         return MStr_Err_InvaildArgumentType;
     }
     else if (sz_arg->type != MStrFmtArgType_Uint32) {
@@ -263,21 +244,20 @@ static mstr_result_t format_array(
     }
     // else:
     // 数组长度
-    usize_t array_len = (usize_t)sz_arg->value;
+    array_len = (usize_t)sz_arg->value;
     // 格式化数组中的每一个元素
-    usize_t array_index = 0;
-    MString buff;
-    mstr_result_t result = mstr_create_empty(&buff);
+    array_index = 0;
+    result = mstr_create_empty(&buff);
     while (MSTR_SUCC(result) && array_index < array_len) {
         MStrFmtFormatArgument element;
-        element.type = parser_result->array_ele_type;
+        element.type = parser_result->val.arr.ele_typ;
         element.value = array_get_item(arg, array_index);
         // 格式化元素的值到 internal_buff
         MSTR_AND_THEN(result, convert(&buff, parser_result, &element));
         // 增加分隔符
         if (MSTR_SUCC(result) && array_index + 1 < array_len) {
-            const char* split_beg = parser_result->array_split_beg;
-            const char* split_end = parser_result->array_split_end;
+            const char* split_beg = parser_result->val.arr.split_beg;
+            const char* split_end = parser_result->val.arr.split_end;
             result =
                 mstr_concat_cstr_slice(&buff, split_beg, split_end);
         }
@@ -287,7 +267,7 @@ static mstr_result_t format_array(
     // 处理对齐和填充
     MSTR_AND_THEN(
         result,
-        copy_to_output(res_str, &parser_result->format_spec, &buff)
+        copy_to_output(res_str, &parser_result->val.val.spec, &buff)
     );
     // 返回
     mstr_free(&buff);
@@ -306,61 +286,62 @@ static iptr_t array_get_item(
 )
 {
     MStrFmtArgType type =
-        (MStrFmtArgType)((u32_t)(array->type) &
-                         (u32_t)(MStrFmtArgType_Array_Bit - 1));
-    size_t ele_size = 0;
+        (MStrFmtArgType)((uint32_t)(array->type) &
+                         (uint32_t)(MStrFmtArgType_Array_Bit - 1));
+    usize_t ele_size = 0;
+    iptr_t element_ptr = (iptr_t)NULL;
+    const void* ptr = NULL;
     switch (type) {
-    case MStrFmtArgType_Int8: ele_size = sizeof(i8_t); break;
-    case MStrFmtArgType_Int16: ele_size = sizeof(i16_t); break;
-    case MStrFmtArgType_Int32: ele_size = sizeof(i32_t); break;
-    case MStrFmtArgType_Uint8: ele_size = sizeof(u8_t); break;
-    case MStrFmtArgType_Uint16: ele_size = sizeof(u16_t); break;
-    case MStrFmtArgType_Uint32: ele_size = sizeof(u32_t); break;
+    case MStrFmtArgType_Int8: ele_size = sizeof(int8_t); break;
+    case MStrFmtArgType_Int16: ele_size = sizeof(int16_t); break;
+    case MStrFmtArgType_Int32: ele_size = sizeof(int32_t); break;
+    case MStrFmtArgType_Uint8: ele_size = sizeof(uint8_t); break;
+    case MStrFmtArgType_Uint16: ele_size = sizeof(uint16_t); break;
+    case MStrFmtArgType_Uint32: ele_size = sizeof(uint32_t); break;
     case MStrFmtArgType_CString: ele_size = sizeof(const char*); break;
-    case MStrFmtArgType_Time:
-        ele_size = sizeof(const sys_time_t*);
+    case MStrFmtArgType_Time: ele_size = sizeof(const MStrTime*); break;
+    case MStrFmtArgType_QuantizedValue:
+        ele_size = sizeof(int32_t);
         break;
-    case MStrFmtArgType_QuantizedValue: ele_size = sizeof(i32_t); break;
     case MStrFmtArgType_QuantizedUnsignedValue:
-        ele_size = sizeof(u32_t);
+        ele_size = sizeof(uint32_t);
         break;
-    default: system_unreachable(); break;
+    default: mstr_unreachable(); break;
     }
     // 取得值
-    iptr_t element_ptr = (iptr_t)NULL;
-    const void* ptr = (const void*)(index * ele_size + array->value);
+    ptr = (const void*)(index * ele_size + (uptr_t)array->value);
     switch (type) {
     case MStrFmtArgType_Int8:
-        element_ptr = (iptr_t)(*(const i8_t*)ptr);
+        element_ptr = (iptr_t)(*(const int8_t*)ptr);
         break;
     case MStrFmtArgType_Int16:
-        element_ptr = (iptr_t)(*(const i16_t*)ptr);
+        element_ptr = (iptr_t)(*(const int16_t*)ptr);
         break;
     case MStrFmtArgType_Int32:
-        element_ptr = (iptr_t)(*(const i32_t*)ptr);
+        element_ptr = (iptr_t)(*(const int32_t*)ptr);
         break;
     case MStrFmtArgType_Uint8:
-        element_ptr = (iptr_t)(*(const u8_t*)ptr);
+        element_ptr = (iptr_t)(*(const uint8_t*)ptr);
         break;
     case MStrFmtArgType_Uint16:
-        element_ptr = (iptr_t)(*(const u16_t*)ptr);
+        element_ptr = (iptr_t)(*(const uint16_t*)ptr);
         break;
     case MStrFmtArgType_Uint32:
-        element_ptr = (iptr_t)(*(const u32_t*)ptr);
+        element_ptr = (iptr_t)(*(const uint32_t*)ptr);
         break;
     case MStrFmtArgType_CString:
         element_ptr = (iptr_t)(*(const char* const*)ptr);
         break;
     case MStrFmtArgType_Time:
-        element_ptr = (iptr_t)(*(const sys_time_t* const*)ptr);
+        element_ptr = (iptr_t)(*(const MStrTime* const*)ptr);
         break;
     case MStrFmtArgType_QuantizedValue:
-        element_ptr = (iptr_t)(*(const i32_t*)ptr);
+        element_ptr = (iptr_t)(*(const int32_t*)ptr);
         break;
     case MStrFmtArgType_QuantizedUnsignedValue:
-        element_ptr = (iptr_t)(*(const i32_t*)ptr);
+        element_ptr = (iptr_t)(*(const int32_t*)ptr);
         break;
-    default: system_unreachable(); break;
+    default: mstr_unreachable(); break;
     }
     return element_ptr;
 }
@@ -379,14 +360,15 @@ static mstr_result_t format_value(
     const MStrFmtFormatArgument* arg
 )
 {
-    if (arg->type != parser_result->arg_type) {
+    MString buff;
+    mstr_result_t result;
+    if (arg->type != parser_result->val.val.typ) {
         return MStr_Err_InvaildArgumentType;
     }
     // else:
     // 按照value_type,
     // sign_display和fmt_type先格式化到mfmt_static_buff里面
-    MString buff;
-    mstr_result_t result = mstr_create_empty(&buff);
+    result = mstr_create_empty(&buff);
     MSTR_AND_THEN(result, convert(&buff, parser_result, arg));
     if (result == MStr_Err_BufferTooSmall) {
         result = MStr_Err_InternalBufferTooSmall;
@@ -394,7 +376,7 @@ static mstr_result_t format_value(
     // 处理对齐和填充
     MSTR_AND_THEN(
         result,
-        copy_to_output(res_str, &parser_result->format_spec, &buff)
+        copy_to_output(res_str, &parser_result->val.val.spec, &buff)
     );
     // 返回
     mstr_free(&buff);
@@ -416,34 +398,39 @@ static mstr_result_t copy_to_output(
     const MString* src_str
 )
 {
+    usize_t src_len = 0;
+    usize_t fill_len = 0;
+    usize_t offset_len = 0;
+    usize_t need_width = 0;
+    mstr_result_t result = MStr_Ok;
+    MStrFmtAlign align;
+    char fill_char;
     if (fmt_spec->width == -1) {
         // 压根没有指定宽度, 不管对齐了
         return mstr_concat(out_str, src_str);
     }
     // 计算宽度够不够
-    usize_t src_len = src_str->length;
-    if (src_len >= fmt_spec->width) {
+    src_len = src_str->count;
+    need_width = (usize_t)fmt_spec->width;
+    if (src_len >= need_width) {
         // 宽度太宽, 不管对齐了
         return mstr_concat(out_str, src_str);
     }
     // 宽度确定足够, 按照align去copy, 并且用fill_char填充
-    usize_t fill_len = 0;
-    usize_t offset_len = 0;
-    mstr_result_t result = MStr_Ok;
-    MStrFmtAlign align = fmt_spec->fmt_align;
-    char fill_char = fmt_spec->fill_char;
+    align = fmt_spec->fmt_align;
+    fill_char = fmt_spec->fill_char;
     switch (align) {
     case MStrFmtAlign_Left:
         // 复制开头的内容
         MSTR_AND_THEN(result, mstr_concat(out_str, src_str));
         // 进行填充
-        fill_len = fmt_spec->width - src_len;
+        fill_len = need_width - src_len;
         MSTR_AND_THEN(
             result, mstr_repeat_append(out_str, fill_char, fill_len)
         );
         break;
     case MStrFmtAlign_Right:
-        fill_len = fmt_spec->width - src_len;
+        fill_len = need_width - src_len;
         MSTR_AND_THEN(
             result, mstr_repeat_append(out_str, fill_char, fill_len)
         );
@@ -451,7 +438,7 @@ static mstr_result_t copy_to_output(
         MSTR_AND_THEN(result, mstr_concat(out_str, src_str));
         break;
     case MStrFmtAlign_Center:
-        fill_len = (fmt_spec->width - src_len) / 2;
+        fill_len = (need_width - src_len) / 2;
         // 左侧的填充
         MSTR_AND_THEN(
             result, mstr_repeat_append(out_str, fill_char, fill_len)
@@ -460,7 +447,7 @@ static mstr_result_t copy_to_output(
         MSTR_AND_THEN(result, mstr_concat(out_str, src_str));
         // 右边的填充
         offset_len = fill_len + src_len;
-        fill_len = fmt_spec->width - offset_len;
+        fill_len = need_width - offset_len;
         MSTR_AND_THEN(
             result, mstr_repeat_append(out_str, fill_char, fill_len)
         );
@@ -485,51 +472,53 @@ static mstr_result_t convert(
 {
     iptr_t value = arg->value;
     MStrFmtArgType value_type = arg->type;
+    mstr_result_t result;
     switch (value_type) {
     case MStrFmtArgType_Uint8:
     case MStrFmtArgType_Uint16:
     case MStrFmtArgType_Uint32:
-        return convert_uint(
+        result = convert_uint(
             str,
-            (u32_t)value,
-            parser_result->format_spec.fmt_spec.fmt_type
+            (uint32_t)value,
+            parser_result->val.val.spec.fmt_spec.fmt_type
         );
         break;
     case MStrFmtArgType_Int8:
     case MStrFmtArgType_Int16:
     case MStrFmtArgType_Int32:
-        return convert_int(
+        result = convert_int(
             str,
-            (i32_t)value,
-            parser_result->format_spec.sign_display,
-            parser_result->format_spec.fmt_spec.fmt_type
+            (int32_t)value,
+            parser_result->val.val.spec.sign_display,
+            parser_result->val.val.spec.fmt_spec.fmt_type
         );
         break;
     case MStrFmtArgType_CString:
-        return convert_string(
-            str, value, &parser_result->format_spec.fmt_spec
+        result = convert_string(
+            str, value, &parser_result->val.val.spec.fmt_spec
         );
         break;
     case MStrFmtArgType_Time:
-        return convert_time(
-            str, value, &parser_result->format_spec.fmt_spec
+        result = convert_time(
+            str, value, &parser_result->val.val.spec.fmt_spec
         );
         break;
     case MStrFmtArgType_QuantizedValue:
-        return convert_quat(
+        result = convert_quat(
             str,
-            (i32_t)value,
-            parser_result->arg_prop.a,
-            parser_result->format_spec.sign_display
+            (int32_t)value,
+            parser_result->val.val.prop.a,
+            parser_result->val.val.spec.sign_display
         );
         break;
     case MStrFmtArgType_QuantizedUnsignedValue:
-        return convert_uquat(
-            str, (u32_t)value, parser_result->arg_prop.a
+        result = convert_uquat(
+            str, (uint32_t)value, parser_result->val.val.prop.a
         );
         break;
-    default: return MStr_Err_UnsupportType; break;
+    default: result = MStr_Err_UnsupportType; break;
     }
+    return result;
 }
 
 /**
@@ -561,8 +550,8 @@ static mstr_result_t convert_time(
         return MStr_Err_UnsupportFormatType;
     }
     else {
-        const sys_time_t* tm = (const sys_time_t*)value;
-        return mstr_fmt_ttoa(str, tm, &spec->chrono_spec);
+        const MStrTime* tm = (const MStrTime*)value;
+        return mstr_fmt_ttoa(str, tm, &spec->spec.chrono);
     }
 }
 
@@ -571,14 +560,15 @@ static mstr_result_t convert_time(
  *
  */
 static mstr_result_t convert_quat(
-    MString* str, i32_t value, u32_t qbits, MStrFmtSignDisplay sign
+    MString* str, int32_t value, uint32_t qbits, MStrFmtSignDisplay sign
 )
 {
+    uint32_t uvalue;
     mstr_result_t result = MStr_Ok;
     // 转换符号
     MSTR_AND_THEN(result, convert_sign_helper(str, value, sign));
     // 转换无符号值
-    u32_t uvalue = value > 0 ? (u32_t)value : (u32_t)(-value);
+    uvalue = value > 0 ? (uint32_t)value : (uint32_t)(-value);
     MSTR_AND_THEN(result, convert_uquat(str, uvalue, qbits));
     // 返回
     return result;
@@ -589,7 +579,7 @@ static mstr_result_t convert_quat(
  *
  */
 static mstr_result_t convert_uquat(
-    MString* str, u32_t value, u32_t qbits
+    MString* str, uint32_t value, uint32_t qbits
 )
 {
     return mstr_fmt_uqtoa(str, value, qbits);
@@ -601,16 +591,17 @@ static mstr_result_t convert_uquat(
  */
 static mstr_result_t convert_int(
     MString* str,
-    i32_t value,
+    int32_t value,
     MStrFmtSignDisplay sign,
     MStrFmtFormatType ftyp
 )
 {
+    uint32_t uvalue;
     mstr_result_t result = MStr_Ok;
     // 转换符号
     MSTR_AND_THEN(result, convert_sign_helper(str, value, sign));
     // 转换无符号整数值
-    u32_t uvalue = value > 0 ? (u32_t)value : (u32_t)(-value);
+    uvalue = value > 0 ? (uint32_t)value : (uint32_t)(-value);
     MSTR_AND_THEN(result, convert_uint(str, uvalue, ftyp));
     // 返回
     return result;
@@ -621,7 +612,7 @@ static mstr_result_t convert_int(
  *
  */
 static mstr_result_t convert_sign_helper(
-    MString* str, i32_t value, MStrFmtSignDisplay sign
+    MString* str, int32_t value, MStrFmtSignDisplay sign
 )
 {
     char sign_ch = '\0';
@@ -649,7 +640,7 @@ static mstr_result_t convert_sign_helper(
  *
  */
 static mstr_result_t convert_uint(
-    MString* str, u32_t value, MStrFmtFormatType ftyp
+    MString* str, uint32_t value, MStrFmtFormatType ftyp
 )
 {
     mstr_result_t result = MStr_Ok;
@@ -693,7 +684,6 @@ static mstr_result_t convert_uint(
         // 默认是十进制
         result = mstr_fmt_utoa(&buff, value, MStrFmtIntIndex_Dec);
         break;
-    default: result = MStr_Err_UnsupportFormatType; break;
     }
     // 然后跟上格式化的内容
     MSTR_AND_THEN(result, mstr_concat(str, &buff));
@@ -712,12 +702,13 @@ static mstr_result_t process_replacement_field(
     char const** ppfmt, MStrFmtParseResult* parser_result
 )
 {
+    mstr_result_t result;
     const char* pfmt = *ppfmt;
     // 解析内容
     MStrFmtParserState* state;
     byte_t state_memory[MFMT_PARSER_STATE_SIZE];
     mstr_fmt_parser_init(state_memory, pfmt, &state);
-    mstr_result_t result = mstr_fmt_parse_goal(state, parser_result);
+    result = mstr_fmt_parse_goal(state, parser_result);
     // 增加offset
     if (MSTR_SUCC(result)) {
         pfmt += mstr_fmt_parser_end_position(state, pfmt);

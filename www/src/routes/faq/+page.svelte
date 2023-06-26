@@ -11,8 +11,6 @@
         en: { toc: EnPage.toc, html: EnPage.html },
         zh: { toc: ZhPage.toc, html: ZhPage.html },
     }
-
-    const language = Object.keys(contents)
 </script>
 
 <svelte:head>
@@ -20,7 +18,7 @@
     <meta name="description" content="MtFmt library faq" />
 </svelte:head>
 
-<div>
+<div class="content-page">
     <Header />
-    <Markdown {language} {contents} />
+    <Markdown {contents} />
 </div>

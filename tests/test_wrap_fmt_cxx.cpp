@@ -1,24 +1,25 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    test_string_cxx.cpp
+ * @file    test_wrap_fmt_cxx.cpp
  * @author  向阳 (hinata.hoshino@foxmail.com)
- * @brief   字符串(cxx)
+ * @brief   fmt (cpp包装)
  * @version 1.0
- * @date    2023-06-03
+ * @date    2023-06-05
  *
  * @copyright Copyright (c) 向阳, all rights reserved.
  *
  */
+#include "helper.h"
 #include "main.h"
 #include "mtfmt.hpp"
 #include "unity.h"
 #include <stddef.h>
 #include <stdio.h>
 
-extern "C" void cpp_string_equal(void)
+extern "C" void cpp_wrap_fmt(void)
 {
-    mtfmt::string str1("String");
-    mtfmt::string str2 = str1;
-    TEST_ASSERT_TRUE(str1 == "String");
-    TEST_ASSERT_TRUE(str2 == "String");
+}
+
+extern "C" void cpp_wrap_fmt_parser(void)
+{
 }

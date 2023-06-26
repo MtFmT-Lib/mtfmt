@@ -16,7 +16,49 @@
 extern "C"
 {
 #endif
+    void monadic_result_conjugate(void);
+    void monadic_result_flatten(void);
+    void monadic_result_map(void);
+    void monadic_result_map_err(void);
+    void monadic_result_and_then(void);
+    void monadic_result_or_else(void);
+    void monadic_result_or_value(void);
+    void monadic_result_or_exception(void);
+
     void allocate_then_free(void);
+
+    void string_copy_create(void);
+    void string_move_create(void);
+    void string_length(void);
+    void string_char_at(void);
+    void string_insert(void);
+    void string_remove(void);
+
+    void string_equal(void);
+    void string_not_equal(void);
+    void string_end_with(void);
+    void string_start_with(void);
+
+    void string_concat_object(void);
+    void string_concat_c_str(void);
+    void string_concat_c_slice(void);
+
+    void string_append(void);
+    void string_repeat_append(void);
+
+    void string_trans_clear(void);
+    void string_trans_reverse(void);
+    void string_trans_reverse_unicode(void);
+
+    void string_index(void);
+    void string_const_iterator(void);
+    void string_reverse_const_iterator(void);
+
+    void string_find(void);
+    void string_contain(void);
+    void string_retain(void);
+    void string_find_large(void);
+    void string_find_or_error(void);
 
     void fmt_align_left(void);
     void fmt_align_left_fill(void);
@@ -50,11 +92,6 @@ extern "C"
     void fmt_sty_hex(void);
     void fmt_sty_hex_prefix(void);
 
-    void append_char(void);
-    void equal_string(void);
-    void reverse_self(void);
-    void repeat_append_char(void);
-
     void fmt_array(void);
     void fmt_array_element_style(void);
     void fmt_array_userdefind_split(void);
@@ -72,7 +109,10 @@ extern "C"
 
     void fmt_escape_bracket(void);
 
-    void cpp_string_equal(void);
+    void sync_io_write(void);
+
+    void cpp_wrap_fmt(void);
+    void cpp_wrap_fmt_parser(void);
 #if __cplusplus
 }
 #endif

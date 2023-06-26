@@ -142,7 +142,7 @@ C_INCLUDES = \
 -Itests
 
 # Standard
-C_STANDARD = --std=c11
+C_STANDARD = --std=c99
 
 # Standard
 CXX_STANDARD = --std=c++11
@@ -154,8 +154,8 @@ CFLAGS = $(ARCH) $(C_DEFS) $(C_INCLUDES) $(OPT) $(LTO_OPT) -Wall -fdata-sections
 endif
 
 # C++
-# 不使用RTTI, 异常
-CXX_FLAGS = $(CFLAGS) -fno-rtti -fno-exceptions --std=c++11
+# 不使用RTTI
+CXX_FLAGS = $(CFLAGS) -fno-rtti --std=c++11
 
 # 动态链接库的链接选项
 DYLIB_LD_OPTS =	
@@ -178,6 +178,7 @@ ifneq ($(MTFMT_BUILD_DEBUG), 1)
 TEST_LD_OPTS += $(LTO_OPT)
 endif
 
+TEST_LD_OPTS += -lstdc++
 ifeq ($(MTFMT_BUILD_COVERAGE),1)
 TEST_LD_OPTS += -lgcov
 endif
@@ -221,7 +222,7 @@ coverage: test
 # 测试覆盖率, 并携带报告
 coverage_report: coverage | $(COVERAGE_DIR)
 	@echo $(GCOV_REPORT_DISPLAY)
-	@$(COV_REPORT) --exclude "test_*" --exclude "thirds/*" --html --html-details --output "$(COVERAGE_DIR)/index.html"
+	@$(COV_REPORT) --source-encoding=utf-8 --exclude "test_*" --exclude "thirds/*" --html --html-details --output "$(COVERAGE_DIR)/index.html"
 	@echo $(GCOV_REPORT_DISPLAY) completed.
 
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
@@ -230,7 +231,7 @@ $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
 
 $(BUILD_DIR)/%.o: %.cpp Makefile | $(BUILD_DIR) 
 	@echo $(CC_DISPLAY) $<
-	@$(CC) -c $(CXX_STANDARD) $(CXX_FLAGS) $< -o $@
+	@$(CC) -c $(CXX_STANDARD) $(CXX_FLAGS) -MMD -MP -MF"$(@:%.o=%.d)" $< -o $@
 
 $(OUTPUT_DIR)/$(LIB_TARGET): $(OBJECTS) Makefile | $(OUTPUT_DIR)
 	@echo $(AR_DISPLAY) $@

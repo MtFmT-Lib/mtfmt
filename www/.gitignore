@@ -28,3 +28,7 @@ node_modules
 !*.svelte
 !*.scss
 !*.svg
+!*.webp
+!*.gif
+!*.png
+

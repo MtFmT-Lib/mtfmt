@@ -7,16 +7,16 @@
 }
 
 .hljs-title {
-    color: #006e54;
+    color: #1ca182;
     font-weight: 600;
 }
 
 .hljs-type {
-    color: #ba2636;
+    color: #c53745;
 }
 
 .hljs-string {
-    color: #bb5535;
+    color: #c05c3e;
 }
 
 .hljs-number {
@@ -24,6 +24,19 @@
 }
 
 .hljs-comment {
-    color: #028760;
+    color: #11a075;
     font-style: italic;
+}
+
+.hljs-meta {
+    color: #9761a7;
+
+    .hljs-keyword {
+        color: inherit;
+        font-weight: 600;
+    }
+}
+
+.hljs-literal {
+    color: #1e50a2;
 }

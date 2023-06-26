@@ -8,6 +8,8 @@ import MarkdownIt from 'markdown-it'
 import { textVide } from 'text-vide'
 import { katex } from '@mdit/plugin-katex'
 import Token from 'markdown-it/lib/token'
+import * as fs from 'node:fs'
+import path from 'node:path'
 
 export default defineConfig({
     plugins: [
@@ -22,7 +24,7 @@ export default defineConfig({
     server: {
         fs: {
             allow: ['./wasm/target'],
-        },
+        }
     }
 })
 
@@ -42,6 +44,10 @@ function markdown_preprocess(): MarkdownIt {
     })
     // katex
     markdown.use(katex)
+    // 表格标头
+    markdown.use(plugin_table_caption)
+    // 嵌入图片
+    markdown.use(plugin_embed_image)
     // 超链接的addr
     markdown.use(plugin_section_id)
     // 断行
@@ -49,6 +55,79 @@ function markdown_preprocess(): MarkdownIt {
     // bionic reading
     markdown.use(plugin_bionic_reading)
     return markdown
+}
+
+/**
+ * 表格标头
+ * 
+ * 该插件识别"!table-caption:XXX"开头的段落, 并替换为合适的表格标头
+ */
+function plugin_table_caption(md: MarkdownIt): void {
+    md.core.ruler.push('table-caption', state => {
+        state.tokens.forEach(token => {
+            if (token.type !== 'inline') {
+                return
+            }
+            const caption = token.content.match(/!table-caption:(.+)/)
+            if (caption === null) {
+                return
+            }
+            const caption_text = caption[1]
+            // 生成table id
+            const caption_id = as_table_id_name(caption_text)
+            // 重新生成caption text
+            token.children = []
+            token.children.push(make_html_token('<span id="' + caption_id + '" class="table-caption">'))
+            token.children.push(make_text_token(caption_text))
+            token.children.push(make_html_token('</span>'))
+        })
+    })
+    md.enable(['table-caption'])
+}
+
+/**
+ * 嵌入图片
+ */
+function plugin_embed_image(md: MarkdownIt): void {
+    md.core.ruler.push('embed-image', state => {
+        state.tokens.forEach(token => {
+            if (token.type === 'inline') {
+                if (token.children === null) {
+                    return
+                }
+                if (token.children.length !== 1) {
+                    return
+                }
+                if (token.children[0].type !== 'image') {
+                    return
+                }
+                // 图片转换为base64
+                const img_child = token.children[0]
+                const img_path = img_child.attrGet('src')
+                if (img_path !== null) {
+                    const img_base64 = readfile_as_base64(img_path)
+                    img_child.attrSet('src', img_base64)
+                }
+                // 添加图注
+                // 总而言之它以一种很奇怪的方式跑了起来...
+                const img_alt = img_child.attrGet('alt') ?? ''
+                let img_alt_content: string
+                if (img_alt.length > 0) {
+                    img_alt_content = img_alt
+                }
+                else {
+                    img_alt_content = img_child.content
+                }
+                const text_token = make_html_token(img_alt_content)
+                token.children.push(make_html_token('<span class="img-caption">'))
+                token.children.push(text_token)
+                token.children.push(make_html_token('</span>'))
+                // 添加图片id
+                img_child.attrSet('id', as_figure_id_name(img_alt_content))
+            }
+        })
+    })
+    md.enable(['embed-image'])
 }
 
 /**
@@ -68,7 +147,7 @@ function plugin_section_id(md: MarkdownIt): void {
                     return token.content
                 })(index + 1, self)
                 // section的id
-                const section_id = as_id_name(content)
+                const section_id = as_section_id_name(content)
                 // push attr
                 token.attrPush(['id', section_id])
             }
@@ -79,22 +158,50 @@ function plugin_section_id(md: MarkdownIt): void {
 
 /**
  * 转换为合适的id名
+ * 
+ * 该函数会优先考虑 [0-9] { `.` [0-9]} 的范式生成id
+ * 否则会生成完整的内容
  */
-function as_id_name(content: string): string {
-    const name = content.replace(/[<>&". -:]/g, (c: string) => {
-        const lut = new Map([
-            ['<', '&lt;'],
-            ['>', '&gt;'],
-            ['&', '&amp;'],
-            ['"', '&quot;'],
-            [' ', '_'],
-            ['-', '_'],
-            [':', '_'],
-            ['.', '_']
-        ])
-        return lut.get(c) ?? c
+function as_section_id_name(content: string): string {
+    const patt = content.match(/[0-9](\.[0-9]+)*/g)
+    const section_id = patt ? patt[0] : content
+    return 'section_' + replace_escape_char(section_id.toLowerCase())
+}
+
+/**
+ * 转换为合适的id名
+ * 
+ * 该函数会优先考虑 Figure[0-9] { `.` [0-9]} 的范式生成id
+ * 否则会生成完整的内容
+ */
+function as_figure_id_name(content: string): string {
+    const patt = content.match(/(Figure|figure|图)( *)([0-9](\.[0-9]+)*)/)
+    const figure_id = patt ? patt[3] : content
+    return 'figure_' + replace_escape_char(figure_id.toLowerCase())
+}
+
+/**
+ * 转换为合适的id名
+ * 
+ * 该函数会优先考虑 Table[0-9] { `.` [0-9]} 的范式生成id
+ * 否则会生成完整的内容
+ */
+function as_table_id_name(content: string): string {
+    const patt = content.match(/(Table|table|表)( *)([0-9](\.[0-9]+)*)/)
+    const table_id = patt ? patt[3] : content
+    return 'table_' + replace_escape_char(table_id.toLowerCase())
+}
+
+/**
+ * 把<, >等字符替换为_
+ */
+function replace_escape_char(content: string): string {
+    const lut = new Set([
+        '<', '>', '&', '"', '\'', ' ', '-', ':', '.'
+    ])
+    return content.replace(/[<>&". -:]/g, (c: string) => {
+        return lut.has(c) ? '_' : c
     })
-    return 'section_' + name
 }
 
 /**
@@ -154,8 +261,14 @@ function plugin_bionic_reading(md: MarkdownIt): void {
                             if (token.children != null) {
                                 throw 'Markdown parser: Cannot process a text with children'
                             }
-                            const result = add_bionic_reading(token.content)
-                            children.push(...result)
+                            const content = token.content
+                            if (/^[\x00-\x7f]+$/.test(content)) {
+                                const result = add_bionic_reading(token.content)
+                                children.push(...result)
+                            } else {
+                                // 非ascii
+                                children.push(token)
+                            }
                         } else {
                             children.push(token)
                         }
@@ -236,6 +349,32 @@ function highlight_process(str: string, lang: string): string {
 }
 
 /**
+ * 读取文件并转为base64
+ */
+function readfile_as_base64(file: string): string {
+    const src_path = path.resolve('./src/texts')
+    const full_path = path.resolve(src_path, file)
+    const file_ext_name = path.extname(full_path)
+    // 读取并转换base64
+    const fs_data = fs.readFileSync(full_path)
+    const base64 = fs_data.toString('base64')
+    // 转换mime type
+    const mime_lut = new Map([
+        ['.gif', 'image/gif'],
+        ['.png', 'image/png'],
+        ['.jpg', 'image/jpeg'],
+        ['.jpeg', 'image/jpeg'],
+        ['.webp', 'image/webp'],
+    ])
+    const mime_type = mime_lut.get(file_ext_name)
+    if (mime_type) {
+        return 'data:' + mime_type + ';base64,' + base64
+    } else {
+        throw `No mime type for extname ${file_ext_name}`
+    }
+}
+
+/**
  * 构造text的标签
  */
 function make_text_token(str: string): Token {
@@ -250,8 +389,6 @@ function make_text_token(str: string): Token {
     token.markup = ''
     token.info = ''
     token.meta = null
-    token.block = false
-    token.hidden = false
     return token
 }
 

@@ -3,60 +3,138 @@
 -->
 <script lang="ts">
     import { writable } from 'svelte/store'
-    import generate_toc from './markdown_toc'
-    import { set_theme, type Theme } from './theme_storager'
-    import theme_info, { get_storager_theme } from './theme_storager'
+    import { into_boolean } from '$lib/fp/cast'
+    import * as Storager from '$lib/local_storager'
+    import { set_language_attrs } from './theme_lang'
+    import { get_build_in_html } from './markdown_trans'
+    import theme_info, { type Theme } from './theme_storager'
+    import { set_theme, get_storager_theme } from './theme_storager'
+    import type { BuildinContent, LanguageKey } from './markdown_trans'
+    import get_content_html, { get_support_languages } from './markdown_trans'
+
+    /**
+     * 文本颜色
+     */
+    type TextColor = 'inherit' | 'var(--weak-color)'
 
     /**
      * 内容
      */
-    export let contents: Record<
-        string,
-        {
-            html: string
-            toc: { level: string; content: string }[]
-        }
-    >
+    export let contents: BuildinContent
 
     /**
-     * 语言表
+     * 支持的语言
      */
-    export let language: string[]
+    let support_languages = get_support_languages(contents)
 
     /**
-     * 当前的语言
+     * 语言配置项
      */
-    let cur_language = writable(language[0])
+    const LANGUAGE_ITEM_KEY = 'language'
 
     /**
-     * 当前的主题名
+     * bio-reading模式配置项
      */
-    let cur_theme: Theme = get_storager_theme()
+    const BIO_READING_ITEM_KEY = 'bio-reading'
+
+    /**
+     * html内容
+     */
+    let html_content = writable<string>(get_build_in_html('en', contents))
+
+    /**
+     * 文本颜色
+     */
+    let text_color = writable<TextColor>('inherit')
 
     /**
      * 是否开启bio-reader
      */
-    let enable_bio_reader = writable(false)
+    let enable_bio_reader = writable(
+        Storager.read_local_storager(BIO_READING_ITEM_KEY)
+            .map(into_boolean)
+            .or(false)
+    )
+
+    enable_bio_reader.subscribe((enable) => {
+        if (enable) {
+            text_color.set('var(--weak-color)')
+        } else {
+            text_color.set('inherit')
+        }
+    })
 
     /**
-     * 设置语言
+     * 当前的语言
      */
-    function set_language(lang: string) {
-        cur_language.set(lang.toLowerCase())
-    }
+    let cur_language = writable(get_default_language())
+
+    cur_language.subscribe((language) => {
+        // 设置语言attrs
+        set_language_attrs(language)
+        // 更新bio-reading模式
+        if ($enable_bio_reader && language !== 'en') {
+            // 仅在英文下允许使用bio reading
+            enable_bio_reader.set(false)
+        } else {
+            const las = Storager.read_local_storager(BIO_READING_ITEM_KEY)
+                .map(into_boolean)
+                .or(false)
+            // 恢复上次的选项
+            enable_bio_reader.set(las)
+        }
+        // 加载内容
+        get_content_html(html_content, language, contents)
+    })
 
     /**
      * 切换bio reading
      */
-    function toggle_bio_mode() {
-        enable_bio_reader.set(!$enable_bio_reader)
+    function set_bio_mode(enable: boolean) {
+        enable_bio_reader.set(enable)
+        Storager.write_local_storager(BIO_READING_ITEM_KEY, enable)
     }
 
     /**
      * 更新选中的主题
      */
-    function update_cur_theme() {
+    function update_cur_theme(arg: { currentTarget: HTMLSelectElement }) {
+        const target = arg.currentTarget
+        const cur_theme = target.value as Theme
         set_theme(cur_theme)
+    }
+
+    /**
+     * 更新选中的语言
+     */
+    function update_cur_language(arg: { currentTarget: HTMLSelectElement }) {
+        const target = arg.currentTarget
+        const language = target.value as LanguageKey
+        cur_language.set(language)
+        Storager.write_local_storager(LANGUAGE_ITEM_KEY, language)
+    }
+
+    /**
+     * 取得默认的语言
+     */
+    function get_default_language(): LanguageKey {
+        return Storager.read_local_storager(LANGUAGE_ITEM_KEY)
+            .map((s) => s as LanguageKey)
+            .or_map(() => {
+                let language: LanguageKey
+                if (typeof navigator === 'undefined') {
+                    language = 'en'
+                } else {
+                    const lut = new Map<string, LanguageKey>([
+                        ['en', 'en'],
+                        ['en-US', 'en'],
+                        ['zh-CN', 'zh'],
+                    ])
+                    language = lut.get(navigator.language) ?? 'en'
+                }
+                Storager.write_local_storager(LANGUAGE_ITEM_KEY, language)
+                return language
+            })
     }
 </script>
 
@@ -66,11 +144,18 @@
             <!-- bio 阅读 -->
             {#if $cur_language === 'en'}
                 {#if $enable_bio_reader}
-                    <button id="actived-button" on:click={toggle_bio_mode}>
+                    <button
+                        id="actived-button"
+                        title="Disable the bio-reading mode"
+                        on:click={() => set_bio_mode(!$enable_bio_reader)}
+                    >
                         <span>B</span>
                     </button>
                 {:else}
-                    <button on:click={toggle_bio_mode}>
+                    <button
+                        title="Active the bio-reading mode"
+                        on:click={() => set_bio_mode(!$enable_bio_reader)}
+                    >
                         <span>B</span>
                     </button>
                 {/if}
@@ -78,7 +163,11 @@
         </div>
         <div class="reader-language">
             <!-- 主题 -->
-            <select bind:value={cur_theme} on:change={update_cur_theme}>
+            <select
+                title="Choice theme"
+                value={get_storager_theme()}
+                on:change={update_cur_theme}
+            >
                 {#each $theme_info.themes as t}
                     <option value={t}>
                         {t.toUpperCase()}
@@ -86,20 +175,21 @@
                 {/each}
             </select>
             <!-- 语言 -->
-            {#each language as lang}
-                <button on:click={() => set_language(lang)}>
-                    {lang.toUpperCase()}
-                </button>
-            {/each}
-            <!-- 翻译 -->
-            <button>ADD</button>
+            <select
+                title="Choice language"
+                value={get_default_language()}
+                on:change={update_cur_language}
+            >
+                {#each support_languages as lang}
+                    <option value={lang.language_key}>
+                        <span>{lang.display_name}</span>
+                    </option>
+                {/each}
+            </select>
         </div>
     </div>
-    <div class="markdown-box">
-        {@html generate_toc(
-            contents[$cur_language].html,
-            contents[$cur_language].toc
-        )}
+    <div class="markdown-box" style="color: {$text_color}">
+        {@html $html_content}
     </div>
 </div>
 
@@ -134,8 +224,7 @@
     }
 
     .reader-tools button,
-    .reader-language select,
-    .reader-language button {
+    .reader-language select {
         outline: 0;
         display: block;
 
@@ -185,10 +274,5 @@
 
     .reader-tools button[id='actived-button'] {
         background-color: var(--button-actived-bg-color);
-    }
-
-    .markdown-box {
-        line-height: 150%;
-        font-size: 1.1rem;
     }
 </style>
