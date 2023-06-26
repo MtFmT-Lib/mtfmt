@@ -325,6 +325,7 @@ static mstr_result_t uqtoa_helper_dpart(
     }
     // copy到输出
     MSTR_AND_THEN(result, mstr_concat(str, &buff));
+    mstr_free(&buff);
     return result;
 }
 

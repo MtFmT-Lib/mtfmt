@@ -26,7 +26,6 @@ static byte_t heap[RUNTIME_HEAP_SIZE];
 
 void setUp(void)
 {
-    mstr_heap_init(heap, RUNTIME_HEAP_SIZE);
 }
 
 void tearDown(void)
@@ -48,6 +47,9 @@ int main()
         "Build configure - configure: 0x%x\n",
         MSTR_CONFIGURE_CFG_VAL(cfg)
     );
+
+    // 初始化堆
+    mstr_heap_init(heap, RUNTIME_HEAP_SIZE);
 
     RUN_TEST(monadic_result_conjugate);
     RUN_TEST(monadic_result_flatten);
@@ -145,6 +147,17 @@ int main()
 
     RUN_TEST(cpp_wrap_fmt);
     RUN_TEST(cpp_wrap_fmt_parser);
+
+    usize_t alloc_cnt, free_cnt, usage_mark;
+    mstr_heap_get_allocate_count(&alloc_cnt, &free_cnt);
+    usage_mark = RUNTIME_HEAP_SIZE - mstr_heap_get_high_water_mark();
+    printf("\nHeap usage: %llu bytes(max)\n", usage_mark);
+    printf("            %llu times allocating\n", alloc_cnt);
+    printf("            %llu times free\n", free_cnt);
+
+    TEST_ASSERT_TRUE_MESSAGE(
+        alloc_cnt == free_cnt, "alloc_cnt != free_cnt"
+    );
 
     return UNITY_END();
 }

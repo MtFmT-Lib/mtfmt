@@ -96,7 +96,13 @@ typedef struct tagMStringMatchResult
     usize_t is_matched;
 
     /**
-     * @brief 目标位置
+     * @brief 目标位置的字符索引
+     *
+     */
+    usize_t begin_pos;
+
+    /**
+     * @brief 目标位置的字符char的偏移
      *
      */
     usize_t begin_offset;
@@ -289,11 +295,11 @@ mstr_equal(const MString* a, const MString* b);
  *
  * @param[in] str: 字符串
  * @param[in] prefix: 需要确认其开始的内容
- * @param[in] prefix_len: prefix长度
+ * @param[in] prefix_cnt: prefix的char字符数
  */
 MSTR_EXPORT_API(mstr_bool_t)
 mstr_start_with(
-    const MString* str, const char* prefix, usize_t prefix_len
+    const MString* str, const char* prefix, usize_t prefix_cnt
 );
 
 /**
@@ -301,11 +307,11 @@ mstr_start_with(
  *
  * @param[in] str: 字符串
  * @param[in] suffix: 需要确认其结束的内容
- * @param[in] suffix_len: suffix长度
+ * @param[in] suffix_cnt: suffix的char字符数
  */
 MSTR_EXPORT_API(mstr_bool_t)
 mstr_end_with(
-    const MString* str, const char* suffix, usize_t suffix_len
+    const MString* str, const char* suffix, usize_t suffix_cnt
 );
 
 /**
@@ -313,13 +319,14 @@ mstr_end_with(
  *
  * @param[in] str: 字符串
  * @param[in] pattern: 需要包含的内容
+ * @param[in] pattern_cnt: 需要包含的内容的字符数
  *
  * @attention 在发生意外的错误(如编码问题, 内存分配失败)时,
  * 该函数也会返回False
  */
 MSTR_EXPORT_API(mstr_bool_t)
 mstr_contains(
-    const MString* str, const char* pattern, usize_t pattern_len
+    const MString* str, const char* pattern, usize_t pattern_cnt
 );
 
 /**
@@ -355,16 +362,19 @@ mstr_insert(MString* str, usize_t idx, mstr_codepoint_t ch);
  * @brief 查找子串第一次出现的位置
  *
  * @param[in] str: 字符串a
- * @param[out] res: 查找结果
+ * @param[out] f_res: 查找结果
+ * @param[in] begin_pos: 开始查找的位置
  * @param[in] pattern: 需要查找的子串
+ * @param[in] pattern_cnt: pattern的char个数
  *
  */
 MSTR_EXPORT_API(mstr_result_t)
 mstr_find(
     const MString* str,
-    MStringMatchResult* res,
+    MStringMatchResult* f_res,
+    usize_t begin_pos,
     const char* pattern,
-    usize_t pattern_len
+    usize_t pattern_cnt
 );
 
 /**
@@ -372,7 +382,7 @@ mstr_find(
  *
  * @param[inout] str: 字符串
  * @param[in] target: 需要替换的目标
- * @param[in] target_cnt: 需要替换的目标个数
+ * @param[in] target_cnt: 需要替换的目标的数组大小
  */
 MSTR_EXPORT_API(mstr_result_t)
 mstr_replace_multi(
@@ -489,6 +499,20 @@ MSTR_EXPORT_API(mstr_result_t)
 mstr_codepoint_of(
     mstr_codepoint_t* code, const mstr_char_t* ch, usize_t byte_count
 );
+
+/**
+ * @brief 找到第idx个字符的offset
+ *
+ * @param[in] str: 字符串
+ * @param[in] idx: 字符索引
+ *
+ * @attention 该函数会进行边界检查
+ *
+ * @return usize_t: 相对于 buff 的偏移量, buff + 返回值 是该字符的 lead
+ *
+ */
+MSTR_EXPORT_API(usize_t)
+mstr_char_offset_at(const MString* str, usize_t idx);
 
 /**
  * @brief 释放一个字符串所占的内存

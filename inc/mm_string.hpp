@@ -324,7 +324,9 @@ public:
     {
         MString obj;
         mstr_create(&obj, str);
-        return !!mstr_equal(&this_obj, &obj);
+        bool result = !!mstr_equal(&this_obj, &obj);
+        mstr_free(&obj);
+        return result;
     }
 
     /**
@@ -651,7 +653,7 @@ public:
      * 但是index是-1。使用find_or_err在找不到的时候返回Error
      */
     result<isize_t, error_code_t> find(
-        const value_t* patt, usize_t patt_len = 0
+        const value_t* patt, usize_t begin_pos = 0, usize_t patt_len = 0
     ) const noexcept
     {
         mstr_result_t res;
@@ -659,6 +661,7 @@ public:
         res = mstr_find(
             &this_obj,
             &find_result,
+            begin_pos,
             patt,
             patt_len == 0 ? strlen(patt) : patt_len
         );
@@ -666,7 +669,7 @@ public:
             return res;
         }
         else if (find_result.is_matched) {
-            return static_cast<isize_t>(find_result.begin_offset);
+            return static_cast<isize_t>(find_result.begin_pos);
         }
         else {
             return static_cast<isize_t>(-1);
@@ -680,10 +683,11 @@ public:
      * 但是index是-1。使用find_or_err在找不到的时候返回Error
      */
     template <std::size_t N>
-    result<isize_t, error_code_t> find(const value_t (&patt)[N]
+    result<isize_t, error_code_t> find(
+        const value_t (&patt)[N], usize_t begin_pos = 0
     ) const noexcept
     {
-        return find(patt, N);
+        return find(patt, begin_pos, N);
     }
 
     /**
@@ -692,10 +696,11 @@ public:
      * @note 该函数会在找不到的时候返回succ,
      * 但是index是-1。使用find_or_err在找不到的时候返回Error
      */
-    result<isize_t, error_code_t> find(const mtfmt::string& patt
+    result<isize_t, error_code_t> find(
+        const mtfmt::string& patt, usize_t begin_pos = 0
     ) const noexcept
     {
-        return find(patt.this_obj.buff, patt.this_obj.count);
+        return find(patt.this_obj.buff, begin_pos, patt.this_obj.count);
     }
 
     /**
@@ -704,7 +709,7 @@ public:
      * @note 该函数会在找不到的时候返回Error, 使用 find 返回-1
      */
     result<usize_t, error_code_t> find_or_err(
-        const value_t* patt, usize_t patt_len = 0
+        const value_t* patt, usize_t begin_pos = 0, usize_t patt_len = 0
     ) const noexcept
     {
         mstr_result_t res;
@@ -712,6 +717,7 @@ public:
         res = mstr_find(
             &this_obj,
             &find_result,
+            begin_pos,
             patt,
             patt_len == 0 ? strlen(patt) : patt_len
         );
@@ -719,7 +725,7 @@ public:
             return res;
         }
         else if (find_result.is_matched) {
-            return static_cast<isize_t>(find_result.begin_offset);
+            return static_cast<isize_t>(find_result.begin_pos);
         }
         else {
             return MStr_Err_NoSubstrFound;
@@ -732,10 +738,11 @@ public:
      * @note 该函数会在找不到的时候返回Error, 使用 find 返回-1
      */
     template <std::size_t N>
-    result<usize_t, error_code_t> find_or_err(const value_t (&patt)[N]
+    result<usize_t, error_code_t> find_or_err(
+        const value_t (&patt)[N], usize_t begin_pos = 0
     ) const noexcept
     {
-        return find_or_err(patt, N);
+        return find_or_err(patt, begin_pos, N);
     }
 
     /**
@@ -743,10 +750,13 @@ public:
      *
      * @note 该函数会在找不到的时候返回Error, 使用 find 返回-1
      */
-    result<usize_t, error_code_t> find_or_err(const mtfmt::string& patt
+    result<usize_t, error_code_t> find_or_err(
+        const mtfmt::string& patt, usize_t begin_pos = 0
     ) const noexcept
     {
-        return find_or_err(patt.this_obj.buff, patt.this_obj.count);
+        return find_or_err(
+            patt.this_obj.buff, begin_pos, patt.this_obj.count
+        );
     }
 
     /**
