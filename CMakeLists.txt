@@ -112,13 +112,12 @@ if(MTFMT_BUILD_SHARED)
 endif()
 
 install(TARGETS mtfmt
-        EXPORT mtfmt-targets
-        LIBRARY DESTINATION lib  # 动态库安装路径
-        ARCHIVE DESTINATION lib  # 静态库安装路径
-        PUBLIC_HEADER DESTINATION include()  # 头文件安装路径
-        )
+    EXPORT mtfmt-targets
+    LIBRARY DESTINATION lib  # 动态库安装路径
+    ARCHIVE DESTINATION lib  # 静态库安装路径
+    PUBLIC_HEADER DESTINATION include  # 头文件安装路径
+    )
 
-# 导出 CMake 配置文件
 install(EXPORT mtfmt-targets
     FILE mtfmt-config.cmake
     NAMESPACE mtfmt::
