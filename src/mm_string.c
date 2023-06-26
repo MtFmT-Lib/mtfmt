@@ -18,19 +18,27 @@
 #include <string.h>
 
 /**
- * @brief 每次分配的步进大小
+ * @brief 进行扩展的阈值
  *
  */
-#define MSTR_CAP_SIZE_STEP 16
+#define MSTR_SIZE_EXPAND_MAX          1024
+
+/**
+ * @brief 超过X2阈值的情况下每次增大的大小
+ *
+ */
+#define MSTR_SIZE_LARGE_CAP_SIZE_STEP 512
 
 //
 // private:
 //
+
 static mstr_bool_t mstr_compare_helper(
     const char*, const char*, usize_t
 );
 static void* mstr_string_realloc(void*, mstr_bool_t, usize_t, usize_t);
 static mstr_result_t mstr_expand_size(MString*, usize_t);
+static usize_t mstr_resize_tactic(usize_t, usize_t);
 static mstr_result_t
     mstr_strlen(usize_t*, usize_t*, const mstr_char_t*, const mstr_char_t*);
 //
@@ -64,7 +72,7 @@ mstr_create(MString* str, const char* content)
         return MStr_Ok;
     }
     else {
-        str->cap_size = content_cnt + 1 + MSTR_CAP_SIZE_STEP;
+        str->cap_size = content_cnt + MSTR_STACK_REGION_SIZE;
         str->buff = (char*)mstr_heap_alloc(str->cap_size);
         if (str->buff == NULL) {
             // 内存分配失败
@@ -136,7 +144,7 @@ mstr_repeat_append(MString* str, mstr_codepoint_t ch, usize_t cnt)
             MSTR_AND_THEN(
                 result,
                 mstr_expand_size(
-                    str, str->cap_size + need_len + MSTR_CAP_SIZE_STEP
+                    str, mstr_resize_tactic(str->cap_size, need_len)
                 )
             );
         }
@@ -166,7 +174,7 @@ mstr_concat(MString* str, const MString* other)
         MSTR_AND_THEN(
             result,
             mstr_expand_size(
-                str, str->cap_size + other->count + MSTR_CAP_SIZE_STEP
+                str, mstr_resize_tactic(str->cap_size, other->count)
             )
         );
     }
@@ -449,7 +457,7 @@ mstr_insert(MString* str, usize_t idx, mstr_codepoint_t ch)
                 res,
                 mstr_expand_size(
                     str,
-                    str->cap_size + insert_data_len + MSTR_CAP_SIZE_STEP
+                    mstr_resize_tactic(str->cap_size, insert_data_len)
                 )
             );
         }
@@ -759,10 +767,7 @@ static mstr_bool_t mstr_compare_helper(
  */
 static mstr_result_t mstr_expand_size(MString* str, usize_t new_size)
 {
-    if (new_size < MSTR_CAP_SIZE_STEP) {
-        return MStr_Ok;
-    }
-    else if (new_size > str->cap_size) {
+    if (new_size > str->cap_size) {
         char* new_ptr = (char*)mstr_string_realloc(
             str->buff,
             str->buff == str->stack_region,
@@ -808,5 +813,23 @@ static void* mstr_string_realloc(
     }
     else {
         return mstr_heap_realloc(old_ptr, new_size, old_size);
+    }
+}
+
+/**
+ * @brief 改变cap的策略
+ *
+ * @param[in] old_sz: 以前的大小
+ * @param[in] inc_len: 至少需要增加的大小, 会在此基础上增加1
+ */
+static usize_t mstr_resize_tactic(usize_t old_sz, usize_t inc_len)
+{
+    usize_t min_sz = old_sz + inc_len + 1;
+    if (old_sz < MSTR_SIZE_EXPAND_MAX) {
+        usize_t exp_sz = old_sz * 2;
+        return min_sz < exp_sz ? exp_sz : min_sz;
+    }
+    else {
+        return old_sz + inc_len + MSTR_SIZE_LARGE_CAP_SIZE_STEP;
     }
 }
