@@ -115,8 +115,10 @@ install(TARGETS mtfmt
     EXPORT mtfmt-targets
     LIBRARY DESTINATION lib  # 动态库安装路径
     ARCHIVE DESTINATION lib  # 静态库安装路径
-    PUBLIC_HEADER DESTINATION include  # 头文件安装路径
     )
+
+# 安装头文件
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/inc/ DESTINATION include)
 
 install(EXPORT mtfmt-targets
     FILE mtfmt-config.cmake
