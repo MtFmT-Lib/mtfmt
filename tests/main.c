@@ -143,6 +143,7 @@ int main()
     RUN_TEST(sync_io_write);
 
     RUN_TEST(cpp_wrap_fmt);
+    RUN_TEST(cpp_wrap_fmt_parser);
 
     return UNITY_END();
 }

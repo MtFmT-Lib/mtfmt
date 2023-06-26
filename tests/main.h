@@ -111,6 +111,7 @@ extern "C"
     void sync_io_write(void);
 
     void cpp_wrap_fmt(void);
+    void cpp_wrap_fmt_parser(void);
 #if __cplusplus
 }
 #endif

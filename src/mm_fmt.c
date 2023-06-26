@@ -22,27 +22,6 @@
 #define AS_ARRAY_TYPE(t) \
     ((MStrFmtArgType)((uint32_t)(t) | MStrFmtArgType_Array_Bit))
 
-/**
- * @brief 格式化参数
- *
- */
-typedef struct tagMStrFmtFormatArgument
-{
-    iptr_t value;
-    MStrFmtArgType type;
-} MStrFmtFormatArgument;
-
-/**
- * @brief 格式化参数的context
- *
- */
-typedef struct tagMStrFmtArgsContext
-{
-    va_list* p_ap;
-    usize_t max_place;
-    MStrFmtFormatArgument cache[MFMT_PLACE_MAX_NUM];
-} MStrFmtArgsContext;
-
 //
 // private:
 //
@@ -52,8 +31,6 @@ static mstr_result_t
 static mstr_result_t load_value(
     MStrFmtFormatArgument*, MStrFmtArgsContext*, usize_t, MStrFmtArgType
 );
-static mstr_result_t
-    format_impl(MString*, const char*, MStrFmtArgsContext*);
 static mstr_result_t
     format_value(MString*, const MStrFmtParseResult*, const MStrFmtFormatArgument*);
 static mstr_result_t
@@ -107,14 +84,11 @@ mstr_vformat(
     MStrFmtArgsContext context = {0};
     context.max_place = fmt_place;
     context.p_ap = (va_list*)ap_ptr;
-    return format_impl(res_str, fmt, &context);
+    return mstr_context_format(res_str, fmt, &context);
 }
 
-/**
- * @brief 格式化函数的实现
- *
- */
-static mstr_result_t format_impl(
+MSTR_EXPORT_API(mstr_result_t)
+mstr_context_format(
     MString* res_str, const char* fmt, MStrFmtArgsContext* ctx
 )
 {

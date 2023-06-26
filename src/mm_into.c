@@ -2,7 +2,7 @@
 /**
  * @file    mm_into.c
  * @author  向阳 (hinata.hoshino@foxmail.com)
- * @brief   格式化的函数实现
+ * @brief   格式化的函数实现, 不包括浮点数
  * @version 1.0
  * @date    2023-03-24
  *

@@ -17,13 +17,10 @@
 //! peek一个字符
 #define LEX_PEEK_CHAR(pstr) (*(pstr))
 
-//! 取得下一个字符
-#define LEX_NEXT_CHAR(pstr) (*(pstr)++)
-
 //! move到下一个字符的位置
-#define LEX_MOVE_TO_NEXT(pstr)     \
-    do {                           \
-        (void)LEX_NEXT_CHAR(pstr); \
+#define LEX_MOVE_TO_NEXT(pstr) \
+    do {                       \
+        (pstr) += 1;           \
     } while (0)
 
 //! ACCEPT一个token, 注意这个macro不会跳转

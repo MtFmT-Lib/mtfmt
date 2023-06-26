@@ -696,7 +696,25 @@ public:
     }
 
     /**
-     * @brief 进行格式化
+     * @brief 进行格式化(字符串数组)
+     *
+     * @tparam Args: 参数类型
+     *
+     * @param fmt_str: 格式化串
+     * @param args: 格式化参数
+     *
+     * @return result<string, error_code_t>: 结果
+     */
+    template <std::size_t N, typename... Args>
+    static result<string, error_code_t> format(
+        const value_t (&fmt_str)[N], Args&&... args
+    )
+    {
+        return format_variable(fmt_str, std::forward<Args&&>(args)...);
+    }
+
+    /**
+     * @brief 进行格式化(动态的格式化串)
      *
      * @tparam Args: 参数类型
      *
@@ -706,7 +724,7 @@ public:
      * @return result<string, error_code_t>: 结果
      */
     template <typename... Args>
-    static result<string, error_code_t> format(
+    static result<string, error_code_t> format_variable(
         const string::value_t* fmt_str, Args&&... args
     )
     {

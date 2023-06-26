@@ -215,7 +215,7 @@
  * @brief 指定是否使用float32
  *
  */
-#define _MSTR_USE_FP_FLOAT32 1
+#define _MSTR_USE_FP_FLOAT32 0
 #endif // MSTR_BUILD_CC
 #endif // _MSTR_USE_FP_FLOAT32
 
@@ -245,7 +245,7 @@
  * @brief 指定是否使用float64
  *
  */
-#define _MSTR_USE_FP_FLOAT64 1
+#define _MSTR_USE_FP_FLOAT64 0
 #endif // MSTR_BUILD_CC
 #endif // _MSTR_USE_FP_FLOAT64
 
