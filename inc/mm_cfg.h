@@ -166,6 +166,97 @@
 #define _MSTR_RUNTIME_CTRLFLOW_MARKER 1
 #endif // _MSTR_RUNTIME_CTRLFLOW_MARKER
 
+#if !defined(_MSTR_USE_FP_FLOAT16)
+#if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
+    MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
+#if defined(__TARGET_FPU_SOFTVFP_VFPV3_FP16) ||     \
+    defined(__TARGET_FPU_SOFTVFP_VFPV3_D16_FP16) || \
+    defined(__TARGET_FPU_VFPV3_FP16) ||             \
+    defined(__TARGET_FPU_VFPV3_D16_FP16)
+/**
+ * @brief 指定是否使用float16 (ARMCC指定fp16, 启用)
+ *
+ */
+#define _MSTR_USE_FP_FLOAT16 1
+#else
+/**
+ * @brief 指定是否使用float16 (ARMCC未指定fp16, 不启用)
+ *
+ */
+#define _MSTR_USE_FP_FLOAT16 0
+#endif // ARMCC: __TARGET_FPU
+#else
+/**
+ * @brief 指定是否使用float16 (默认不启用)
+ *
+ */
+#define _MSTR_USE_FP_FLOAT16 0
+#endif // MSTR_BUILD_CC
+#endif // _MSTR_USE_FP_FLOAT16
+
+#if !defined(_MSTR_USE_FP_FLOAT32)
+#if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
+    MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
+#if defined(__TARGET_FPU_VFP)
+/**
+ * @brief 指定使用float32 (ARMCC 使用vfp)
+ *
+ */
+#define _MSTR_USE_FP_FLOAT32 1
+#else
+/**
+ * @brief 指定是否使用float32 (ARMCC未指定vfp, 不启用)
+ *
+ */
+#define _MSTR_USE_FP_FLOAT32 0
+#endif // ARMCC: __TARGET_FPU
+#else
+/**
+ * @brief 指定是否使用float32
+ *
+ */
+#define _MSTR_USE_FP_FLOAT32 1
+#endif // MSTR_BUILD_CC
+#endif // _MSTR_USE_FP_FLOAT32
+
+#if !defined(_MSTR_USE_FP_FLOAT64)
+#if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
+    MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
+#if defined(__TARGET_FPU_SOFTVFP_VFPV3_D16) ||      \
+    defined(__TARGET_FPU_SOFTVFP_VFPV3_D16_FP16) || \
+    defined(__TARGET_FPU_SOFTVFP_VFPV4_D16) ||      \
+    defined(__TARGET_FPU_VFPV3_D16) ||              \
+    defined(__TARGET_FPU_VFPV3_D16_FP16) ||         \
+    defined(__TARGET_FPU_VFPV4_D16)
+/**
+ * @brief 指定是否使用float64 (ARMCC指定d16或d32的vfp, 启用)
+ *
+ */
+#define _MSTR_USE_FP_FLOAT64 1
+#else
+/**
+ * @brief 指定是否使用float64 (ARMCC未指定d16或d32的vfp, 不启用)
+ *
+ */
+#define _MSTR_USE_FP_FLOAT64 0
+#endif // ARMCC: __TARGET_FPU
+#else
+/**
+ * @brief 指定是否使用float64
+ *
+ */
+#define _MSTR_USE_FP_FLOAT64 1
+#endif // MSTR_BUILD_CC
+#endif // _MSTR_USE_FP_FLOAT64
+
+/**
+ * @brief 是否有float的支持
+ *
+ */
+#define _MSTR_USE_FP                                 \
+    (_MSTR_USE_FP_FLOAT16 || _MSTR_USE_FP_FLOAT32 || \
+     _MSTR_USE_FP_FLOAT64)
+
 #if !defined(_MSTR_BUILD_DLL)
 /**
  * @brief 指定是否使用动态库构建
@@ -305,6 +396,24 @@
  *
  */
 #define MSTRCFG_USE_CXX_EXCEPTION  0x20
+
+/**
+ * @brief 标记是否使用了float16支持
+ *
+ */
+#define MSTRCFG_USE_FLOAT16        0x40
+
+/**
+ * @brief 标记是否使用了float支持
+ *
+ */
+#define MSTRCFG_USE_FLOAT32        0x80
+
+/**
+ * @brief 标记是否使用了float64支持
+ *
+ */
+#define MSTRCFG_USE_FLOAT64        0x100
 
 /**
  * @brief 取得库版本信息
