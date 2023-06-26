@@ -16,6 +16,7 @@ on:
       - "www/**.scss"
       - "www/**.svelte"
       - "www/wasm/**"
+      - "www/package.json"
   pull_request:
     branches: [master]
     paths:
@@ -31,6 +32,7 @@ on:
       - "www/**.scss"
       - "www/**.svelte"
       - "www/wasm/**"
+      - "www/package.json"
   workflow_dispatch:
     inputs:
       logLevel:
