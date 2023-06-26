@@ -13,7 +13,7 @@
 
 #if !defined(__MM_TYPEDEF_H__)
 #define __MM_TYPEDEF_H__ 1
-
+#include "mm_cfg.h"
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -37,6 +37,33 @@ typedef size_t usize_t, uptr_t;
  *
  */
 typedef intptr_t isize_t, iptr_t;
+
+#if _MSTR_USE_FP_FLOAT16
+#if MSTR_BUILD_CC == MSTR_BUILD_CC_GNUC
+// see also: https://gcc.gnu.org/onlinedocs/gcc/Half-Precision.html
+typedef _Float16 float16_t;
+#elif MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
+// see also:
+// https://developer.arm.com/documentation/dui0375/g/Compiler-Command-line-Options/--fp16-format-format
+typedef __fp16 float16_t;
+#elif MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG
+typedef __fp16 float16_t;
+#else
+#error Unsupport float16 type in this compiler.
+#endif // cc
+#endif // _MSTR_USE_FP_FLOAT16
+
+/**
+ * @brief 32位浮点值
+ *
+ */
+typedef float float32_t;
+
+/**
+ * @brief 64位浮点值
+ *
+ */
+typedef double float64_t;
 
 /**
  * @brief 布尔值

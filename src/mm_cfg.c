@@ -36,6 +36,15 @@ MSTR_EXPORT_API(uint32_t) mstr_configure(void)
 #if _MSTR_USE_CPP_EXCEPTION
     configure |= MSTRCFG_USE_CXX_EXCEPTION;
 #endif // _MSTR_USE_CPP_EXCEPTION
+#if _MSTR_USE_FP_FLOAT16
+    configure |= MSTRCFG_USE_FLOAT16;
+#endif // _MSTR_USE_FP_FLOAT16
+#if _MSTR_USE_FP_FLOAT32
+    configure |= MSTRCFG_USE_FLOAT32;
+#endif // _MSTR_USE_FP_FLOAT32
+#if _MSTR_USE_FP_FLOAT64
+    configure |= MSTRCFG_USE_FLOAT64;
+#endif // _MSTR_USE_FP_FLOAT64
     // 使用的编译器信息
     configure |= MSTR_BUILD_CC << 12;
     // ret

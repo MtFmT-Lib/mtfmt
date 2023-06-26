@@ -29,7 +29,6 @@
 static mstr_bool_t mstr_compare_helper(
     const char*, const char*, usize_t
 );
-static usize_t mstr_char_offset_at(const MString*, usize_t);
 static void* mstr_realloc(void*, mstr_bool_t, usize_t, usize_t);
 static mstr_result_t mstr_expand_size(MString*, usize_t);
 static mstr_result_t
@@ -228,6 +227,7 @@ MSTR_EXPORT_API(void) mstr_clear(MString* str)
 MSTR_EXPORT_API(void) mstr_reverse_self(MString* str)
 {
     mstr_char_t* p2 = str->buff + str->count - 1;
+    mstr_char_t* pe = str->buff + str->count;
     mstr_char_t* p1 = str->buff;
     while (p1 < p2) {
         char v = *p2;
@@ -247,7 +247,7 @@ MSTR_EXPORT_API(void) mstr_reverse_self(MString* str)
     // 把上次的位置到目前lead character的字符交换
     p1 = str->buff;
     p2 = str->buff;
-    while (*p2) {
+    while (p2 < pe) {
         mstr_char_t ch = *p2;
         p2 += 1;
         if ((ch & 0x80) == 0) {
@@ -317,10 +317,10 @@ mstr_equal(const MString* a, const MString* b)
 
 MSTR_EXPORT_API(mstr_bool_t)
 mstr_start_with(
-    const MString* str, const char* prefix, usize_t prefix_len
+    const MString* str, const char* prefix, usize_t prefix_cnt
 )
 {
-    usize_t len = prefix_len;
+    usize_t len = prefix_cnt;
     if (str->count < len) {
         return False;
     }
@@ -331,10 +331,10 @@ mstr_start_with(
 
 MSTR_EXPORT_API(mstr_bool_t)
 mstr_end_with(
-    const MString* str, const char* suffix, usize_t suffix_len
+    const MString* str, const char* suffix, usize_t suffix_cnt
 )
 {
-    usize_t len = suffix_len;
+    usize_t len = suffix_cnt;
     if (str->count < len) {
         return False;
     }
@@ -346,12 +346,12 @@ mstr_end_with(
 
 MSTR_EXPORT_API(mstr_bool_t)
 mstr_contains(
-    const MString* str, const char* pattern, usize_t pattern_len
+    const MString* str, const char* pattern, usize_t pattern_cnt
 )
 {
     mstr_result_t match_ret;
     MStringMatchResult match_res;
-    match_ret = mstr_find(str, &match_res, pattern, pattern_len);
+    match_ret = mstr_find(str, &match_res, 0, pattern, pattern_cnt);
     if (MSTR_FAILED(match_ret)) {
         return False;
     }
@@ -648,6 +648,25 @@ mstr_codepoint_of(mstr_codepoint_t*, const mstr_char_t*, usize_t)
 }
 #endif // _MSTR_USE_UTF_8
 
+MSTR_EXPORT_API(usize_t)
+mstr_char_offset_at(const MString* str, usize_t idx)
+{
+#if _MSTR_USE_UTF_8
+    usize_t cur_idx = 0;
+    const char* it = str->buff;
+    mstr_bounding_check(idx < str->length);
+    while (cur_idx != idx) {
+        usize_t cnt = mstr_char_length(*it);
+        it += cnt;
+        cur_idx += 1;
+    }
+    return (usize_t)(it - str->buff);
+#else
+    mstr_bounding_check(idx < str->length);
+    return idx;
+#endif // _MSTR_USE_UTF_8
+}
+
 MSTR_EXPORT_API(void) mstr_free(MString* str)
 {
     if (str->buff != NULL && str->buff != str->stack_region) {
@@ -729,28 +748,6 @@ static mstr_bool_t mstr_compare_helper(
         bit |= ch_a - ch_b;
     }
     return bit == 0;
-}
-
-/**
- * @brief 找到第idx个字符的偏移量
- *
- */
-static usize_t mstr_char_offset_at(const MString* str, usize_t idx)
-{
-#if _MSTR_USE_UTF_8
-    usize_t cur_idx = 0;
-    const char* it = str->buff;
-    mstr_bounding_check(idx < str->length);
-    while (cur_idx != idx) {
-        usize_t cnt = mstr_char_length(*it);
-        it += cnt;
-        cur_idx += 1;
-    }
-    return (usize_t)(it - str->buff);
-#else
-    mstr_bounding_check(idx < str->length);
-    return idx;
-#endif // _MSTR_USE_UTF_8
 }
 
 /**

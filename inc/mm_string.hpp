@@ -324,7 +324,9 @@ public:
     {
         MString obj;
         mstr_create(&obj, str);
-        return !!mstr_equal(&this_obj, &obj);
+        bool result = !!mstr_equal(&this_obj, &obj);
+        mstr_free(&obj);
+        return result;
     }
 
     /**
@@ -384,7 +386,7 @@ public:
      * @brief 判断字符串是否以另一个字串开始(c_str)
      *
      */
-    bool start_with(const char* prefix) const noexcept
+    bool start_with(const value_t* prefix) const noexcept
     {
         return !!mstr_start_with(&this_obj, prefix, strlen(prefix));
     }
@@ -414,7 +416,7 @@ public:
      * @brief 判断字符串是否以另一个字串结束(c_str)
      *
      */
-    bool end_with(const char* suffix) const noexcept
+    bool end_with(const value_t* suffix) const noexcept
     {
         return !!mstr_end_with(&this_obj, suffix, strlen(suffix));
     }
@@ -606,6 +608,158 @@ public:
     }
 
     /**
+     * @brief 判断字符串是否包括字符串B
+     *
+     * @attention 该函数在字符串B出现编码错误,
+     * 或者实现过程出现堆分配失败时依然会返回 false
+     *
+     */
+    bool contains(const value_t* patt) const noexcept
+    {
+        return mstr_contains(&this_obj, patt, strlen(patt));
+    }
+
+    /**
+     * @brief 判断字符串是否包括字符串B (cstr数组)
+     *
+     * @attention 该函数在字符串B出现编码错误,
+     * 或者实现过程出现堆分配失败时依然会返回 false
+     *
+     */
+    template <std::size_t N>
+    bool contains(const value_t (&patt)[N]) const noexcept
+    {
+        return mstr_contains(&this_obj, patt, N);
+    }
+
+    /**
+     * @brief 判断字符串是否包括字符串B (string对象)
+     *
+     * @attention 该函数在字符串B出现编码错误,
+     * 或者实现过程出现堆分配失败时依然会返回 false
+     *
+     */
+    bool contains(const string& patt) const noexcept
+    {
+        return mstr_contains(
+            &this_obj, patt.this_obj.buff, patt.this_obj.count
+        );
+    }
+
+    /**
+     * @brief 查找字符串 (c_str)
+     *
+     * @note 该函数会在找不到的时候返回succ,
+     * 但是index是-1。使用find_or_err在找不到的时候返回Error
+     */
+    result<isize_t, error_code_t> find(
+        const value_t* patt, usize_t begin_pos = 0, usize_t patt_len = 0
+    ) const noexcept
+    {
+        mstr_result_t res;
+        MStringMatchResult find_result;
+        res = mstr_find(
+            &this_obj,
+            &find_result,
+            begin_pos,
+            patt,
+            patt_len == 0 ? strlen(patt) : patt_len
+        );
+        if (MSTR_FAILED(res)) {
+            return res;
+        }
+        else if (find_result.is_matched) {
+            return static_cast<isize_t>(find_result.begin_pos);
+        }
+        else {
+            return static_cast<isize_t>(-1);
+        }
+    }
+
+    /**
+     * @brief 查找字符串 (c_str array)
+     *
+     * @note 该函数会在找不到的时候返回succ,
+     * 但是index是-1。使用find_or_err在找不到的时候返回Error
+     */
+    template <std::size_t N>
+    result<isize_t, error_code_t> find(
+        const value_t (&patt)[N], usize_t begin_pos = 0
+    ) const noexcept
+    {
+        return find(patt, begin_pos, N);
+    }
+
+    /**
+     * @brief 查找字符串 (mtfmt::string)
+     *
+     * @note 该函数会在找不到的时候返回succ,
+     * 但是index是-1。使用find_or_err在找不到的时候返回Error
+     */
+    result<isize_t, error_code_t> find(
+        const mtfmt::string& patt, usize_t begin_pos = 0
+    ) const noexcept
+    {
+        return find(patt.this_obj.buff, begin_pos, patt.this_obj.count);
+    }
+
+    /**
+     * @brief 查找字符串 (c_str)
+     *
+     * @note 该函数会在找不到的时候返回Error, 使用 find 返回-1
+     */
+    result<usize_t, error_code_t> find_or_err(
+        const value_t* patt, usize_t begin_pos = 0, usize_t patt_len = 0
+    ) const noexcept
+    {
+        mstr_result_t res;
+        MStringMatchResult find_result;
+        res = mstr_find(
+            &this_obj,
+            &find_result,
+            begin_pos,
+            patt,
+            patt_len == 0 ? strlen(patt) : patt_len
+        );
+        if (MSTR_FAILED(res)) {
+            return res;
+        }
+        else if (find_result.is_matched) {
+            return static_cast<isize_t>(find_result.begin_pos);
+        }
+        else {
+            return MStr_Err_NoSubstrFound;
+        }
+    }
+
+    /**
+     * @brief 查找字符串 (c_str array)
+     *
+     * @note 该函数会在找不到的时候返回Error, 使用 find 返回-1
+     */
+    template <std::size_t N>
+    result<usize_t, error_code_t> find_or_err(
+        const value_t (&patt)[N], usize_t begin_pos = 0
+    ) const noexcept
+    {
+        return find_or_err(patt, begin_pos, N);
+    }
+
+    /**
+     * @brief 查找字符串 (mtfmt::string)
+     *
+     * @note 该函数会在找不到的时候返回Error, 使用 find 返回-1
+     */
+    result<usize_t, error_code_t> find_or_err(
+        const mtfmt::string& patt, usize_t begin_pos = 0
+    ) const noexcept
+    {
+        return find_or_err(
+            patt.this_obj.buff, begin_pos, patt.this_obj.count
+        );
+    }
+
+    /**
      * @brief 取得C风格字符串
      *
      * @return const element_t*: c风格字符串指针吗
@@ -696,7 +850,25 @@ public:
     }
 
     /**
-     * @brief 进行格式化
+     * @brief 进行格式化(字符串数组)
+     *
+     * @tparam Args: 参数类型
+     *
+     * @param fmt_str: 格式化串
+     * @param args: 格式化参数
+     *
+     * @return result<string, error_code_t>: 结果
+     */
+    template <std::size_t N, typename... Args>
+    static result<string, error_code_t> format(
+        const value_t (&fmt_str)[N], Args&&... args
+    )
+    {
+        return format_variable(fmt_str, std::forward<Args&&>(args)...);
+    }
+
+    /**
+     * @brief 进行格式化(动态的格式化串)
      *
      * @tparam Args: 参数类型
      *
@@ -706,7 +878,7 @@ public:
      * @return result<string, error_code_t>: 结果
      */
     template <typename... Args>
-    static result<string, error_code_t> format(
+    static result<string, error_code_t> format_variable(
         const string::value_t* fmt_str, Args&&... args
     )
     {

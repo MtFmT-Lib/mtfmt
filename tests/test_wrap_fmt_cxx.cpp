@@ -9,6 +9,7 @@
  * @copyright Copyright (c) 向阳, all rights reserved.
  *
  */
+#include "helper.h"
 #include "main.h"
 #include "mtfmt.hpp"
 #include "unity.h"
@@ -16,5 +17,9 @@
 #include <stdio.h>
 
 extern "C" void cpp_wrap_fmt(void)
+{
+}
+
+extern "C" void cpp_wrap_fmt_parser(void)
 {
 }

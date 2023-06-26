@@ -11,5 +11,12 @@
  */
 #if !defined(_INCLUDE_MM_PARSER_HPP_)
 #define _INCLUDE_MM_PARSER_HPP_ 1
+#include "mm_result.hpp"
 
+namespace mtfmt
+{
+namespace details
+{
+}
+} // namespace mtfmt
 #endif // _INCLUDE_MM_PARSER_HPP_

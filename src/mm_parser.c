@@ -17,13 +17,10 @@
 //! peek一个字符
 #define LEX_PEEK_CHAR(pstr) (*(pstr))
 
-//! 取得下一个字符
-#define LEX_NEXT_CHAR(pstr) (*(pstr)++)
-
 //! move到下一个字符的位置
-#define LEX_MOVE_TO_NEXT(pstr)     \
-    do {                           \
-        (void)LEX_NEXT_CHAR(pstr); \
+#define LEX_MOVE_TO_NEXT(pstr) \
+    do {                       \
+        (pstr) += 1;           \
     } while (0)
 
 //! ACCEPT一个token, 注意这个macro不会跳转
@@ -110,6 +107,15 @@ typedef enum tagTokenType
 
     //! 'qXXu'
     TokenType_Type_UQuant,
+
+    //! f16
+    TokenType_Type_Floating16,
+
+    //! f32
+    TokenType_Type_Floating32,
+
+    //! f64
+    TokenType_Type_Floating64,
 
     //! ':s'
     TokenType_Type_CString,
@@ -1434,6 +1440,9 @@ colon:
     case 'u': goto type_ux;
     case 'q': goto type_quat;
     case 'F': goto type_fixed;
+#if _MSTR_USE_FP
+    case 'f': goto type_floating;
+#endif // _MSTR_USE_FP
     case 's': goto type_str;
     case 't': goto type_time;
     default: goto acc;
@@ -1597,6 +1606,55 @@ type_quat_end:
         LEX_ACCEPT_TOKEN(token, TokenType_Type_IQuant, pstr);
         goto acc;
     }
+#if _MSTR_USE_FP
+type_floating:
+    LEX_MOVE_TO_NEXT(pstr);
+    ch = LEX_PEEK_CHAR(pstr);
+    if (ch == '1') {
+        goto type_floating_1x;
+    }
+    else if (ch == '3') {
+        goto type_floating_3x;
+    }
+    else if (ch == '6') {
+        goto type_floating_6x;
+    }
+    else {
+        // 默认fp32
+        LEX_ACCEPT_TOKEN(token, TokenType_Type_Floating32, pstr);
+        goto acc;
+    }
+type_floating_1x:
+    LEX_MOVE_TO_NEXT(pstr);
+    ch = LEX_PEEK_CHAR(pstr);
+    if (ch == '6') {
+        LEX_MOVE_TO_NEXT(pstr);
+        LEX_ACCEPT_TOKEN(token, TokenType_Type_Floating16, pstr);
+    }
+    else {
+        goto err;
+    }
+type_floating_3x:
+    LEX_MOVE_TO_NEXT(pstr);
+    ch = LEX_PEEK_CHAR(pstr);
+    if (ch == '2') {
+        LEX_MOVE_TO_NEXT(pstr);
+        LEX_ACCEPT_TOKEN(token, TokenType_Type_Floating32, pstr);
+    }
+    else {
+        goto err;
+    }
+type_floating_6x:
+    LEX_MOVE_TO_NEXT(pstr);
+    ch = LEX_PEEK_CHAR(pstr);
+    if (ch == '4') {
+        LEX_MOVE_TO_NEXT(pstr);
+        LEX_ACCEPT_TOKEN(token, TokenType_Type_Floating64, pstr);
+    }
+    else {
+        goto err;
+    }
+#endif // _MSTR_USE_FP
 type_str:
     matched_type = TokenType_Type_CString;
     goto signed_char_acc;

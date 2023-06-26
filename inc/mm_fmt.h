@@ -18,6 +18,27 @@
 #include "mm_typedef.h"
 
 /**
+ * @brief 格式化参数
+ *
+ */
+typedef struct tagMStrFmtFormatArgument
+{
+    iptr_t value;
+    MStrFmtArgType type;
+} MStrFmtFormatArgument;
+
+/**
+ * @brief 格式化参数的context
+ *
+ */
+typedef struct tagMStrFmtArgsContext
+{
+    va_list* p_ap;
+    usize_t max_place;
+    MStrFmtFormatArgument cache[MFMT_PLACE_MAX_NUM];
+} MStrFmtArgsContext;
+
+/**
  * @brief 格式化字符串
  *
  * @param[in] fmt: 格式化串
@@ -49,6 +70,19 @@ mstr_vformat(
     MString* res_str,
     usize_t fmt_place,
     va_list* ap_ptr
+);
+
+/**
+ * @brief 按照上下文进行格式化
+ *
+ * @param[out] res_str: 格式化结果
+ * @param[in] fmt: 格式化串
+ * @param[in] ctx: 格式化context
+ *
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_context_format(
+    MString* res_str, const char* fmt, MStrFmtArgsContext* ctx
 );
 
 /**
