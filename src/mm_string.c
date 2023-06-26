@@ -29,7 +29,7 @@
 static mstr_bool_t mstr_compare_helper(
     const char*, const char*, usize_t
 );
-static void* mstr_realloc(void*, mstr_bool_t, usize_t, usize_t);
+static void* mstr_string_realloc(void*, mstr_bool_t, usize_t, usize_t);
 static mstr_result_t mstr_expand_size(MString*, usize_t);
 static mstr_result_t
     mstr_strlen(usize_t*, usize_t*, const mstr_char_t*, const mstr_char_t*);
@@ -763,7 +763,7 @@ static mstr_result_t mstr_expand_size(MString* str, usize_t new_size)
         return MStr_Ok;
     }
     else if (new_size > str->cap_size) {
-        char* new_ptr = (char*)mstr_realloc(
+        char* new_ptr = (char*)mstr_string_realloc(
             str->buff,
             str->buff == str->stack_region,
             str->count,
@@ -791,33 +791,22 @@ static mstr_result_t mstr_expand_size(MString* str, usize_t new_size)
  * @param[in] new_size: 需要分配的大小
  * @return void*: 新分配的地址, 失败返回NULL
  */
-static void* mstr_realloc(
+static void* mstr_string_realloc(
     void* old_ptr,
     mstr_bool_t is_stack,
     usize_t old_size,
     usize_t new_size
 )
 {
-#if _MSTR_USE_MALLOC
-    void* new_ptr;
-    if (!is_stack) {
-        new_ptr = realloc(old_ptr, new_size);
+    if (is_stack) {
+        void* new_ptr = mstr_heap_alloc(new_size);
+        if (new_ptr == NULL) {
+            return NULL;
+        }
+        memcpy(new_ptr, old_ptr, old_size);
+        return new_ptr;
     }
     else {
-        new_ptr = mstr_heap_alloc(new_size);
-        if (new_ptr != NULL) {
-            memcpy(new_ptr, old_ptr, old_size);
-        }
+        return mstr_heap_realloc(old_ptr, new_size, old_size);
     }
-#else
-    void* new_ptr = mstr_heap_alloc(new_size);
-    if (new_ptr == NULL) {
-        return NULL;
-    }
-    memcpy(new_ptr, old_ptr, old_size);
-    if (!is_stack) {
-        mstr_heap_free(old_ptr);
-    }
-#endif // _MSTR_USE_MALLOC
-    return new_ptr;
 }

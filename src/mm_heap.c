@@ -15,12 +15,13 @@
 #include "mm_heap.h"
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 /**
- * @brief 堆的size, 可以省个几bytes
+ * @brief 堆的size
  *
  */
-typedef uint16_t heap_size_t;
+typedef usize_t heap_size_t;
 
 /**
  * @brief 空闲块记录
@@ -108,6 +109,9 @@ static void insert_block_helper(const Heap*, FreeBlock*, FreeBlock*);
 static FreeBlock* split_free_block(FreeBlock*, heap_size_t);
 static FreeBlock* allocate_tactic(const Heap*, heap_size_t);
 static void* heap_allocate_impl(Heap*, heap_size_t, heap_size_t);
+static void* heap_re_allocate_impl(
+    Heap*, void*, heap_size_t, heap_size_t
+);
 
 //
 // public:
@@ -124,6 +128,19 @@ mstr_heap_allocate_sym(usize_t size, usize_t align)
 {
     return heap_allocate_impl(
         &global_heap, (heap_size_t)size, (heap_size_t)align
+    );
+}
+
+MSTR_EXPORT_API(void*)
+mstr_heap_re_allocate_sym(
+    void* old_ptr, usize_t new_size, usize_t old_size
+)
+{
+    return heap_re_allocate_impl(
+        &global_heap,
+        old_ptr,
+        (heap_size_t)new_size,
+        (heap_size_t)old_size
     );
 }
 
@@ -147,6 +164,20 @@ mstr_heap_get_allocate_count(usize_t* alloc_count, usize_t* free_count)
 {
     *alloc_count = global_heap.alloc_count;
     *free_count = global_heap.free_count;
+}
+
+MSTR_EXPORT_API(void*)
+mstr_heap_realloc_cpimp_sym(
+    void* old_ptr, usize_t new_size, usize_t old_size
+)
+{
+    void* new_ptr = mstr_heap_alloc(new_size);
+    if (new_ptr == NULL) {
+        return NULL;
+    }
+    memcpy(new_ptr, old_ptr, old_size);
+    mstr_heap_free(old_ptr);
+    return new_ptr;
 }
 
 /**
@@ -202,9 +233,10 @@ static void heap_init_impl(
 /**
  * @brief 在堆中分配内存
  *
- * @param heap: 堆
- * @param need_size: 需要分配的大小
- * @param align: 要求的字节对齐
+ * @param[inout] heap: 堆
+ * @param[in] need_size: 需要分配的大小
+ * @param[in] align: 要求的字节对齐
+ *
  * @return void*: 内存区, 分配失败返回NULL
  */
 static void* heap_allocate_impl(
@@ -240,21 +272,50 @@ static void* heap_allocate_impl(
     }
     // 统计分配次数
     heap->alloc_count += 1;
+    _MSTR_RUNTIME_HEAP_TRACING(0, (void*)res_mem, alloc_size, 0);
     // ret
     return (void*)res_mem;
 }
 
 /**
+ * @brief 在堆中重新分配内存
+ *
+ * @param[inout] heap: 堆
+ * @param[in] old_ptr: 以前的指针
+ * @param[in] need_size: 需要分配的大小
+ * @param[in] old_size: 以前的内存区大小, 可能用于数据拷贝
+ *
+ * @return void*: 内存区, 分配失败返回NULL
+ */
+static void* heap_re_allocate_impl(
+    Heap* heap,
+    void* old_ptr,
+    heap_size_t need_size,
+    heap_size_t old_size
+)
+{
+    FreeBlock* block =
+        (FreeBlock*)((uptr_t)(old_ptr) - sizeof(FreeBlock));
+    // 本内存块大小
+    heap_size_t origin_sz = block->size;
+    heap_size_t block_sz = origin_sz + block->align_fill;
+    // TODO
+    _MSTR_RUNTIME_HEAP_TRACING(1, old_ptr, need_size, block_sz);
+    return mstr_heap_realloc_cpimp_sym(old_ptr, need_size, old_size);
+}
+
+/**
  * @brief 释放由堆分配器分配的内存
  *
- * @param heap
- * @param mem
+ * @param[inout] heap: 堆
+ * @param[in] mem: 需要释放的内存区
  */
 static void heap_free_impl(Heap* heap, void* mem)
 {
     FreeBlock* block = (FreeBlock*)((uptr_t)(mem) - sizeof(FreeBlock));
     // 本内存块大小
-    heap_size_t block_sz = block->size + block->align_fill;
+    heap_size_t origin_sz = block->size;
+    heap_size_t block_sz = origin_sz + block->align_fill;
     // 空闲块的真正起始位置
     uptr_t freeblock_head =
         (uptr_t)(mem) - sizeof(FreeBlock) - block->align_fill;
@@ -269,6 +330,7 @@ static void heap_free_impl(Heap* heap, void* mem)
     heap->cur_free_size += block_sz;
     // 统计释放次数
     heap->free_count += 1;
+    _MSTR_RUNTIME_HEAP_TRACING(2, mem, origin_sz, 0);
 }
 
 /**
