@@ -66,14 +66,3 @@ jobs:
             <p>
               Automated release from `releases.yml`
             </p>
-            <p>
-              File hashs summary:
-            </p>
-            <ul>
-              <li>${{ steps.compute_digests_arch.outputs.zip_256 }}</li>
-              <li>${{ steps.compute_digests_arch.outputs.zip_512 }}</li>
-              <li>${{ steps.compute_digests_arch.outputs.tgz_256 }}</li>
-              <li>${{ steps.compute_digests_arch.outputs.tgz_512 }}</li>
-              <li>${{ steps.compute_digests_cmsis.outputs.pack_256 }}</li>
-              <li>${{ steps.compute_digests_cmsis.outputs.pack_512 }}</li>
-            </ul>
