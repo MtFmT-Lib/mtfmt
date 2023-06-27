@@ -36,3 +36,29 @@ jobs:
           echo "::set-output name=tgz_512::$(openssl dgst -sha512 ${{ steps.archive_project.outputs.file_name }}.tar.gz)"
           echo "::set-output name=zip_256::$(openssl dgst -sha256 ${{ steps.archive_project.outputs.file_name }}.zip)"
           echo "::set-output name=zip_512::$(openssl dgst -sha512 ${{ steps.archive_project.outputs.file_name }}.zip)"
+      # 上传发布内容
+      - name: Create Release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          body: |
+            Automated release from `releases.yml`
+            <details>
+              <summary>File Hashes</summary>
+              <ul>
+                <li>${{ steps.compute_digests.outputs.zip_256 }}</li>
+                <li>${{ steps.compute_digests.outputs.zip_512 }}</li>
+                <li>${{ steps.compute_digests.outputs.tgz_256 }}</li>
+                <li>${{ steps.compute_digests.outputs.tgz_512 }}</li>
+              </ul>
+            </details>
+      - name: Update release zip files
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ./${{ steps.archive_project.outputs.file_name }}.zip
+      - name: Update release tar.gz files
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ./${{ steps.archive_project.outputs.file_name }}.tar.gz
