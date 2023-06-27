@@ -21,7 +21,7 @@
  * @brief 指定使用BM算法的阈值
  *
  */
-#define BM_THRESHOLD_CNT  12
+#define BM_THRESHOLD_CNT  6
 
 /**
  * @brief 单个char的最大值(unsigned)
@@ -61,65 +61,50 @@ mstr_find(
     usize_t pattern_cnt
 )
 {
-    if (begin_pos > str->length) {
+    mstr_result_t res;
+    MStringMatchResult find_res;
+    usize_t offset;
+    if (begin_pos > str->length || pattern_cnt > str->count) {
         // 超过主串的长度了, 肯定是找不到的
-        f_res->is_matched = false;
-        f_res->begin_pos = 0;
-        f_res->begin_offset = 0;
-        return MStr_Ok;
-    }
-    else if (pattern_cnt > str->count) {
         // 子串过长, 肯定是找不到的
         f_res->is_matched = false;
         f_res->begin_pos = 0;
         f_res->begin_offset = 0;
         return MStr_Ok;
     }
-    else if (pattern_cnt == 0) {
+    if (pattern_cnt == 0) {
         // 空的, 永远返回true
         f_res->begin_pos = 0;
         f_res->begin_offset = 0;
         f_res->is_matched = True;
         return MStr_Ok;
     }
-    else if (begin_pos == 0 && pattern_cnt == str->count) {
-        // 退化为比较
-        f_res->is_matched = mstr_start_with(str, pattern, pattern_cnt);
-        f_res->begin_pos = 0;
-        f_res->begin_offset = 0;
-        return MStr_Ok;
+    offset = mstr_char_offset_at(str, begin_pos);
+    if (pattern_cnt < BM_THRESHOLD_CNT) {
+        res = patt_match_naive(
+            &find_res,
+            str->buff + offset,
+            str->count - offset,
+            pattern,
+            pattern_cnt
+        );
     }
     else {
-        mstr_result_t res;
-        MStringMatchResult find_res;
-        usize_t offset = mstr_char_offset_at(str, begin_pos);
-        if (pattern_cnt < BM_THRESHOLD_CNT) {
-            res = patt_match_naive(
-                &find_res,
-                str->buff + offset,
-                str->count - offset,
-                pattern,
-                pattern_cnt
-            );
-        }
-        else {
-            res = patt_match_large(
-                &find_res,
-                str->buff + offset,
-                str->count - offset,
-                pattern,
-                pattern_cnt
-            );
-        }
-        if (MSTR_SUCC(res)) {
-            f_res->is_matched = find_res.is_matched;
-            f_res->begin_pos =
-                f_res->is_matched ? find_res.begin_pos : 0;
-            f_res->begin_offset =
-                f_res->is_matched ? find_res.begin_offset : 0;
-        }
-        return res;
+        res = patt_match_large(
+            &find_res,
+            str->buff + offset,
+            str->count - offset,
+            pattern,
+            pattern_cnt
+        );
     }
+    if (MSTR_SUCC(res)) {
+        f_res->is_matched = find_res.is_matched;
+        f_res->begin_pos = f_res->is_matched ? find_res.begin_pos : 0;
+        f_res->begin_offset =
+            f_res->is_matched ? find_res.begin_offset : 0;
+    }
+    return res;
 }
 
 /**

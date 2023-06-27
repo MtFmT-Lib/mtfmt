@@ -713,7 +713,7 @@ public:
      * @note 该函数会在找不到的时候返回Error, 使用 find 返回-1
      */
     result<usize_t, error_code_t> find_or_err(
-        const value_t* patt, usize_t begin_pos = 0, usize_t patt_len = 0
+        const value_t* patt, usize_t begin_pos = 0, usize_t patt_cnt = 0
     ) const noexcept
     {
         mstr_result_t res;
@@ -723,7 +723,7 @@ public:
             &find_result,
             begin_pos,
             patt,
-            patt_len == 0 ? strlen(patt) : patt_len
+            patt_cnt == 0 ? strlen(patt) : patt_cnt
         );
         if (MSTR_FAILED(res)) {
             return res;
@@ -761,6 +761,66 @@ public:
         return find_or_err(
             patt.this_obj.buff, begin_pos, patt.this_obj.count
         );
+    }
+
+    /**
+     * @brief 剔除掉patt字符
+     *
+     * @param[in] patt: 模式串
+     * @param[in] patt_len: 模式串的字符数
+     * @param[in] mode: 替换模式
+     *
+     */
+    result<details::unit_t, error_code_t> retain(
+        const value_t* patt,
+        MStringReplaceOption mode = MStringReplaceOption_All,
+        usize_t patt_cnt = 0
+    ) noexcept
+    {
+        mstr_result_t res;
+        res = mstr_retain(
+            &this_obj,
+            mode,
+            patt,
+            patt_cnt == 0 ? strlen(patt) : patt_cnt
+        );
+        if (MSTR_SUCC(res)) {
+            return details::unit_t{};
+        }
+        else {
+            return res;
+        }
+    }
+
+    /**
+     * @brief 剔除掉patt字符(c str array)
+     *
+     * @param[in] patt: 模式串
+     * @param[in] mode: 替换模式
+     *
+     */
+    template <std::size_t N>
+    result<details::unit_t, error_code_t> retain(
+        const value_t (&patt)[N],
+        MStringReplaceOption mode = MStringReplaceOption_All
+    ) noexcept
+    {
+        return retain(patt, mode, N);
+    }
+
+    /**
+     * @brief 剔除掉patt字符(string object)
+     *
+     * @param[in] patt: 模式串
+     * @param[in] mode: 替换模式
+     *
+     */
+    result<details::unit_t, error_code_t> retain(
+        const mtfmt::string& patt,
+        MStringReplaceOption mode = MStringReplaceOption_All
+    ) noexcept
+    {
+        return retain(patt.this_obj.buff, mode, patt.this_obj.count);
     }
 
     /**

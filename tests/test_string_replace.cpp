@@ -25,3 +25,15 @@ constexpr mtfmt::unicode_t unicode_char(const char (&u8char)[N])
 extern "C" void string_replace(void)
 {
 }
+
+extern "C" void string_retain_all(void)
+{
+}
+
+extern "C" void string_retain_endwith(void)
+{
+}
+
+extern "C" void string_retain_startwith(void)
+{
+}

@@ -764,7 +764,7 @@ static mstr_bool_t mstr_compare_helper(
         uint32_t ch_a = a[i];
         uint32_t ch_b = b[i];
         // equ
-        bit |= ch_a - ch_b;
+        bit |= ch_a ^ ch_b;
     }
     return bit == 0;
 }
