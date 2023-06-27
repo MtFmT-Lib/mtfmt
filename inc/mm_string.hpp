@@ -130,6 +130,7 @@ public:
     reference operator*() const
     {
         static mstr_codepoint_t code;
+#if _MSTR_USE_UTF_8
         usize_t len = mstr_char_length(*it);
         mstr_result_t res = mstr_codepoint_of(&code, it, len);
         if (MSTR_FAILED(res)) {
@@ -139,6 +140,9 @@ public:
             mstr_cause_exception(MStr_Err_UnicodeEncodingError);
 #endif // _MSTR_USE_CPP_EXCEPTION
         }
+#else
+        code = *it;
+#endif // _MSTR_USE_UTF_8
         // 因为code是计算出来的
         // 因此用static吧...c++11似乎无法延续const reference&的lifetime
         return code;
@@ -846,7 +850,11 @@ public:
     template <std::size_t N>
     constexpr static unicode_t unicode_char(const value_t (&u8char)[N])
     {
+#if _MSTR_USE_UTF_8
         return details::unicode_char(u8char);
+#else
+        return static_cast<unicode_t>(u8char[0]);
+#endif // _MSTR_USE_UTF_8
     }
 
     /**

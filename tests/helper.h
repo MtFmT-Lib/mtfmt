@@ -11,6 +11,7 @@
  */
 #if !defined(_INCLUDE_TEST_HELPER_H_)
 #define _INCLUDE_TEST_HELPER_H_ 1
+#include "mm_cfg.h"
 #include "mm_string.h"
 #include "unity.h"
 

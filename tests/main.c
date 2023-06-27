@@ -83,7 +83,6 @@ int main()
 
     RUN_TEST(string_trans_clear);
     RUN_TEST(string_trans_reverse);
-    RUN_TEST(string_trans_reverse_unicode);
 
     RUN_TEST(string_index);
     RUN_TEST(string_const_iterator);

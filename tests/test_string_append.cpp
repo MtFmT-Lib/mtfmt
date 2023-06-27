@@ -29,7 +29,6 @@ constexpr mtfmt::unicode_t unicode_char(const char (&u8char)[N])
 
 extern "C" void string_append(void)
 {
-    constexpr auto ch = unicode_char(u8"😀");
     // @mstr_append
     mtfmt::string str = u8"Smile";
     ASSERT_EQUAL_VALUE(str.length(), 5);
@@ -38,15 +37,17 @@ extern "C" void string_append(void)
     ASSERT_EQUAL_VALUE(str.length(), 6);
     ASSERT_EQUAL_VALUE(str.byte_count(), 6);
     ASSERT_EQUAL_VALUE(str, u8"Smile:");
+#if _MSTR_USE_UTF_8
+    constexpr auto ch = unicode_char(u8"😀");
     str += ch;
     ASSERT_EQUAL_VALUE(str.length(), 7);
     ASSERT_EQUAL_VALUE(str.byte_count(), 10);
     ASSERT_EQUAL_VALUE(str, u8"Smile:😀");
+#endif // _MSTR_USE_UTF_8
 }
 
 extern "C" void string_repeat_append(void)
 {
-    constexpr auto ch = unicode_char(u8"😀");
     // @mstr_repeat_append
     mtfmt::string str = u8"Smile";
     ASSERT_EQUAL_VALUE(str.length(), 5);
@@ -55,8 +56,11 @@ extern "C" void string_repeat_append(void)
     ASSERT_EQUAL_VALUE(str, u8"Smile:::");
     ASSERT_EQUAL_VALUE(str.length(), 8);
     ASSERT_EQUAL_VALUE(str.byte_count(), 8);
+#if _MSTR_USE_UTF_8
+    constexpr auto ch = unicode_char(u8"😀");
     str += mtfmt::string::repeat_char_t{ch, 3};
     ASSERT_EQUAL_VALUE(str.length(), 11);
     ASSERT_EQUAL_VALUE(str.byte_count(), 20);
     ASSERT_EQUAL_VALUE(str, u8"Smile:::😀😀😀");
+#endif // _MSTR_USE_UTF_8
 }

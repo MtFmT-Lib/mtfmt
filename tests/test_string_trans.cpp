@@ -30,16 +30,6 @@ extern "C" void string_trans_clear(void)
 
 extern "C" void string_trans_reverse(void)
 {
-    MString src;
-    EVAL(mstr_create(&src, u8"😀😊"));
-    ASSERT_EQUAL_STRING(&src, u8"😀😊");
-    mstr_reverse_self(&src);
-    ASSERT_EQUAL_STRING(&src, u8"😊😀");
-    mstr_free(&src);
-}
-
-extern "C" void string_trans_reverse_unicode(void)
-{
     // 偶数长度
     MString src1;
     EVAL(mstr_create(&src1, "1234567890"));
@@ -54,4 +44,13 @@ extern "C" void string_trans_reverse_unicode(void)
     mstr_reverse_self(&src2);
     ASSERT_EQUAL_STRING(&src2, "987654321");
     mstr_free(&src2);
+    // Unicode
+#if _MSTR_USE_UTF_8
+    MString src_unicode;
+    EVAL(mstr_create(&src_unicode, u8"😀😊"));
+    ASSERT_EQUAL_STRING(&src_unicode, u8"😀😊");
+    mstr_reverse_self(&src_unicode);
+    ASSERT_EQUAL_STRING(&src_unicode, u8"😊😀");
+    mstr_free(&src_unicode);
+#endif
 }

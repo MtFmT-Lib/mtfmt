@@ -56,17 +56,15 @@ mstr_create(MString* str, const char* content)
     else {
         mstr_strlen(&content_len, &content_cnt, content, NULL);
     }
+    str->count = content_cnt;
+    str->length = content_len;
     if (content_cnt == 0) {
         str->buff = str->stack_region;
-        str->count = 0;
-        str->length = 0;
         str->cap_size = MSTR_STACK_REGION_SIZE;
         return MStr_Ok;
     }
     else if (content_cnt < MSTR_STACK_REGION_SIZE) {
         str->buff = str->stack_region;
-        str->count = content_cnt;
-        str->length = content_len;
         str->cap_size = MSTR_STACK_REGION_SIZE;
         strcpy(str->buff, content);
         return MStr_Ok;
@@ -78,8 +76,6 @@ mstr_create(MString* str, const char* content)
             // 内存分配失败
             return MStr_Err_HeapTooSmall;
         }
-        str->count = content_cnt;
-        str->length = content_len;
         memcpy(str->buff, content, content_cnt);
         return MStr_Ok;
     }
@@ -235,8 +231,10 @@ MSTR_EXPORT_API(void) mstr_clear(MString* str)
 MSTR_EXPORT_API(void) mstr_reverse_self(MString* str)
 {
     mstr_char_t* p2 = str->buff + str->count - 1;
-    mstr_char_t* pe = str->buff + str->count;
     mstr_char_t* p1 = str->buff;
+#if _MSTR_USE_UTF_8
+    mstr_char_t* pe = str->buff + str->count;
+#endif // _MSTR_USE_UTF_8
     while (p1 < p2) {
         char v = *p2;
         *p2 = *p1;
@@ -644,14 +642,24 @@ mstr_codepoint_of(
 #else
 
 MSTR_EXPORT_API(mstr_result_t)
-mstr_as_utf8(mstr_codepoint_t, mstr_char_t*, usize_t*)
+mstr_as_utf8(
+    mstr_codepoint_t code, mstr_char_t* result, usize_t* result_len
+)
 {
+    (void)code;
+    (void)result;
+    (void)result_len;
     return MStr_Err_NoImplemention;
 }
 
 MSTR_EXPORT_API(mstr_result_t)
-mstr_codepoint_of(mstr_codepoint_t*, const mstr_char_t*, usize_t)
+mstr_codepoint_of(
+    mstr_codepoint_t* code, const mstr_char_t* ch, usize_t byte_count
+)
 {
+    (void)code;
+    (void)ch;
+    (void)byte_count;
     return MStr_Err_NoImplemention;
 }
 #endif // _MSTR_USE_UTF_8
@@ -705,6 +713,9 @@ static mstr_result_t mstr_strlen(
     if (str_end == NULL) {
         // 给一个大大的值让str < str_end恒为true
         str_end = (const mstr_char_t*)(uptr_t)(-1);
+    }
+    if (str == NULL) {
+        return 0;
     }
 #if _MSTR_USE_UTF_8
     while (*str && str < str_end) {

@@ -23,15 +23,23 @@ constexpr mtfmt::unicode_t unicode_char(const char (&u8char)[N])
 
 extern "C" void string_concat_object(void)
 {
-    mtfmt::string str_rhs = u8"😀";
     // @mstr_concat
     mtfmt::string str_lhs = u8"Smile:";
     ASSERT_EQUAL_VALUE(str_lhs.length(), 6);
     ASSERT_EQUAL_VALUE(str_lhs.byte_count(), 6);
+#if _MSTR_USE_UTF_8
+    mtfmt::string str_rhs = u8"😀";
     str_lhs += str_rhs;
     ASSERT_EQUAL_VALUE(str_lhs.length(), 7);
     ASSERT_EQUAL_VALUE(str_lhs.byte_count(), 10);
     ASSERT_EQUAL_VALUE(str_lhs, u8"Smile:😀");
+#else
+    mtfmt::string str_rhs = u8"Everyday!";
+    str_lhs += str_rhs;
+    ASSERT_EQUAL_VALUE(str_lhs.length(), 15);
+    ASSERT_EQUAL_VALUE(str_lhs.byte_count(), 15);
+    ASSERT_EQUAL_VALUE(str_lhs, u8"Smile:Everyday!");
+#endif // _MSTR_USE_UTF_8
 }
 
 extern "C" void string_concat_c_str(void)
@@ -39,10 +47,15 @@ extern "C" void string_concat_c_str(void)
     mtfmt::string str_lhs = u8"Smile:";
     ASSERT_EQUAL_VALUE(str_lhs.length(), 6);
     ASSERT_EQUAL_VALUE(str_lhs.byte_count(), 6);
+    str_lhs += u8"@@";
+    ASSERT_EQUAL_VALUE(str_lhs.length(), 8);
+    ASSERT_EQUAL_VALUE(str_lhs.byte_count(), 8);
+#if _MSTR_USE_UTF_8
     str_lhs += u8"😀";
-    ASSERT_EQUAL_VALUE(str_lhs.length(), 7);
-    ASSERT_EQUAL_VALUE(str_lhs.byte_count(), 10);
-    ASSERT_EQUAL_VALUE(str_lhs, u8"Smile:😀");
+    ASSERT_EQUAL_VALUE(str_lhs.length(), 9);
+    ASSERT_EQUAL_VALUE(str_lhs.byte_count(), 12);
+    ASSERT_EQUAL_VALUE(str_lhs, u8"Smile:@@😀");
+#endif // _MSTR_USE_UTF_8
 }
 
 extern "C" void string_concat_c_slice(void)
@@ -51,6 +64,7 @@ extern "C" void string_concat_c_slice(void)
     EVAL(mstr_create(&str_lhs, u8"Smile:"));
     ASSERT_EQUAL_VALUE(str_lhs.count, 6);
     ASSERT_EQUAL_VALUE(str_lhs.length, 6);
+#if _MSTR_USE_UTF_8
     const char c_str[] = {u8"😀😀😀"};
     // 拼接完整的字符串
     EVAL(mstr_concat_cstr_slice(&str_lhs, c_str + 0, c_str + 4));
@@ -61,5 +75,12 @@ extern "C" void string_concat_c_slice(void)
     mstr_result_t res;
     res = mstr_concat_cstr_slice(&str_lhs, c_str + 0, c_str + 3);
     ASSERT_EQUAL_VALUE(res, MStr_Err_EncodingNotCompleted);
+#else
+    const char c_str[] = {u8"Everyday"};
+    EVAL(mstr_concat_cstr_slice(&str_lhs, c_str + 0, c_str + 4));
+    ASSERT_EQUAL_VALUE(str_lhs.count, 10);
+    ASSERT_EQUAL_VALUE(str_lhs.length, 10);
+    ASSERT_EQUAL_STRING(&str_lhs, u8"Smile:Ever");
+#endif // _MSTR_USE_UTF_8
     mstr_free(&str_lhs);
 }

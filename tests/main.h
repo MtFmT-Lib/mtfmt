@@ -48,7 +48,6 @@ extern "C"
 
     void string_trans_clear(void);
     void string_trans_reverse(void);
-    void string_trans_reverse_unicode(void);
 
     void string_index(void);
     void string_const_iterator(void);

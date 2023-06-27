@@ -302,6 +302,39 @@
     (_MSTR_USE_FP_FLOAT16 || _MSTR_USE_FP_FLOAT32 || \
      _MSTR_USE_FP_FLOAT64)
 
+#if !defined(_MSTR_USE_CPP_EXCEPTION)
+#if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
+    MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
+#if defined(__EXCEPTIONS)
+/**
+ * @brief 指定是否使用异常(跟随arm cc, 使用)
+ *
+ */
+#define _MSTR_USE_CPP_EXCEPTION 1
+#else
+/**
+ * @brief 指定是否使用异常(跟随arm cc, 不使用)
+ *
+ */
+#define _MSTR_USE_CPP_EXCEPTION 0
+#endif // __EXCEPTIONS
+#else
+/**
+ * @brief 指定是否使用异常 (默认打开)
+ *
+ */
+#define _MSTR_USE_CPP_EXCEPTION 1
+#endif // MSTR_BUILD_CC
+#endif // _MSTR_USE_CPP_EXCEPTION
+
+#if !defined(_MSTR_USE_UTF_8)
+/**
+ * @brief 指定是否启用UTF-8支持
+ *
+ */
+#define _MSTR_USE_UTF_8 1
+#endif // _MSTR_USE_UTF_8
+
 #if !defined(_MSTR_BUILD_DLL)
 /**
  * @brief 指定是否使用动态库构建
@@ -351,39 +384,6 @@
 #define mstr_cause_exception(code) ((void)0U)
 #define mstr_assert(e)             ((void)0U)
 #endif // _MSTR_RUNTIME_CTRLFLOW_MARKER
-
-#if !defined(_MSTR_USE_CPP_EXCEPTION)
-#if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
-    MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
-#if defined(__EXCEPTIONS)
-/**
- * @brief 指定是否使用异常(跟随arm cc, 使用)
- *
- */
-#define _MSTR_USE_CPP_EXCEPTION 1
-#else
-/**
- * @brief 指定是否使用异常(跟随arm cc, 不使用)
- *
- */
-#define _MSTR_USE_CPP_EXCEPTION 0
-#endif // __EXCEPTIONS
-#else
-/**
- * @brief 指定是否使用异常 (默认打开)
- *
- */
-#define _MSTR_USE_CPP_EXCEPTION 1
-#endif // MSTR_BUILD_CC
-#endif // _MSTR_USE_CPP_EXCEPTION
-
-#if !defined(_MSTR_USE_UTF_8)
-/**
- * @brief 指定是否启用UTF-8支持
- *
- */
-#define _MSTR_USE_UTF_8 1
-#endif // _MSTR_USE_UTF_8
 
 //
 // 导出函数修辞
