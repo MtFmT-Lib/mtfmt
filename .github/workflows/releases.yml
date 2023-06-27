@@ -10,7 +10,7 @@ on:
         default: "warning"
 
 permissions:
-  contents: read
+  contents: write
 
 name: Release it
 jobs:
