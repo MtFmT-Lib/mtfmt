@@ -32,10 +32,10 @@ jobs:
       - name: Compute digests
         id: compute_digests_arch
         run: |
-          echo "::set-output name=tgz_256::$(openssl dgst -sha256 -r ${{ steps.archive_project.outputs.file_name }}.tar.gz)"
-          echo "::set-output name=tgz_512::$(openssl dgst -sha512 -r ${{ steps.archive_project.outputs.file_name }}.tar.gz)"
-          echo "::set-output name=zip_256::$(openssl dgst -sha256 -r ${{ steps.archive_project.outputs.file_name }}.zip)"
-          echo "::set-output name=zip_512::$(openssl dgst -sha512 -r ${{ steps.archive_project.outputs.file_name }}.zip)"
+          echo "$(openssl dgst -sha256 -r ${{ steps.archive_project.outputs.file_name }}.tar.gz)" >>checksum.txt
+          echo "$(openssl dgst -sha512 -r ${{ steps.archive_project.outputs.file_name }}.tar.gz)" >>checksum.txt
+          echo "$(openssl dgst -sha256 -r ${{ steps.archive_project.outputs.file_name }}.zip)" >>checksum.txt
+          echo "$(openssl dgst -sha512 -r ${{ steps.archive_project.outputs.file_name }}.zip)" >>checksum.txt
       # keil包
       # TODO 下面的内容都只是单纯的复制了其它的workflows, 把它们改成actions
       - name: Install dependencies
@@ -49,8 +49,8 @@ jobs:
       - name: Compute digests for CMSIS pack
         id: compute_digests_cmsis
         run: |
-          echo "::set-output name=pack_256::$(openssl dgst -sha256 -r target_package/*.pack)"
-          echo "::set-output name=pack_512::$(openssl dgst -sha512 -r target_package/*.pack)"
+          echo "$(openssl dgst -sha256 -r target_package/*.pack)" >>checksum.txt
+          echo "$(openssl dgst -sha512 -r target_package/*.pack)" >>checksum.txt
       # 上传发布内容
       - name: Create Release
         id: create_release
@@ -59,20 +59,8 @@ jobs:
           artifacts: >-
             ./${{ steps.archive_project.outputs.file_name }}.zip,
             ./${{ steps.archive_project.outputs.file_name }}.tar.gz,
-            ./target_package/*.pack
+            ./target_package/*.pack,
+            ./checksum.txt
           allowUpdates: true
           body: |
-            <p>
               Automated release from `releases.yml`
-            </p>
-            <p>
-              File hashs summary:
-            </p>
-            <ul>
-              <li>${{ steps.compute_digests_arch.outputs.zip_256 }}</li>
-              <li>${{ steps.compute_digests_arch.outputs.zip_512 }}</li>
-              <li>${{ steps.compute_digests_arch.outputs.tgz_256 }}</li>
-              <li>${{ steps.compute_digests_arch.outputs.tgz_512 }}</li>
-              <li>${{ steps.compute_digests_cmsis.outputs.pack_256 }}</li>
-              <li>${{ steps.compute_digests_cmsis.outputs.pack_512 }}</li>
-            </ul>
