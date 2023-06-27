@@ -2,7 +2,7 @@
 import MtfmtWASM from './mtfmt'
 import Result from '$lib/fp/result'
 import type { CObject } from './scope'
-
+export { default as ScopeObject } from './scope'
 /**
  * 库错误
 */
@@ -57,12 +57,12 @@ export enum MStrResult {
 }
 
 /**
- * 取得库的wrapper版本号
+ * 取得库的编译选项
  * 
- * @returns 版本号
+ * @returns 编译选项
  */
-export function wrap_version(): number {
-    return MtfmtWASM.mstr_wasm_version()
+export function mtfmt_compile_configure(): number {
+    return MtfmtWASM.mstr_configure()
 }
 
 /**
@@ -92,6 +92,20 @@ export class CString implements CObject {
             }
             this.handle = handle
         }
+    }
+
+    /**
+     * 取得字符串长度
+     */
+    public length(): number {
+        return MtfmtWASM.mstr_wasm_string_len(this.handle)
+    }
+
+    /**
+     * 取得字符串的字符计数长度
+     */
+    public char_counts(): number {
+        return MtfmtWASM.mstr_wasm_string_count(this.handle)
     }
 
     /**
@@ -130,7 +144,7 @@ export class CString implements CObject {
         const c_rawstr = MtfmtWASM.mstr_as_cstr(ret_handle)
         // 取得字符串内容
         const buffer = MtfmtWASM.memory.buffer
-        const length = MtfmtWASM.mstr_wasm_string_len(ret_handle)
+        const length = MtfmtWASM.mstr_wasm_string_count(ret_handle)
         const rawstr = new Uint8Array(buffer, c_rawstr, length)
         // 取得字符串内容
         const decoder = new TextDecoder()

@@ -16,15 +16,16 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-MSTR_EXPORT_API(uint32_t) mstr_wasm_version()
-{
-    return 0x01000000;
-}
-
 MSTR_EXPORT_API(size_t) mstr_wasm_string_len(intptr_t str)
 {
     const MString* s = (const MString*)str;
     return s->length;
+}
+
+MSTR_EXPORT_API(size_t) mstr_wasm_string_count(intptr_t str)
+{
+    const MString* s = (const MString*)str;
+    return s->count;
 }
 
 MSTR_EXPORT_API(intptr_t) mstr_wasm_new_string()

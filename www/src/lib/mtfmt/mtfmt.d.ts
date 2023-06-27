@@ -10,11 +10,13 @@ export declare function mstr_concat_cstr(pstr: number, cstr: number): MStrResult
 
 export declare function mstr_free(pstr: number)
 
-export declare function mstr_wasm_version(): number
+export declare function mstr_configure(): number
 
 export declare function mstr_wasm_new_string(): number
 
 export declare function mstr_wasm_string_len(ptr: number): number
+
+export declare function mstr_wasm_string_count(ptr: number): number
 
 export declare function mstr_wasm_free_string(ptr: number)
 
