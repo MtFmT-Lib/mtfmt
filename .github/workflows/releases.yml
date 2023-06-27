@@ -1,0 +1,38 @@
+on:
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+
+permissions:
+  contents: read
+
+name: Release it
+jobs:
+  release-to-github:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      # 源代码
+      - name: Archive project sources
+        id: archive_project
+        run: |
+          FILE_NAME=${GITHUB_REPOSITORY#*/}-${GITHUB_REF##*/}
+          git archive ${{ github.ref }} -o ${FILE_NAME}.zip
+          git archive ${{ github.ref }} -o ${FILE_NAME}.tar.gz
+          echo "::set-output name=file_name::${FILE_NAME}"
+      - name: Compute digests
+        id: compute_digests
+        run: |
+          echo "::set-output name=tgz_256::$(openssl dgst -sha256 ${{ steps.archive_project.outputs.file_name }}.tar.gz)"
+          echo "::set-output name=tgz_512::$(openssl dgst -sha512 ${{ steps.archive_project.outputs.file_name }}.tar.gz)"
+          echo "::set-output name=zip_256::$(openssl dgst -sha256 ${{ steps.archive_project.outputs.file_name }}.zip)"
+          echo "::set-output name=zip_512::$(openssl dgst -sha512 ${{ steps.archive_project.outputs.file_name }}.zip)"
