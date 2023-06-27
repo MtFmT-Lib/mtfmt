@@ -142,7 +142,7 @@ public:
         }
 #else
         code = *it;
-#endif // _MSTR_USE_UTF_8
+#endif
         // 因为code是计算出来的
         // 因此用static吧...c++11似乎无法延续const reference&的lifetime
         return code;

@@ -34,7 +34,10 @@ jobs:
         buildin-div: ["0", "1"]
         buildin-alloc: ["0", "1"]
     runs-on: ubuntu-latest
-    name: "Tests"
+    name: >
+      Tests ${{ matrix.platform }}
+      div: ${{ matrix.buildin-div }}
+      alloc: ${{ matrix.buildin-alloc }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -52,4 +55,6 @@ jobs:
           make test
         env:
           MTFMT_BUILD_USE_LTO: "1"
-          MTFMT_BUILD_C_DEFS: "-D_MSTR_USE_MALLOC=${{ matrix.buildin-alloc }} -D_MSTR_USE_HARDWARE_DIV=${{ matrix.buildin-div }}"
+          MTFMT_BUILD_C_DEFS: >
+            -D_MSTR_USE_MALLOC=${{ matrix.buildin-alloc }}
+            -D_MSTR_USE_HARDWARE_DIV=${{ matrix.buildin-div }}
