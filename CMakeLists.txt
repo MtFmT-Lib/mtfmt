@@ -113,9 +113,9 @@ endif()
 
 install(TARGETS mtfmt
     EXPORT mtfmt-targets
-    RUNTIME DESTINATION bin # dll
-    LIBRARY DESTINATION lib # 动态库安装路径
-    ARCHIVE DESTINATION lib/static # 静态库安装路径
+    RUNTIME DESTINATION mtfmt/bin # dll
+    LIBRARY DESTINATION mtfmt/lib # 动态库安装路径
+    ARCHIVE DESTINATION mtfmt/lib/static # 静态库安装路径
 )
 
 # 安装头文件
