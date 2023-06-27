@@ -7,7 +7,7 @@ description = "A formatting library wrote by pure C language"
 keywords = ["formatting", "heap-manager", "string"]
 name = "mtfmt"
 organization = "mtfmt"
-version = "1.0.0"
+version = "0.1.1"
 
 [package.support]
 homepage = "https://mtfmt.cc/"

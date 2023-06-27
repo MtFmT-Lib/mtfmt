@@ -30,37 +30,49 @@ jobs:
           git archive ${{ github.ref }} -o ${FILE_NAME}.tar.gz
           echo "::set-output name=file_name::${FILE_NAME}"
       - name: Compute digests
-        id: compute_digests
+        id: compute_digests_arch
         run: |
-          echo "::set-output name=tgz_256::$(openssl dgst -sha256 ${{ steps.archive_project.outputs.file_name }}.tar.gz)"
-          echo "::set-output name=tgz_512::$(openssl dgst -sha512 ${{ steps.archive_project.outputs.file_name }}.tar.gz)"
-          echo "::set-output name=zip_256::$(openssl dgst -sha256 ${{ steps.archive_project.outputs.file_name }}.zip)"
-          echo "::set-output name=zip_512::$(openssl dgst -sha512 ${{ steps.archive_project.outputs.file_name }}.zip)"
+          echo "::set-output name=tgz_256::$(openssl dgst -sha256 -r ${{ steps.archive_project.outputs.file_name }}.tar.gz)"
+          echo "::set-output name=tgz_512::$(openssl dgst -sha512 -r ${{ steps.archive_project.outputs.file_name }}.tar.gz)"
+          echo "::set-output name=zip_256::$(openssl dgst -sha256 -r ${{ steps.archive_project.outputs.file_name }}.zip)"
+          echo "::set-output name=zip_512::$(openssl dgst -sha512 -r ${{ steps.archive_project.outputs.file_name }}.zip)"
+      # keil包
+      # TODO 下面的内容都只是单纯的复制了其它的workflows, 把它们改成actions
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest
+          if [ -f zipack/requirements.txt ]; then pip install -r zipack/requirements.txt; fi
+      - name: Generate CMSIS pack
+        run: |
+          python zipack --project=./support/project.toml cmsis-pack
+      - name: Compute digests for CMSIS pack
+        id: compute_digests_cmsis
+        run: |
+          echo "::set-output name=pack_256::$(openssl dgst -sha256 -r target_package/*.pack)"
+          echo "::set-output name=pack_512::$(openssl dgst -sha512 -r target_package/*.pack)"
       # 上传发布内容
       - name: Create Release
         id: create_release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ github.ref }}
-          name: ${{ github.ref }}
+          artifacts: >-
+            ./${{ steps.archive_project.outputs.file_name }}.zip,
+            ./${{ steps.archive_project.outputs.file_name }}.tar.gz,
+            ./target_package/*.pack
+          allowUpdates: true
           body: |
-            Automated release from `releases.yml`
-            <details>
-              <summary>File Hashes</summary>
-              <ul>
-                <li>${{ steps.compute_digests.outputs.zip_256 }}</li>
-                <li>${{ steps.compute_digests.outputs.zip_512 }}</li>
-                <li>${{ steps.compute_digests.outputs.tgz_256 }}</li>
-                <li>${{ steps.compute_digests.outputs.tgz_512 }}</li>
-              </ul>
-            </details>
-      - name: Update release zip files
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ./${{ steps.archive_project.outputs.file_name }}.zip
-      - name: Update release tar.gz files
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ./${{ steps.archive_project.outputs.file_name }}.tar.gz
+            <p>
+              Automated release from `releases.yml`
+            </p>
+            <p>
+              File hashs summary:
+            </p>
+            <ul>
+              <li>${{ steps.compute_digests_arch.outputs.zip_256 }}</li>
+              <li>${{ steps.compute_digests_arch.outputs.zip_512 }}</li>
+              <li>${{ steps.compute_digests_arch.outputs.tgz_256 }}</li>
+              <li>${{ steps.compute_digests_arch.outputs.tgz_512 }}</li>
+              <li>${{ steps.compute_digests_cmsis.outputs.pack_256 }}</li>
+              <li>${{ steps.compute_digests_cmsis.outputs.pack_512 }}</li>
+            </ul>
