@@ -33,11 +33,13 @@ jobs:
         platform: [x86, x64]
         buildin-div: ["0", "1"]
         buildin-alloc: ["0", "1"]
+        utf-8-support: ["0", "1"]
     runs-on: ubuntu-latest
-    name: >
+    name: >-
       Tests ${{ matrix.platform }}
       div: ${{ matrix.buildin-div }}
       alloc: ${{ matrix.buildin-alloc }}
+      utf-8: ${{ matrix.utf-8-support }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -55,6 +57,7 @@ jobs:
           make test
         env:
           MTFMT_BUILD_USE_LTO: "1"
-          MTFMT_BUILD_C_DEFS: >
+          MTFMT_BUILD_C_DEFS: >-
             -D_MSTR_USE_MALLOC=${{ matrix.buildin-alloc }}
             -D_MSTR_USE_HARDWARE_DIV=${{ matrix.buildin-div }}
+            -D_MSTR_USE_UTF_8=${{ matrix.utf-8-support }}
