@@ -119,12 +119,12 @@ install(TARGETS mtfmt
 )
 
 # 安装头文件
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/inc/ DESTINATION include)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/inc/ DESTINATION mtfmt/include)
 
 install(EXPORT mtfmt-targets
     FILE mtfmt-config.cmake
     NAMESPACE mtfmt::
-    DESTINATION lib/cmake/mtfmt)
+    DESTINATION mtfmt/lib/cmake/mtfmt)
 
 # 测试
 # enable_testing()
