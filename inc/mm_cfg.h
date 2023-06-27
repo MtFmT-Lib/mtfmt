@@ -129,6 +129,7 @@
  */
 #define _MSTR_MEM_ALLOC_FUNCTION(s) malloc(s)
 #endif // _MSTR_MALLOC_FUNCTION
+
 #if !defined(_MSTR_MEM_FREE_FUNCTION)
 /**
  * @brief 内存释放函数
@@ -136,7 +137,51 @@
  */
 #define _MSTR_MEM_FREE_FUNCTION(s) free(s)
 #endif // _MSTR_MEM_FREE_FUNCTION
+
+#if !defined(_MSTR_MEM_REALLOC_FUNCTION)
+#if !defined(_MSTR_MEM_ALLOC_FUNCTION) && \
+    !defined(_MSTR_MEM_FREE_FUNCTION)
+/**
+ * @brief 内存重新分配函数, 使用c标准库
+ *
+ */
+#define _MSTR_MEM_REALLOC_FUNCTION(old_p, s) realloc((old_p), (s))
+/**
+ * @brief 重新分配函数可用
+ *
+ */
+#define MSTR_MEM_REALLOC_FUNCTION_NOT_AVAL   0
+#else
+/**
+ * @brief 重新分配函数不可用
+ *
+ */
+#define MSTR_MEM_REALLOC_FUNCTION_NOT_AVAL 1
+#endif // _MSTR_MEM_XXX
+#endif // _MSTR_MEM_REALLOC_FUNCTION
+#else
+/**
+ * @brief 重新分配函数可用
+ *
+ */
+#define MSTR_MEM_REALLOC_FUNCTION_NOT_AVAL 0
 #endif // _MSTR_USE_MALLOCs
+
+#if !defined(_MSTR_RUNTIME_HEAP_TRACING)
+/**
+ * @brief 指定heap tracing
+ *
+ * @note 该宏定义的函数拥有原型 (type: int, ptr: void*, size:
+ * usize, old_size: usize_t) -> (), 其会在分配和释放时调用。type:
+ * 0=alloc, 1=realloc, 2=free; size为操作大小, alloc时表示分配的大小,
+ * realloc表示ptr新的大小, free时表示释放的大小,
+ * old_size记录了realloc时曾经ptr的大小, 其余时候无效
+ *
+ * @attention 该宏仅在内建分配器上被使用
+ *
+ */
+#define _MSTR_RUNTIME_HEAP_TRACING(type, ptr, size, old_size) ((void)0U)
+#endif // _MSTR_RUNTIME_HEAP_TRACING
 
 #if !defined(_MSTR_RUNTIME_HEAP_ALIGN)
 /**
@@ -257,6 +302,39 @@
     (_MSTR_USE_FP_FLOAT16 || _MSTR_USE_FP_FLOAT32 || \
      _MSTR_USE_FP_FLOAT64)
 
+#if !defined(_MSTR_USE_CPP_EXCEPTION)
+#if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
+    MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
+#if defined(__EXCEPTIONS)
+/**
+ * @brief 指定是否使用异常(跟随arm cc, 使用)
+ *
+ */
+#define _MSTR_USE_CPP_EXCEPTION 1
+#else
+/**
+ * @brief 指定是否使用异常(跟随arm cc, 不使用)
+ *
+ */
+#define _MSTR_USE_CPP_EXCEPTION 0
+#endif // __EXCEPTIONS
+#else
+/**
+ * @brief 指定是否使用异常 (默认打开)
+ *
+ */
+#define _MSTR_USE_CPP_EXCEPTION 1
+#endif // MSTR_BUILD_CC
+#endif // _MSTR_USE_CPP_EXCEPTION
+
+#if !defined(_MSTR_USE_UTF_8)
+/**
+ * @brief 指定是否启用UTF-8支持
+ *
+ */
+#define _MSTR_USE_UTF_8 1
+#endif // _MSTR_USE_UTF_8
+
 #if !defined(_MSTR_BUILD_DLL)
 /**
  * @brief 指定是否使用动态库构建
@@ -306,39 +384,6 @@
 #define mstr_cause_exception(code) ((void)0U)
 #define mstr_assert(e)             ((void)0U)
 #endif // _MSTR_RUNTIME_CTRLFLOW_MARKER
-
-#if !defined(_MSTR_USE_CPP_EXCEPTION)
-#if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
-    MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
-#if defined(__EXCEPTIONS)
-/**
- * @brief 指定是否使用异常(跟随arm cc, 使用)
- *
- */
-#define _MSTR_USE_CPP_EXCEPTION 1
-#else
-/**
- * @brief 指定是否使用异常(跟随arm cc, 不使用)
- *
- */
-#define _MSTR_USE_CPP_EXCEPTION 0
-#endif // __EXCEPTIONS
-#else
-/**
- * @brief 指定是否使用异常 (默认打开)
- *
- */
-#define _MSTR_USE_CPP_EXCEPTION 1
-#endif // MSTR_BUILD_CC
-#endif // _MSTR_USE_CPP_EXCEPTION
-
-#if !defined(_MSTR_USE_UTF_8)
-/**
- * @brief 指定是否启用UTF-8支持
- *
- */
-#define _MSTR_USE_UTF_8 1
-#endif // _MSTR_USE_UTF_8
 
 //
 // 导出函数修辞

@@ -18,19 +18,27 @@
 #include <string.h>
 
 /**
- * @brief 每次分配的步进大小
+ * @brief 进行扩展的阈值
  *
  */
-#define MSTR_CAP_SIZE_STEP 16
+#define MSTR_SIZE_EXPAND_MAX          1024
+
+/**
+ * @brief 超过X2阈值的情况下每次增大的大小
+ *
+ */
+#define MSTR_SIZE_LARGE_CAP_SIZE_STEP 512
 
 //
 // private:
 //
+
 static mstr_bool_t mstr_compare_helper(
     const char*, const char*, usize_t
 );
-static void* mstr_realloc(void*, mstr_bool_t, usize_t, usize_t);
+static void* mstr_string_realloc(void*, mstr_bool_t, usize_t, usize_t);
 static mstr_result_t mstr_expand_size(MString*, usize_t);
+static usize_t mstr_resize_tactic(usize_t, usize_t);
 static mstr_result_t
     mstr_strlen(usize_t*, usize_t*, const mstr_char_t*, const mstr_char_t*);
 //
@@ -48,30 +56,26 @@ mstr_create(MString* str, const char* content)
     else {
         mstr_strlen(&content_len, &content_cnt, content, NULL);
     }
+    str->count = content_cnt;
+    str->length = content_len;
     if (content_cnt == 0) {
         str->buff = str->stack_region;
-        str->count = 0;
-        str->length = 0;
         str->cap_size = MSTR_STACK_REGION_SIZE;
         return MStr_Ok;
     }
     else if (content_cnt < MSTR_STACK_REGION_SIZE) {
         str->buff = str->stack_region;
-        str->count = content_cnt;
-        str->length = content_len;
         str->cap_size = MSTR_STACK_REGION_SIZE;
         strcpy(str->buff, content);
         return MStr_Ok;
     }
     else {
-        str->cap_size = content_cnt + 1 + MSTR_CAP_SIZE_STEP;
+        str->cap_size = content_cnt + MSTR_STACK_REGION_SIZE;
         str->buff = (char*)mstr_heap_alloc(str->cap_size);
         if (str->buff == NULL) {
             // 内存分配失败
             return MStr_Err_HeapTooSmall;
         }
-        str->count = content_cnt;
-        str->length = content_len;
         memcpy(str->buff, content, content_cnt);
         return MStr_Ok;
     }
@@ -136,7 +140,7 @@ mstr_repeat_append(MString* str, mstr_codepoint_t ch, usize_t cnt)
             MSTR_AND_THEN(
                 result,
                 mstr_expand_size(
-                    str, str->cap_size + need_len + MSTR_CAP_SIZE_STEP
+                    str, mstr_resize_tactic(str->cap_size, need_len)
                 )
             );
         }
@@ -166,7 +170,7 @@ mstr_concat(MString* str, const MString* other)
         MSTR_AND_THEN(
             result,
             mstr_expand_size(
-                str, str->cap_size + other->count + MSTR_CAP_SIZE_STEP
+                str, mstr_resize_tactic(str->cap_size, other->count)
             )
         );
     }
@@ -227,8 +231,10 @@ MSTR_EXPORT_API(void) mstr_clear(MString* str)
 MSTR_EXPORT_API(void) mstr_reverse_self(MString* str)
 {
     mstr_char_t* p2 = str->buff + str->count - 1;
-    mstr_char_t* pe = str->buff + str->count;
     mstr_char_t* p1 = str->buff;
+#if _MSTR_USE_UTF_8
+    mstr_char_t* pe = str->buff + str->count;
+#endif // _MSTR_USE_UTF_8
     while (p1 < p2) {
         char v = *p2;
         *p2 = *p1;
@@ -449,7 +455,7 @@ mstr_insert(MString* str, usize_t idx, mstr_codepoint_t ch)
                 res,
                 mstr_expand_size(
                     str,
-                    str->cap_size + insert_data_len + MSTR_CAP_SIZE_STEP
+                    mstr_resize_tactic(str->cap_size, insert_data_len)
                 )
             );
         }
@@ -636,14 +642,24 @@ mstr_codepoint_of(
 #else
 
 MSTR_EXPORT_API(mstr_result_t)
-mstr_as_utf8(mstr_codepoint_t, mstr_char_t*, usize_t*)
+mstr_as_utf8(
+    mstr_codepoint_t code, mstr_char_t* result, usize_t* result_len
+)
 {
+    (void)code;
+    (void)result;
+    (void)result_len;
     return MStr_Err_NoImplemention;
 }
 
 MSTR_EXPORT_API(mstr_result_t)
-mstr_codepoint_of(mstr_codepoint_t*, const mstr_char_t*, usize_t)
+mstr_codepoint_of(
+    mstr_codepoint_t* code, const mstr_char_t* ch, usize_t byte_count
+)
 {
+    (void)code;
+    (void)ch;
+    (void)byte_count;
     return MStr_Err_NoImplemention;
 }
 #endif // _MSTR_USE_UTF_8
@@ -697,6 +713,9 @@ static mstr_result_t mstr_strlen(
     if (str_end == NULL) {
         // 给一个大大的值让str < str_end恒为true
         str_end = (const mstr_char_t*)(uptr_t)(-1);
+    }
+    if (str == NULL) {
+        return 0;
     }
 #if _MSTR_USE_UTF_8
     while (*str && str < str_end) {
@@ -759,11 +778,8 @@ static mstr_bool_t mstr_compare_helper(
  */
 static mstr_result_t mstr_expand_size(MString* str, usize_t new_size)
 {
-    if (new_size < MSTR_CAP_SIZE_STEP) {
-        return MStr_Ok;
-    }
-    else if (new_size > str->cap_size) {
-        char* new_ptr = (char*)mstr_realloc(
+    if (new_size > str->cap_size) {
+        char* new_ptr = (char*)mstr_string_realloc(
             str->buff,
             str->buff == str->stack_region,
             str->count,
@@ -791,33 +807,40 @@ static mstr_result_t mstr_expand_size(MString* str, usize_t new_size)
  * @param[in] new_size: 需要分配的大小
  * @return void*: 新分配的地址, 失败返回NULL
  */
-static void* mstr_realloc(
+static void* mstr_string_realloc(
     void* old_ptr,
     mstr_bool_t is_stack,
     usize_t old_size,
     usize_t new_size
 )
 {
-#if _MSTR_USE_MALLOC
-    void* new_ptr;
-    if (!is_stack) {
-        new_ptr = realloc(old_ptr, new_size);
+    if (is_stack) {
+        void* new_ptr = mstr_heap_alloc(new_size);
+        if (new_ptr == NULL) {
+            return NULL;
+        }
+        memcpy(new_ptr, old_ptr, old_size);
+        return new_ptr;
     }
     else {
-        new_ptr = mstr_heap_alloc(new_size);
-        if (new_ptr != NULL) {
-            memcpy(new_ptr, old_ptr, old_size);
-        }
+        return mstr_heap_realloc(old_ptr, new_size, old_size);
     }
-#else
-    void* new_ptr = mstr_heap_alloc(new_size);
-    if (new_ptr == NULL) {
-        return NULL;
+}
+
+/**
+ * @brief 改变cap的策略
+ *
+ * @param[in] old_sz: 以前的大小
+ * @param[in] inc_len: 至少需要增加的大小, 会在此基础上增加1
+ */
+static usize_t mstr_resize_tactic(usize_t old_sz, usize_t inc_len)
+{
+    usize_t min_sz = old_sz + inc_len + 1;
+    if (old_sz < MSTR_SIZE_EXPAND_MAX) {
+        usize_t exp_sz = old_sz * 2;
+        return min_sz < exp_sz ? exp_sz : min_sz;
     }
-    memcpy(new_ptr, old_ptr, old_size);
-    if (!is_stack) {
-        mstr_heap_free(old_ptr);
+    else {
+        return old_sz + inc_len + MSTR_SIZE_LARGE_CAP_SIZE_STEP;
     }
-#endif // _MSTR_USE_MALLOC
-    return new_ptr;
 }

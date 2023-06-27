@@ -24,7 +24,6 @@ constexpr mtfmt::unicode_t unicode_char(const char (&u8char)[N])
 extern "C" void string_find(void)
 {
     mtfmt::string test_str_ascii = u8"Example";
-    mtfmt::string test_str_unicode = u8"汉字😊🌈🍥English";
     // 这里用 -2 作为 or_value 的值是考虑到 find 的错误返回值包括 -1
     // ascii: 单个字符
     ASSERT_EQUAL_VALUE(test_str_ascii.find(u8"E").or_value(-2), 0);
@@ -49,6 +48,8 @@ extern "C" void string_find(void)
     ASSERT_EQUAL_VALUE(test_str_ascii.find(u8"mp", 1).or_value(-2), 2);
     ASSERT_EQUAL_VALUE(test_str_ascii.find(u8"mp", 3).or_value(-2), 0);
     ASSERT_EQUAL_VALUE(test_str_ascii.find(u8"mp", 4).or_value(-2), -1);
+#if _MSTR_USE_UTF_8
+    mtfmt::string test_str_unicode = u8"汉字😊🌈🍥English";
     // unicode: 单个字符
     ASSERT_EQUAL_VALUE(test_str_unicode.find(u8"汉").or_value(-2), 0);
     ASSERT_EQUAL_VALUE(test_str_unicode.find(u8"字").or_value(-2), 1);
@@ -80,6 +81,7 @@ extern "C" void string_find(void)
     ASSERT_EQUAL_VALUE(
         test_str_unicode.find(u8"🌈🍥", 4).or_value(-2), -1
     );
+#endif // _MSTR_USE_UTF_8
 }
 
 extern "C" void string_find_large(void)
@@ -87,7 +89,6 @@ extern "C" void string_find_large(void)
     mtfmt::string test_str_ascii =
         u8"The mini template formatting library, or MtFmt is a "
         u8"formatter library";
-    mtfmt::string test_str_unicode = u8"汉字😊🌈🍥English汉字😊🌈🍥";
     // 这里用 -2 作为 or_value 的值是考虑到 find 的错误返回值包括 -1
     // ascii: 多多的字符
     ASSERT_EQUAL_VALUE(
@@ -102,7 +103,9 @@ extern "C" void string_find_large(void)
     ASSERT_EQUAL_VALUE(
         test_str_ascii.find(u8"formatting library", 19).or_value(-2), -1
     );
+#if _MSTR_USE_UTF_8
     // unicode: 多多的字符
+    mtfmt::string test_str_unicode = u8"汉字😊🌈🍥English汉字😊🌈🍥";
     ASSERT_EQUAL_VALUE(
         test_str_unicode.find(u8"🍥English汉字😊").or_value(-2), 4
     );
@@ -115,26 +118,53 @@ extern "C" void string_find_large(void)
     ASSERT_EQUAL_VALUE(
         test_str_unicode.find(u8"🍥English汉字😊", 5).or_value(-2), -1
     );
+#endif // _MSTR_USE_UTF_8
 }
 
 extern "C" void string_find_or_error(void)
 {
-    mtfmt::string test_str = u8"汉字😊🌈🍥English";
+    mtfmt::string test_str_ascii =
+        u8"The mini template formatting library, or MtFmt is a "
+        u8"formatter library";
+    // ascii: 多多的字符
     ASSERT_EQUAL_VALUE(
-        test_str.find_or_err(u8"🌈🍥").or_value(0xff), 3
+        test_str_ascii.find_or_err(u8"formatting library")
+            .or_value(0xff),
+        18
     );
     ASSERT_EQUAL_VALUE(
-        test_str.find_or_err(u8"🌈🍥", 1).or_value(0xff), 2
+        test_str_ascii.find_or_err(u8"formatting library", 2)
+            .or_value(0xff),
+        16
     );
     ASSERT_EQUAL_VALUE(
-        test_str.find_or_err(u8"🌈🍥", 3).or_value(0xff), 0
+        test_str_ascii.find_or_err(u8"formatting library", 18)
+            .or_value(0xff),
+        0
     );
     ASSERT_EQUAL_VALUE(
-        test_str.find_or_err(u8"🌈🍥", 4).or_value(0xff), 0xff
+        test_str_ascii.find_or_err(u8"formatting library", 19)
+            .or_value(0xff),
+        0xff
+    );
+#if _MSTR_USE_UTF_8
+    mtfmt::string test_str_unicode = u8"汉字😊🌈🍥English";
+    ASSERT_EQUAL_VALUE(
+        test_str_unicode.find_or_err(u8"🌈🍥").or_value(0xff), 3
     );
     ASSERT_EQUAL_VALUE(
-        test_str.find_or_err(u8"🍥🍥", 0).or_value(0xff), 0xff
+        test_str_unicode.find_or_err(u8"🌈🍥", 1).or_value(0xff), 2
     );
+    ASSERT_EQUAL_VALUE(
+        test_str_unicode.find_or_err(u8"🌈🍥", 3).or_value(0xff), 0
+    );
+    ASSERT_EQUAL_VALUE(
+        test_str_unicode.find_or_err(u8"🌈🍥", 4).or_value(0xff), 0xff
+    );
+    ASSERT_EQUAL_VALUE(
+        test_str_unicode.find_or_err(u8"🍥🍥", 0).or_value(0xff), 0xff
+    );
+#endif // _MSTR_USE_UTF_8
 }
 
 extern "C" void string_contain(void)
