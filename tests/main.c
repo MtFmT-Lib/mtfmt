@@ -150,9 +150,9 @@ int main()
     usize_t alloc_cnt, free_cnt, usage_mark;
     mstr_heap_get_allocate_count(&alloc_cnt, &free_cnt);
     usage_mark = RUNTIME_HEAP_SIZE - mstr_heap_get_high_water_mark();
-    printf("\nHeap usage: %llu bytes(max)\n", usage_mark);
-    printf("            %llu times allocating\n", alloc_cnt);
-    printf("            %llu times free\n", free_cnt);
+    printf("\nHeap usage: %u bytes(max)\n", (uint32_t)usage_mark);
+    printf("            %u times allocating\n", (uint32_t)alloc_cnt);
+    printf("            %u times free\n", (uint32_t)free_cnt);
 
     TEST_ASSERT_TRUE_MESSAGE(
         alloc_cnt == free_cnt, "alloc_cnt != free_cnt"
