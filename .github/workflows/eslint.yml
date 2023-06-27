@@ -6,12 +6,15 @@ on:
       - "www/**.ts"
       - "www/**.js"
       - "www/.eslintrc.yml"
+      - "www/.stylelintrc.json"
       - ".github/workflows/eslint.yml"
   pull_request:
     branches: [master]
     paths:
       - "www/**.ts"
       - "www/**.js"
+      - "www/.eslintrc.yml"
+      - "www/.stylelintrc.json"
       - ".github/workflows/eslint.yml"
   workflow_dispatch:
     inputs:

@@ -8,6 +8,7 @@
     import theme_info from './theme_storager'
     import { register_window_event } from './theme_logic'
     import { change_theme, set_default_theme } from './theme_logic'
+    import language_info, { change_language } from './theme_lang'
 
     /**
      * 需要用到window.XXX的东东
@@ -22,6 +23,7 @@
     onMount(() => {
         set_default_theme(document, $theme_info)
         theme_info.subscribe(curry_2(change_theme)(document))
+        language_info.subscribe(curry_2(change_language)(document))
     })
 </script>
 

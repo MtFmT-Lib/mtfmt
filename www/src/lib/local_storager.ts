@@ -10,7 +10,7 @@ export function read_local_storager<T = string>(key: string): Optional<T> {
     } else {
         const value = localStorage.getItem(key)
         if (value) {
-            return Some<T>(value as T)
+            return Some<T>(value as unknown as T)
         }
         else {
             return None<T>()

@@ -22,7 +22,7 @@ void fmt_sign_add(void)
     MString s;
     EVAL(mstr_create_empty(&s));
     EVAL(mstr_format(
-        "@{0:i32:+}@{1:i32:+}@{2:i32:+}@", &s, 3, 123, -123, 0
+        &s, "@{0:i32:+}@{1:i32:+}@{2:i32:+}@", 3, 123, -123, 0
     ));
     ASSERT_EQUAL_STRING(&s, "@+123@-123@0@");
     mstr_free(&s);
@@ -33,7 +33,7 @@ void fmt_sign_sub(void)
     MString s;
     EVAL(mstr_create_empty(&s));
     EVAL(mstr_format(
-        "@{0:i32:-}@{1:i32:-}@{2:i32:-}@", &s, 3, 123, -123, 0
+        &s, "@{0:i32:-}@{1:i32:-}@{2:i32:-}@", 3, 123, -123, 0
     ));
     ASSERT_EQUAL_STRING(&s, "@123@-123@0@");
     mstr_free(&s);
@@ -44,7 +44,7 @@ void fmt_sign_space(void)
     MString s;
     EVAL(mstr_create_empty(&s));
     EVAL(mstr_format(
-        "@{0:i32: }@{1:i32: }@{2:i32: }@", &s, 3, 123, -123, 0
+        &s, "@{0:i32: }@{1:i32: }@{2:i32: }@", 3, 123, -123, 0
     ));
     ASSERT_EQUAL_STRING(&s, "@ 123@-123@ 0@");
     mstr_free(&s);

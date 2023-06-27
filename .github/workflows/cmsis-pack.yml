@@ -1,0 +1,45 @@
+name: "Build CMSIS pack"
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "src/**.c"
+      - "inc/**.h"
+      - "support/project.toml"
+      - ".github/workflows/cmsis-pack.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "src/**.c"
+      - "inc/**.h"
+      - "support/project.toml"
+      - ".github/workflows/cmsis-pack.yml"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+
+jobs:
+  pack-file:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest
+          if [ -f zipack/requirements.txt ]; then pip install -r zipack/requirements.txt; fi
+      - name: Generate CMSIS pack
+        run: |
+          python zipack --project=./support/project.toml cmsis-pack
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cmsis-pack-artifact
+          path: target_package/*.pack

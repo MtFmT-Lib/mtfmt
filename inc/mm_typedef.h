@@ -11,27 +11,13 @@
  *
  */
 
-#ifndef __MM_TYPEDEF_H__
-#define __MM_TYPEDEF_H__
-
-#if 0 // TODO
-
-#else
+#if !defined(__MM_TYPEDEF_H__)
+#define __MM_TYPEDEF_H__ 1
+#include "mm_cfg.h"
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-/**
- * @brief 8位有符号整数
- *
- */
-typedef int8_t i8_t;
-
-/**
- * @brief 8位无符号整数
- *
- */
-typedef uint8_t u8_t;
 
 /**
  * @brief 字节(无符号)
@@ -40,34 +26,10 @@ typedef uint8_t u8_t;
 typedef uint8_t byte_t;
 
 /**
- * @brief 16位有符号整数
- *
- */
-typedef int16_t i16_t;
-
-/**
- * @brief 16位无符号整数
- *
- */
-typedef uint16_t u16_t;
-
-/**
- * @brief 32位有符号整数
- *
- */
-typedef int32_t i32_t;
-
-/**
- * @brief 32位无符号整数
- *
- */
-typedef uint32_t u32_t;
-
-/**
  * @brief 尺寸(无符号)
  *
  */
-typedef size_t usize_t;
+typedef size_t usize_t, uptr_t;
 
 /**
  * @brief 尺寸(有符号, sizeof(isize_t) == sizeof(usize_t) ==
@@ -76,65 +38,84 @@ typedef size_t usize_t;
  */
 typedef intptr_t isize_t, iptr_t;
 
-/**
- * @brief 64位有符号整数
- *
- */
-typedef int64_t i64_t;
+#if _MSTR_USE_FP_FLOAT16
+#if MSTR_BUILD_CC == MSTR_BUILD_CC_GNUC
+// see also: https://gcc.gnu.org/onlinedocs/gcc/Half-Precision.html
+typedef _Float16 float16_t;
+#elif MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
+// see also:
+// https://developer.arm.com/documentation/dui0375/g/Compiler-Command-line-Options/--fp16-format-format
+typedef __fp16 float16_t;
+#elif MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG
+typedef __fp16 float16_t;
+#else
+#error Unsupport float16 type in this compiler.
+#endif // cc
+#endif // _MSTR_USE_FP_FLOAT16
 
 /**
- * @brief 64位无符号整数
+ * @brief 32位浮点值
  *
  */
-typedef uint64_t u64_t;
+typedef float float32_t;
 
 /**
- * @brief 时间戳(毫秒)
+ * @brief 64位浮点值
  *
  */
-typedef u64_t tick_t;
+typedef double float64_t;
 
 /**
  * @brief 布尔值
  *
  */
-typedef bool bool_t;
+typedef bool mstr_bool_t;
 enum
 {
     True = true,
     False = false,
 };
-#endif
+
+/**
+ * @brief 字符
+ *
+ */
+typedef char mstr_char_t;
+
+/**
+ * @brief unicode代码点
+ *
+ */
+typedef uint32_t mstr_codepoint_t;
 
 /**
  * @brief RTC时间
  *
  */
-typedef struct tagRTCTime
+typedef struct tagMStrTime
 {
     //! (BCD) 年份
-    u16_t year;
+    uint16_t year;
 
     //! (BCD) 月
-    u8_t month;
+    uint8_t month;
 
     //! (BCD) 日
-    u8_t day;
+    uint8_t day;
 
     //! (BCD) 时
-    u8_t hour;
+    uint8_t hour;
 
     //! (BCD) 分
-    u8_t minute;
+    uint8_t minute;
 
     //! (BCD) 秒
-    u8_t second;
+    uint8_t second;
 
     //! (BCD) 星期
-    u8_t week;
+    uint8_t week;
 
     //! (BCD) 亚秒值, 单位: x0.1ms
-    u32_t sub_second;
-} RTCTime, sys_time_t;
-
+    uint32_t sub_second;
+} MStrTime;
 #endif

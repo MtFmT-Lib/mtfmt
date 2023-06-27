@@ -68,17 +68,8 @@ export const DEFAULT_THEME: SystemTheme = 'light'
  * 取得存储记录的theme
  */
 export function get_storager_theme(theme_info?: ThemeInfo): Theme {
-    // 是否跟随system
-    const following = read_local_storager(STRONGE_FOLLOWING_KEY)
-        .map(into_boolean)
-        .or(false)
-    // 默认的theme
     const default_theme = theme_info?.system_theme ?? DEFAULT_THEME
-    if (following) {
-        return default_theme
-    } else {
-        return read_local_storager<Theme>(STRONGE_THEME_KEY).or(default_theme)
-    }
+    return read_local_storager<Theme>(STRONGE_THEME_KEY).or(default_theme)
 }
 
 /**
@@ -88,6 +79,7 @@ export function get_storager_theme(theme_info?: ThemeInfo): Theme {
  */
 export function set_theme(cur_theme: Theme): void {
     if (cur_theme === 'sys') {
+        write_local_storager(STRONGE_THEME_KEY, 'sys')
         write_local_storager(STRONGE_FOLLOWING_KEY, true)
         return theme_info.update((store) => ({ ...store, following: true }))
     } else {

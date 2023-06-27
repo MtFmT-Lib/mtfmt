@@ -5,12 +5,12 @@
     import Header from '@comp/Header.svelte'
     import Markdown from '@comp/Markdown.svelte'
     import * as EnPage from '@text/en/QUICKSTART.md'
+    import * as ZhPage from '@text/zh/QUICKSTART.md'
 
     const contents = {
         en: { toc: EnPage.toc, html: EnPage.html },
+        zh: { toc: ZhPage.toc, html: ZhPage.html },
     }
-
-    const language = Object.keys(contents)
 </script>
 
 <svelte:head>
@@ -18,7 +18,7 @@
     <meta name="description" content="MtFmt library quick start" />
 </svelte:head>
 
-<div>
+<div class="content-page">
     <Header />
-    <Markdown {language} {contents} />
+    <Markdown {contents} />
 </div>

@@ -1,0 +1,32 @@
+1 VERSIONINFO
+    FILEVERSION 1,0,0,0
+    PRODUCTVERSION 1,0,0,0
+    FILEFLAGSMASK 0x3fL
+    #ifdef _DEBUG
+        FILEFLAGS 0x21L
+    #else
+        FILEFLAGS 0x20L
+    #endif
+    FILEOS 0x40000L
+    FILETYPE 0x1L
+    FILESUBTYPE 0x0L
+    BEGIN
+        BLOCK "StringFileInfo"
+        BEGIN
+            BLOCK "080404b0"
+            BEGIN
+                VALUE "CompanyName", "XiangYang & HalfSweet"
+                VALUE "FileDescription", "MtFmt"
+                VALUE "FileVersion", "1.0.0.0"
+                VALUE "InternalName", "mtfmt.dll"
+                VALUE "LegalCopyright", "Copyright (C) XiangYang, HalfSweet, all rights reserved."
+                VALUE "OriginalFilename", "mtfmt.dll"
+                VALUE "ProductName", "MtFmt"
+                VALUE "ProductVersion", "1.0.0.0"
+            END
+        END
+        BLOCK "VarFileInfo"
+        BEGIN
+            VALUE "Translation", 0x804, 1200
+        END
+    END

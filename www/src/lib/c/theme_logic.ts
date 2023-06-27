@@ -80,3 +80,7 @@ function set_theme_attr(doc: Document, theme: Theme) {
     root_element.setAttribute(THEME_ATTRIBUTE, theme)
     root_element.style.setProperty('color-scheme', theme)
 }
+
+/**
+ * 设置语言的属性
+ */

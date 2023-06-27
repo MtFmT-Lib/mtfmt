@@ -26,5 +26,7 @@ rules:
   semi:
     - error
     - never
+  no-control-regex:
+    - off
   svelte/no-at-html-tags:
     - off
