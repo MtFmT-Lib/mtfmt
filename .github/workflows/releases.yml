@@ -29,14 +29,13 @@ jobs:
           git archive ${{ github.ref }} -o ${FILE_NAME}.zip
           git archive ${{ github.ref }} -o ${FILE_NAME}.tar.gz
           echo "::set-output name=file_name::${FILE_NAME}"
-      - name: Compute digests 
+      - name: Compute digests
         id: compute_digests_arch
         run: |
           echo "$(openssl dgst -sha256 -r ${{ steps.archive_project.outputs.file_name }}.tar.gz)" >>checksum.txt
           echo "$(openssl dgst -sha512 -r ${{ steps.archive_project.outputs.file_name }}.tar.gz)" >>checksum.txt
           echo "$(openssl dgst -sha256 -r ${{ steps.archive_project.outputs.file_name }}.zip)" >>checksum.txt
           echo "$(openssl dgst -sha512 -r ${{ steps.archive_project.outputs.file_name }}.zip)" >>checksum.txt
-      # For Test
       # keil包
       # TODO 下面的内容都只是单纯的复制了其它的workflows, 把它们改成actions
       - name: Install dependencies
@@ -50,8 +49,8 @@ jobs:
       - name: Compute digests for CMSIS pack
         id: compute_digests_cmsis
         run: |
-          echo "::set-output name=pack_256::$(openssl dgst -sha256 -r target_package/*.pack)"
-          echo "::set-output name=pack_512::$(openssl dgst -sha512 -r target_package/*.pack)"
+          echo "$(openssl dgst -sha256 -r target_package/*.pack)" >>checksum.txt
+          echo "$(openssl dgst -sha512 -r target_package/*.pack)" >>checksum.txt
       # 上传发布内容
       - name: Create Release
         id: create_release
@@ -64,6 +63,4 @@ jobs:
             ./checksum.txt
           allowUpdates: true
           body: |
-            <p>
               Automated release from `releases.yml`
-            </p>
