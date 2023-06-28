@@ -8,6 +8,8 @@
     --text-color: #{$text-color};
     --weak-color: #999;
     --border-color: #{$border-color};
+    --odd-content-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
+    --even-content-bg-color: #{$bg-color};
     --table-border-color: #{$table-border-color};
     --text-block-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
     --quote-bg-color: #{mix($bg-color, #f8f9fa, 20%)};

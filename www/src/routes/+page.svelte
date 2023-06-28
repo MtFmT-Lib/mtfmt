@@ -2,13 +2,17 @@
 #  SPDX-License-Identifier: LGPL-3.0
 -->
 <script lang="ts">
+    import Header from '@comp/Header.svelte'
+    import Footer from '@comp/Footer.svelte'
     import NavBar from '@comp/NavBar.svelte'
     import TransText from '@comp/TransText.svelte'
+    import OnlineDemo from '@comp/OnlineDemo.svelte'
+    import InstallSelector from '@comp/InstallSelector.svelte'
 </script>
 
 <div class="container">
-    <div class="main-box">
-        <div class="main-content">
+    <div class="top">
+        <div class="top-inner">
             <div class="title">
                 <TransText text="MtFmt" />
             </div>
@@ -21,6 +25,17 @@
             </div>
         </div>
     </div>
+    <div class="content-box-odd">
+        <div class="content">
+            <InstallSelector />
+        </div>
+    </div>
+    <div class="content-box">
+        <div class="content">
+            <OnlineDemo />
+        </div>
+    </div>
+    <Footer />
 </div>
 
 <svelte:head>
@@ -29,8 +44,6 @@
 </svelte:head>
 
 <style lang="scss">
-    @import '@theme/stylevars.scss';
-
     .container {
         position: absolute;
         top: 0;
@@ -39,42 +52,45 @@
         bottom: 0;
     }
 
-    .main-box {
+    .top {
         width: 100%;
-        height: 100%;
-        overflow-y: hidden;
-
-        // 内边距
-        padding: 0.5em 0.5em;
-        box-sizing: border-box;
-    }
-
-    .main-box {
-        text-align: center;
+        height: 80%;
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
-    .main-content {
-        border: 1px solid $border-color;
-        border-radius: 4px;
-        padding: 2em 2em;
-        box-sizing: border-box;
+    .content-box,
+    .content-box-odd {
+        width: 100%;
+        height: 40%;
+    }
 
-        // 外边距
-        margin-bottom: 4em;
+    .content-box {
+        background-color: var(--even-content-bg-color);
+    }
+
+    .content-box-odd {
+        background-color: var(--odd-content-bg-color);
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
     }
 
     .title {
         font-size: 2.25em;
         font-weight: 600;
         margin-bottom: 0.5em;
+        text-align: center;
     }
 
     .brief {
         font-size: 1.15em;
         margin-bottom: 1.15em;
+        text-align: center;
+    }
+
+    .nav {
+        text-align: center;
     }
 
     @media screen and (max-width: 640px) {

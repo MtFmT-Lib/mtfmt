@@ -41,6 +41,13 @@ option {
     padding: 1em;
 }
 
+// 内容
+.content {
+    width: 80%;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
 @media screen and (width < 720px) {
     .content-page {
         width: 90%;
