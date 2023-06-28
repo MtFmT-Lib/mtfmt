@@ -8,6 +8,9 @@
     --text-color: #{$text-color};
     --weak-color: #999;
     --border-color: #{$border-color};
+    --header-bg-color: #{#000000};
+    --footer-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
+    --footer-content-color: #666;
     --odd-content-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
     --even-content-bg-color: #{$bg-color};
     --table-border-color: #{$table-border-color};

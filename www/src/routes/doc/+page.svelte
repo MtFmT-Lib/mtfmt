@@ -2,7 +2,8 @@
 #  SPDX-License-Identifier: LGPL-3.0
 -->
 <script lang="ts">
-    import Header from '@comp/Header.svelte'
+    import Header from '@part/Header.svelte'
+    import Footer from '@part/Footer.svelte'
     import Markdown from '@comp/Markdown.svelte'
     import * as EnPage from '@text/en/DOCUMENT.md'
     import * as ZhPage from '@text/zh/DOCUMENT.md'
@@ -18,7 +19,6 @@
     <meta name="description" content="MtFmt library document" />
 </svelte:head>
 
-<div class="content-page">
-    <Header />
-    <Markdown {contents} />
-</div>
+<Header />
+<Markdown {contents} />
+<Footer />

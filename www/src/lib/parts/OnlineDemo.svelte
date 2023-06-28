@@ -2,8 +2,8 @@
 #  SPDX-License-Identifier: LGPL-3.0
 -->
 <script lang="ts">
-    import Monaco from './Monaco.svelte'
     import Caption from './Caption.svelte'
+    import Monaco from '@comp/Monaco.svelte'
 </script>
 
 <div>

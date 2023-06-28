@@ -197,7 +197,14 @@
     @import '@theme/stylevars.scss';
 
     .markdown {
-        padding-bottom: 0.5em;
+        border-top: 1px solid var(--border-color);
+        margin-bottom: 2em;
+    }
+
+    .markdown-box {
+        width: 80%;
+        max-width: $content-max-width;
+        margin: 0 auto;
     }
 
     .markdown-toolbar {
@@ -207,12 +214,14 @@
         flex-direction: row;
         color: mix($bg-color, $text-color, 40%);
 
+        // 尺寸
+        width: 80%;
+        max-width: $header-max-width;
+        margin: 0 auto;
+
         // 颜色和padding
         padding-top: 0.25em;
         padding-bottom: 0.5em;
-
-        // 边框
-        border-top: 1px solid var(--border-color);
     }
 
     .reader-tools,
@@ -274,5 +283,13 @@
 
     .reader-tools button[id='actived-button'] {
         background-color: var(--button-actived-bg-color);
+    }
+
+    @media screen and (width < 720px) {
+        .markdown-toolbar,
+        .markdown-box {
+            width: 95%;
+            max-width: initial;
+        }
     }
 </style>

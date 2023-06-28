@@ -2,37 +2,34 @@
 #  SPDX-License-Identifier: LGPL-3.0
 -->
 <script lang="ts">
-    import Header from '@comp/Header.svelte'
-    import Footer from '@comp/Footer.svelte'
-    import NavBar from '@comp/NavBar.svelte'
-    import TransText from '@comp/TransText.svelte'
-    import OnlineDemo from '@comp/OnlineDemo.svelte'
-    import InstallSelector from '@comp/InstallSelector.svelte'
+    import Header from '@part/Header.svelte'
+    import Footer from '@part/Footer.svelte'
+    import Caption from '@part/Caption.svelte'
+    import OnlineDemo from '@part/OnlineDemo.svelte'
+    import InstallSelector from '@part/InstallSelector.svelte'
 </script>
 
 <div class="container">
-    <div class="top">
-        <div class="top-inner">
-            <div class="title">
-                <TransText text="MtFmt" />
-            </div>
-            <div class="brief">
-                A clean and efficient pure c language library for string
-                formatting.
-            </div>
-            <div class="nav">
-                <NavBar />
-            </div>
-        </div>
-    </div>
+    <Header />
+    <div class="top">TODO</div>
     <div class="content-box-odd">
-        <div class="content">
+        <div class="contents">
             <InstallSelector />
         </div>
     </div>
     <div class="content-box">
-        <div class="content">
+        <div class="contents">
             <OnlineDemo />
+        </div>
+    </div>
+    <div class="content-box-odd">
+        <div class="contents">
+            <Caption caption_text="contributors" />
+        </div>
+    </div>
+    <div class="content-box">
+        <div class="contents">
+            <Caption caption_text="see also" />
         </div>
     </div>
     <Footer />
@@ -44,12 +41,20 @@
 </svelte:head>
 
 <style lang="scss">
+    @import '@theme/stylevars.scss';
+
     .container {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
+    }
+
+    .contents {
+        width: 80%;
+        max-width: $header-max-width;
+        margin: 0 auto;
     }
 
     .top {
@@ -63,7 +68,9 @@
     .content-box,
     .content-box-odd {
         width: 100%;
-        height: 40%;
+        height: 50%;
+        padding-top: 1em;
+        padding-bottom: 2em;
     }
 
     .content-box {
@@ -76,34 +83,10 @@
         border-bottom: 1px solid var(--border-color);
     }
 
-    .title {
-        font-size: 2.25em;
-        font-weight: 600;
-        margin-bottom: 0.5em;
-        text-align: center;
-    }
-
-    .brief {
-        font-size: 1.15em;
-        margin-bottom: 1.15em;
-        text-align: center;
-    }
-
-    .nav {
-        text-align: center;
-    }
-
-    @media screen and (max-width: 640px) {
-        .brief {
-            font-size: 0.85em;
-        }
-
-        .title {
-            font-size: 1.5em;
-        }
-
-        .nav {
-            font-size: 0.85em;
+    @media screen and (width < 720px) {
+        .contents {
+            width: 95%;
+            max-width: initial;
         }
     }
 </style>

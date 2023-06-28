@@ -21,6 +21,7 @@ const config = {
         alias: {
             '@text': path.resolve('./src/texts'),
             '@comp': path.resolve('./src/lib/c'),
+            '@part': path.resolve('./src/lib/parts'),
             '@style': path.resolve('./src/themes/webpages'),
             '@theme': path.resolve('./src/themes/common'),
         }
