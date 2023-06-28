@@ -48,9 +48,7 @@
             </div>
         </div>
         <div class="brief">
-            <div class="footer-sub-content">
-                MtFmt is a modern string formatting library wrote by pure C
-            </div>
+            <!-- ignored. -->
         </div>
     </div>
 </footer>
@@ -60,9 +58,10 @@
 
     .footer-box {
         width: 100%;
-        padding-top: 3em;
-        padding-bottom: 3em;
+        padding: 1em 1em;
+        box-sizing: border-box;
         background-color: var(--footer-bg-color);
+        border-top: 1px solid var(--border-color);
     }
 
     .contents {
@@ -72,8 +71,9 @@
         display: grid;
         justify-items: center;
         align-items: baseline;
-        grid-row-gap: 6rem;
-        grid-template-rows: 1fr;
+        grid-row-gap: 1em;
+        grid-column-gap: 0.25em;
+        grid-template-rows: 1fr 1fr;
         grid-template-columns: 1fr 1fr 1fr;
     }
 
@@ -118,10 +118,19 @@
         }
     }
 
-    @media screen and (width < 720px) {
+    @media screen and (width < 1080px) {
         .contents {
-            width: 95%;
-            max-width: initial;
+            width: 100%;
+        }
+
+        .copyright {
+            grid-column: span 2;
+            justify-self: start;
+        }
+
+        .brief {
+            grid-column: span 1;
+            display: none;
         }
     }
 </style>

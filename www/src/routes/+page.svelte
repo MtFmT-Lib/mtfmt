@@ -4,7 +4,6 @@
 <script lang="ts">
     import Header from '@part/Header.svelte'
     import Footer from '@part/Footer.svelte'
-    import Caption from '@part/Caption.svelte'
     import OnlineDemo from '@part/OnlineDemo.svelte'
     import InstallSelector from '@part/InstallSelector.svelte'
 </script>
@@ -14,22 +13,12 @@
     <div class="top">TODO</div>
     <div class="content-box-odd">
         <div class="contents">
-            <InstallSelector />
-        </div>
-    </div>
-    <div class="content-box">
-        <div class="contents">
             <OnlineDemo />
         </div>
     </div>
-    <div class="content-box-odd">
-        <div class="contents">
-            <Caption caption_text="contributors" />
-        </div>
-    </div>
     <div class="content-box">
         <div class="contents">
-            <Caption caption_text="see also" />
+            <InstallSelector />
         </div>
     </div>
     <Footer />
@@ -53,7 +42,7 @@
 
     .contents {
         width: 80%;
-        max-width: $header-max-width;
+        max-width: $content-text-max-width;
         margin: 0 auto;
     }
 
@@ -68,7 +57,7 @@
     .content-box,
     .content-box-odd {
         width: 100%;
-        height: 50%;
+        min-height: 30%;
         padding-top: 1em;
         padding-bottom: 2em;
     }

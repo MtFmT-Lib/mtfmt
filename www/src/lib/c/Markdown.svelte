@@ -3,14 +3,13 @@
 -->
 <script lang="ts">
     import { writable } from 'svelte/store'
+    import get_html from './markdown_trans'
+    import * as Mts from './markdown_trans'
     import { into_boolean } from '$lib/fp/cast'
     import * as Storager from '$lib/local_storager'
     import { set_language_attrs } from './theme_lang'
-    import { get_build_in_html } from './markdown_trans'
     import theme_info, { type Theme } from './theme_storager'
     import { set_theme, get_storager_theme } from './theme_storager'
-    import type { BuildinContent, LanguageKey } from './markdown_trans'
-    import get_content_html, { get_support_languages } from './markdown_trans'
 
     /**
      * 文本颜色
@@ -20,12 +19,12 @@
     /**
      * 内容
      */
-    export let contents: BuildinContent
+    export let contents: Mts.BuildinContent
 
     /**
      * 支持的语言
      */
-    let support_languages = get_support_languages(contents)
+    let support_languages = Mts.get_support_languages(contents)
 
     /**
      * 语言配置项
@@ -40,7 +39,14 @@
     /**
      * html内容
      */
-    let html_content = writable<string>(get_build_in_html('en', contents))
+    let html_content = writable<string>(Mts.get_build_in_html('en', contents))
+
+    /**
+     * html内容目录
+     */
+    let html_content_toc = writable<string>(
+        Mts.get_build_in_toc('en', contents)
+    )
 
     /**
      * 文本颜色
@@ -84,7 +90,7 @@
             enable_bio_reader.set(las)
         }
         // 加载内容
-        get_content_html(html_content, language, contents)
+        get_html(html_content, html_content_toc, language, contents)
     })
 
     /**
@@ -109,7 +115,7 @@
      */
     function update_cur_language(arg: { currentTarget: HTMLSelectElement }) {
         const target = arg.currentTarget
-        const language = target.value as LanguageKey
+        const language = target.value as Mts.LanguageKey
         cur_language.set(language)
         Storager.write_local_storager(LANGUAGE_ITEM_KEY, language)
     }
@@ -117,15 +123,15 @@
     /**
      * 取得默认的语言
      */
-    function get_default_language(): LanguageKey {
+    function get_default_language(): Mts.LanguageKey {
         return Storager.read_local_storager(LANGUAGE_ITEM_KEY)
-            .map((s) => s as LanguageKey)
+            .map((s) => s as Mts.LanguageKey)
             .or_map(() => {
-                let language: LanguageKey
+                let language: Mts.LanguageKey
                 if (typeof navigator === 'undefined') {
                     language = 'en'
                 } else {
-                    const lut = new Map<string, LanguageKey>([
+                    const lut = new Map<string, Mts.LanguageKey>([
                         ['en', 'en'],
                         ['en-US', 'en'],
                         ['zh-CN', 'zh'],
@@ -139,57 +145,65 @@
 </script>
 
 <div class="markdown">
-    <div class="markdown-toolbar">
-        <div class="reader-tools">
-            <!-- bio 阅读 -->
-            {#if $cur_language === 'en'}
-                {#if $enable_bio_reader}
-                    <button
-                        id="actived-button"
-                        title="Disable the bio-reading mode"
-                        on:click={() => set_bio_mode(!$enable_bio_reader)}
+    <div class="markdown-inner">
+        <div class="markdown-index">{@html $html_content_toc}</div>
+        <div class="markdown-content">
+            <div class="markdown-toolbar">
+                <div class="reader-tools">
+                    <!-- bio 阅读 -->
+                    {#if $cur_language === 'en'}
+                        {#if $enable_bio_reader}
+                            <button
+                                id="actived-button"
+                                title="Disable the bio-reading mode"
+                                on:click={() =>
+                                    set_bio_mode(!$enable_bio_reader)}
+                            >
+                                <span>B</span>
+                            </button>
+                        {:else}
+                            <button
+                                title="Active the bio-reading mode"
+                                on:click={() =>
+                                    set_bio_mode(!$enable_bio_reader)}
+                            >
+                                <span>B</span>
+                            </button>
+                        {/if}
+                    {/if}
+                </div>
+                <div class="reader-language">
+                    <!-- 主题 -->
+                    <select
+                        title="Choice theme"
+                        value={get_storager_theme()}
+                        on:change={update_cur_theme}
                     >
-                        <span>B</span>
-                    </button>
-                {:else}
-                    <button
-                        title="Active the bio-reading mode"
-                        on:click={() => set_bio_mode(!$enable_bio_reader)}
+                        {#each $theme_info.themes as t}
+                            <option value={t}>
+                                {t.toUpperCase()}
+                            </option>
+                        {/each}
+                    </select>
+                    <!-- 语言 -->
+                    <select
+                        title="Choice language"
+                        value={get_default_language()}
+                        on:change={update_cur_language}
                     >
-                        <span>B</span>
-                    </button>
-                {/if}
-            {/if}
+                        {#each support_languages as lang}
+                            <option value={lang.language_key}>
+                                <span>{lang.display_name}</span>
+                            </option>
+                        {/each}
+                    </select>
+                </div>
+            </div>
+            <div class="markdown-box" style="color: {$text_color}">
+                {@html $html_content}
+            </div>
         </div>
-        <div class="reader-language">
-            <!-- 主题 -->
-            <select
-                title="Choice theme"
-                value={get_storager_theme()}
-                on:change={update_cur_theme}
-            >
-                {#each $theme_info.themes as t}
-                    <option value={t}>
-                        {t.toUpperCase()}
-                    </option>
-                {/each}
-            </select>
-            <!-- 语言 -->
-            <select
-                title="Choice language"
-                value={get_default_language()}
-                on:change={update_cur_language}
-            >
-                {#each support_languages as lang}
-                    <option value={lang.language_key}>
-                        <span>{lang.display_name}</span>
-                    </option>
-                {/each}
-            </select>
-        </div>
-    </div>
-    <div class="markdown-box" style="color: {$text_color}">
-        {@html $html_content}
+        <div style="clear: both" />
     </div>
 </div>
 
@@ -198,13 +212,30 @@
 
     .markdown {
         border-top: 1px solid var(--border-color);
-        margin-bottom: 2em;
     }
 
-    .markdown-box {
+    .markdown-inner {
         width: 80%;
         max-width: $content-max-width;
         margin: 0 auto;
+    }
+
+    .markdown-index {
+        float: left;
+        width: 25%;
+        box-sizing: border-box;
+        padding: 1em 1em;
+    }
+
+    .markdown-content {
+        margin-left: 25%;
+        max-width: $content-text-max-width;
+        border-left: 1px solid var(--border-color);
+    }
+
+    .markdown-box {
+        box-sizing: border-box;
+        padding: 1em 1.5em;
     }
 
     .markdown-toolbar {
@@ -213,11 +244,6 @@
         align-items: baseline;
         flex-direction: row;
         color: mix($bg-color, $text-color, 40%);
-
-        // 尺寸
-        width: 80%;
-        max-width: $header-max-width;
-        margin: 0 auto;
 
         // 颜色和padding
         padding-top: 0.25em;
@@ -285,11 +311,40 @@
         background-color: var(--button-actived-bg-color);
     }
 
+    @media screen and (width < 1080px) {
+        .markdown-inner {
+            width: 100%;
+        }
+    }
+
     @media screen and (width < 720px) {
         .markdown-toolbar,
-        .markdown-box {
-            width: 95%;
+        .markdown-box,
+        .markdown-inner,
+        .markdown-content {
+            width: 100%;
             max-width: initial;
+        }
+
+        .markdown-content {
+            border: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+
+        .markdown-index {
+            display: none;
+        }
+    }
+
+    @media screen and (width > 1368px) {
+        .markdown-index {
+            width: 360px;
+        }
+
+        .markdown-content {
+            margin-left: 360px;
         }
     }
 </style>

@@ -47,6 +47,8 @@
         font-size: 180%;
         font-weight: 600;
         letter-spacing: 0.5px;
+        box-sizing: border-box;
+        padding-left: 1em;
 
         a {
             color: inherit;
@@ -55,7 +57,7 @@
     }
 
     .nav-items {
-        padding-left: 1em;
+        padding-right: 0.8em;
 
         a {
             font-size: inherit;
@@ -74,10 +76,9 @@
         }
     }
 
-    @media screen and (width < 720px) {
+    @media screen and (width < 1080px) {
         .header-content {
-            width: 95%;
-            max-width: initial;
+            width: 100%;
         }
     }
 </style>
