@@ -258,14 +258,14 @@
     }
 }
 
-@media screen and (width < 1280px) {
+@media screen and (width < $xl) {
     .markdown-box table {
         padding-left: 3em;
         padding-right: 3em;
     }
 }
 
-@media screen and (width < 720px) {
+@media screen and (width < $md) {
     .markdown-box {
         table {
             padding-left: 1em;

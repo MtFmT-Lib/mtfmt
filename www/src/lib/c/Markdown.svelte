@@ -287,7 +287,7 @@
         }
     }
 
-    @media screen and (width > 1368px) {
+    @media screen and (width > $xl) {
         .markdown-index {
             width: 360px;
         }

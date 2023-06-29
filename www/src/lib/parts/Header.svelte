@@ -76,7 +76,7 @@
         }
     }
 
-    @media screen and (width < 1080px) {
+    @media screen and (width < $lg) {
         .header-content {
             width: 100%;
         }

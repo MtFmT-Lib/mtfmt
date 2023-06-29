@@ -17,6 +17,8 @@
 </div>
 
 <style lang="scss">
+    @import '@theme/stylevars';
+
     .demo-block {
         display: flex;
         flex-direction: row;
@@ -34,7 +36,7 @@
         box-sizing: border-box;
     }
 
-    @media screen and (width < 720px) {
+    @media screen and (width < $sm) {
         .demo-block {
             flex-direction: column;
         }

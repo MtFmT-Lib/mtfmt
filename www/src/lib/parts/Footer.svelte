@@ -118,7 +118,7 @@
         }
     }
 
-    @media screen and (width < 1080px) {
+    @media screen and (width < $lg) {
         .contents {
             width: 100%;
         }
