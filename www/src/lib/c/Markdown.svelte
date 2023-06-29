@@ -2,6 +2,8 @@
 #  SPDX-License-Identifier: LGPL-3.0
 -->
 <script lang="ts">
+    import Picker from './Picker.svelte'
+    import Toggler from './Toggler.svelte'
     import { writable } from 'svelte/store'
     import get_html from './markdown_trans'
     import * as Mts from './markdown_trans'
@@ -96,7 +98,8 @@
     /**
      * 切换bio reading
      */
-    function set_bio_mode(enable: boolean) {
+    function set_bio_mode(arg: CustomEvent<{ state: boolean }>) {
+        const enable = arg.detail.state
         enable_bio_reader.set(enable)
         Storager.write_local_storager(BIO_READING_ITEM_KEY, enable)
     }
@@ -104,8 +107,8 @@
     /**
      * 更新选中的主题
      */
-    function update_cur_theme(arg: { currentTarget: HTMLSelectElement }) {
-        const target = arg.currentTarget
+    function update_cur_theme(arg: CustomEvent<{ value: string }>) {
+        const target = arg.detail
         const cur_theme = target.value as Theme
         set_theme(cur_theme)
     }
@@ -113,8 +116,8 @@
     /**
      * 更新选中的语言
      */
-    function update_cur_language(arg: { currentTarget: HTMLSelectElement }) {
-        const target = arg.currentTarget
+    function update_cur_language(arg: CustomEvent<{ value: string }>) {
+        const target = arg.detail
         const language = target.value as Mts.LanguageKey
         cur_language.set(language)
         Storager.write_local_storager(LANGUAGE_ITEM_KEY, language)
@@ -152,51 +155,42 @@
                 <div class="reader-tools">
                     <!-- bio 阅读 -->
                     {#if $cur_language === 'en'}
-                        {#if $enable_bio_reader}
-                            <button
-                                id="actived-button"
+                        <div class="reader-tool-item">
+                            <Toggler
                                 title="Disable the bio-reading mode"
-                                on:click={() =>
-                                    set_bio_mode(!$enable_bio_reader)}
+                                checked={$enable_bio_reader}
+                                on:toggle={set_bio_mode}
                             >
                                 <span>B</span>
-                            </button>
-                        {:else}
-                            <button
-                                title="Active the bio-reading mode"
-                                on:click={() =>
-                                    set_bio_mode(!$enable_bio_reader)}
-                            >
-                                <span>B</span>
-                            </button>
-                        {/if}
+                            </Toggler>
+                        </div>
                     {/if}
                 </div>
                 <div class="reader-language">
                     <!-- 主题 -->
-                    <select
-                        title="Choice theme"
-                        value={get_storager_theme()}
-                        on:change={update_cur_theme}
-                    >
-                        {#each $theme_info.themes as t}
-                            <option value={t}>
-                                {t.toUpperCase()}
-                            </option>
-                        {/each}
-                    </select>
+                    <div class="reader-tool-item">
+                        <Picker
+                            title="Select the theme"
+                            items={$theme_info.themes.map((v) => ({
+                                value: v,
+                                display_name: v.toUpperCase(),
+                            }))}
+                            selected_item={get_storager_theme()}
+                            on:picknew={update_cur_theme}
+                        />
+                    </div>
                     <!-- 语言 -->
-                    <select
-                        title="Choice language"
-                        value={get_default_language()}
-                        on:change={update_cur_language}
-                    >
-                        {#each support_languages as lang}
-                            <option value={lang.language_key}>
-                                <span>{lang.display_name}</span>
-                            </option>
-                        {/each}
-                    </select>
+                    <div class="reader-tool-item">
+                        <Picker
+                            title="Choice language"
+                            items={support_languages.map((v) => ({
+                                value: v.language_key,
+                                display_name: v.display_name,
+                            }))}
+                            selected_item={get_default_language()}
+                            on:picknew={update_cur_language}
+                        />
+                    </div>
                 </div>
             </div>
             <div class="markdown-box" style="color: {$text_color}">
@@ -258,57 +252,12 @@
         align-items: baseline;
     }
 
-    .reader-tools button,
-    .reader-language select {
-        outline: 0;
-        display: block;
-
-        // 边距
-        margin: 0;
-        padding-top: 0.08em;
-        padding-bottom: 0.08em;
-        padding-left: 0.6em;
-        padding-right: 0.6em;
-
-        // 边框
-        border: none;
+    .reader-tool-item {
         border-left: 2px solid var(--border-color);
-
-        // 颜色和背景色
-        color: var(--button-color);
-        background: none;
 
         &:first-child {
             border: none;
         }
-
-        &:hover {
-            background-color: var(--button-hover-bg-color);
-        }
-
-        &:active {
-            background-color: var(--button-actived-bg-color);
-        }
-    }
-
-    .reader-language select {
-        text-align: center;
-        appearance: none;
-        -moz-appearance: none;
-        -webkit-appearance: none;
-
-        option {
-            background-color: var(--bg-color);
-        }
-
-        &:hover,
-        &:focus {
-            background-color: var(--button-hover-bg-color);
-        }
-    }
-
-    .reader-tools button[id='actived-button'] {
-        background-color: var(--button-actived-bg-color);
     }
 
     @media screen and (width < 1080px) {
