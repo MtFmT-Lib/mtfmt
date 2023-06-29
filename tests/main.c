@@ -92,7 +92,10 @@ int main()
     RUN_TEST(string_find_large);
     RUN_TEST(string_find_or_error);
     RUN_TEST(string_contain);
-    RUN_TEST(string_retain);
+
+    RUN_TEST(string_retain_all);
+    RUN_TEST(string_retain_endwith);
+    RUN_TEST(string_retain_startwith);
 
     RUN_TEST(fmt_align_left);
     RUN_TEST(fmt_align_left_fill);
