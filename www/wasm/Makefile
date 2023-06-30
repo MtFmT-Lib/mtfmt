@@ -23,6 +23,9 @@ BUILD_DIR = build
 # 构建输出
 OUTPUT_DIR = target
 
+# 导出函数的文件
+EXPORT_FILE = export.mk
+
 # C sources
 C_SOURCES =  \
 $(wildcard ./*.c) \
@@ -30,13 +33,11 @@ $(wildcard ../../src/*.c) \
 $(wildcard ../../src/**/*.c)
 
 # 需要导出的函数
+-include $(EXPORT_FILE)
 C_EXPORT_FUNCS = \
-"EXPORTED_FUNCTIONS=[\
-_mstr_create,_mstr_c_str,_mstr_clear,\
-_mstr_concat_cstr,_mstr_free,\
-_mstr_format,\
-_mstr_configure,\
-_mstr_wasm_new_string,_mstr_wasm_free_string,\
+"EXPORTED_FUNCTIONS=[$(EXPORTS), \
+_mstr_wasm_new_string,\
+_mstr_wasm_free_string,\
 _mstr_wasm_string_len,\
 _mstr_wasm_string_count,\
 _mstr_wasm_allocate,_mstr_wasm_free]"
@@ -89,3 +90,6 @@ $(BUILD_DIR):
 
 $(OUTPUT_DIR):
 	mkdir $@
+
+# 依赖
+-include $(wildcard $(BUILD_DIR)/*.d)
