@@ -615,8 +615,8 @@ static mstr_result_t convert_int(
     MStrFmtFormatType ftyp
 )
 {
-    MStrFmtIntIndex index;
     mstr_result_t result = MStr_Ok;
+    MStrFmtIntIndex index = MStrFmtIntIndex_Dec;
     // 取得对应的index
     MSTR_AND_THEN(result, fmt_type_as_integer_index(&index, ftyp));
     // 进行格式化
@@ -632,8 +632,8 @@ static mstr_result_t convert_uint(
     MString* str, uint32_t value, MStrFmtFormatType ftyp
 )
 {
-    MStrFmtIntIndex index;
     mstr_result_t result = MStr_Ok;
+    MStrFmtIntIndex index = MStrFmtIntIndex_Dec;
     // 取得对应的index
     MSTR_AND_THEN(result, fmt_type_as_integer_index(&index, ftyp));
     // 进行格式化

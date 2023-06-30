@@ -95,7 +95,7 @@ mstr_fmt_utoa(MString* res_str, uint32_t value, MStrFmtIntIndex index)
 MSTR_EXPORT_API(mstr_result_t)
 mstr_fmt_iqtoa(
     MString* res_str,
-    uint32_t value,
+    int32_t value,
     uint32_t quat,
     MStrFmtSignDisplay sign
 )
