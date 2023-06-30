@@ -251,7 +251,7 @@ MSTR_EXPORT_API(void) mstr_reverse_only(MString* str)
     }
 }
 
-MSTR_EXPORT_API(const char*) mstr_as_cstr(MString* str)
+MSTR_EXPORT_API(const char*) mstr_c_str(MString* str)
 {
     // 在length的地方补上0
     // 因为cap_size至少比length大1, 因此不需要担心内存问题

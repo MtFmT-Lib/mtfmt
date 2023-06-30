@@ -287,7 +287,7 @@ MSTR_EXPORT_API(void) mstr_reverse_only(MString* str);
  * @param str: 字符串
  * @return const char*: C字符串指针
  */
-MSTR_EXPORT_API(const char*) mstr_as_cstr(MString* str);
+MSTR_EXPORT_API(const char*) mstr_c_str(MString* str);
 
 /**
  * @brief 判断两个字符串是否相等

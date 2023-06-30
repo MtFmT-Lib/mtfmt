@@ -251,13 +251,13 @@ The other functions include the type converts function.
 
 #### 2.2.8.1 Convert to C-style string
 
-The function `mstr_as_cstr` provides a method that returns the c-style string pointer of the original string. Due to deliberate design reasons, the string capacity always contains one byte. That means the `cap_size` is greater than the `length` is true in all time. So that this function will append one byte in which the value is zero if necessary and return the c-style string pointer directly. The following code shows the usage.
+The function `mstr_c_str` provides a method that returns the c-style string pointer of the original string. Due to deliberate design reasons, the string capacity always contains one byte. That means the `cap_size` is greater than the `length` is true in all time. So that this function will append one byte in which the value is zero if necessary and return the c-style string pointer directly. The following code shows the usage.
 
 ```c
 MString str;
 mstr_create(&str, "string");
 // Convert to c-style string
-const char* c_str = mstr_as_cstr(&str);
+const char* c_str = mstr_c_str(&str);
 // Now, c_str is pointing to "string" and terminated by '\0'
 ```
 

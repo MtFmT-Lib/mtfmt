@@ -2,7 +2,7 @@
 
 export declare function mstr_create(pstr: number, content: number): MStrResult
 
-export declare function mstr_as_cstr(pstr: number): number
+export declare function mstr_c_str(pstr: number): number
 
 export declare function mstr_clear(pstr: number)
 
