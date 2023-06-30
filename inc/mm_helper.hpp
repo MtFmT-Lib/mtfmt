@@ -27,6 +27,35 @@ namespace details
  */
 struct unit_t
 {
+    constexpr bool operator==(unit_t) noexcept
+    {
+        return true;
+    }
+
+    constexpr bool operator!=(unit_t) noexcept
+    {
+        return false;
+    }
+
+    constexpr bool operator<(unit_t) noexcept
+    {
+        return false;
+    }
+
+    constexpr bool operator>(unit_t) noexcept
+    {
+        return false;
+    }
+
+    constexpr bool operator<=(unit_t) noexcept
+    {
+        return true;
+    }
+
+    constexpr bool operator>=(unit_t) noexcept
+    {
+        return true;
+    }
 };
 
 /**

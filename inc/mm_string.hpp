@@ -22,6 +22,12 @@
 namespace mtfmt
 {
 /**
+ * @brief 字符串类
+ *
+ */
+class string;
+
+/**
  * @brief unicode字符
  *
  */
@@ -440,13 +446,12 @@ public:
      * @brief 放入一个字符
      *
      */
-    result<details::unit_t, mstr_result_t> push(
-        mstr_codepoint_t uni_char
+    result<unit_t, mstr_result_t> push(mstr_codepoint_t uni_char
     ) noexcept
     {
         mstr_result_t code = mstr_append(&this_obj, uni_char);
         if (MSTR_SUCC(code)) {
-            return details::unit_t();
+            return unit_t();
         }
         else {
             return code;
@@ -457,13 +462,13 @@ public:
      * @brief 重复放入一个字符
      *
      */
-    result<details::unit_t, mstr_result_t> push(
+    result<unit_t, mstr_result_t> push(
         mstr_codepoint_t ch, std::size_t repeat
     ) noexcept
     {
         mstr_result_t code = mstr_repeat_append(&this_obj, ch, repeat);
         if (MSTR_SUCC(code)) {
-            return details::unit_t();
+            return unit_t();
         }
         else {
             return code;
@@ -474,12 +479,11 @@ public:
      * @brief 放入一个字符串
      *
      */
-    result<details::unit_t, mstr_result_t> concat(const string& rhs
-    ) noexcept
+    result<unit_t, mstr_result_t> concat(const string& rhs) noexcept
     {
         mstr_result_t code = mstr_concat(&this_obj, &rhs.this_obj);
         if (MSTR_SUCC(code)) {
-            return details::unit_t();
+            return unit_t();
         }
         else {
             return code;
@@ -491,12 +495,12 @@ public:
      *
      */
     template <std::size_t N>
-    result<details::unit_t, mstr_result_t> concat(const value_t (&rhs
-    )[N]) noexcept
+    result<unit_t, mstr_result_t> concat(const value_t (&rhs)[N]
+    ) noexcept
     {
         mstr_result_t code = mstr_concat_cstr(&this_obj, rhs);
         if (MSTR_SUCC(code)) {
-            return details::unit_t();
+            return unit_t();
         }
         else {
             return code;
@@ -582,13 +586,13 @@ public:
      * @brief 在idx位置插入字符
      *
      */
-    result<details::unit_t, error_code_t> insert(
+    result<unit_t, error_code_t> insert(
         usize_t idx, unicode_t ch
     ) noexcept
     {
         error_code_t res = mstr_insert(&this_obj, idx, ch);
         if (MSTR_SUCC(res)) {
-            return details::unit_t{};
+            return unit_t{};
         }
         else {
             return res;
@@ -771,7 +775,7 @@ public:
      * @param[in] mode: 替换模式
      *
      */
-    result<details::unit_t, error_code_t> retain(
+    result<unit_t, error_code_t> retain(
         const value_t* patt,
         MStringReplaceOption mode = MStringReplaceOption_All,
         usize_t patt_cnt = 0
@@ -785,7 +789,7 @@ public:
             patt_cnt == 0 ? strlen(patt) : patt_cnt
         );
         if (MSTR_SUCC(res)) {
-            return details::unit_t{};
+            return unit_t{};
         }
         else {
             return res;
@@ -800,7 +804,7 @@ public:
      *
      */
     template <std::size_t N>
-    result<details::unit_t, error_code_t> retain(
+    result<unit_t, error_code_t> retain(
         const value_t (&patt)[N],
         MStringReplaceOption mode = MStringReplaceOption_All
     ) noexcept
@@ -815,7 +819,7 @@ public:
      * @param[in] mode: 替换模式
      *
      */
-    result<details::unit_t, error_code_t> retain(
+    result<unit_t, error_code_t> retain(
         const mtfmt::string& patt,
         MStringReplaceOption mode = MStringReplaceOption_All
     ) noexcept
