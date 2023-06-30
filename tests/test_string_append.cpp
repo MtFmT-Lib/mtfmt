@@ -15,12 +15,6 @@
 #include "unity.h"
 #include <stdio.h>
 
-//
-// 从这里往下都用C++编写C测试的考虑在于字符串是UTF-8编码的
-// C11支持u8"", 但是mtfmt最低要求是C99
-// 因此使用C++ (mtfmt的C++ wrapper至少要求C++11)
-//
-
 template <std::size_t N>
 constexpr mtfmt::unicode_t unicode_char(const char (&u8char)[N])
 {

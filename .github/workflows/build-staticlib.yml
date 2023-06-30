@@ -81,6 +81,7 @@ jobs:
           MTFMT_BUILD_C_DEFS: "-D_MSTR_USE_HARDWARE_DIV=1"
       # 打包
       - name: Upload artifact
+        if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v3
         with:
           name: "gcc-lib-${{ matrix.target-cpu }}"

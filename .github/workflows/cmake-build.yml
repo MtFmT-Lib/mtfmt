@@ -62,6 +62,7 @@ jobs:
         shell: pwsh
       # 打包动态库
       - name: Upload artifact
+        if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v3
         with:
           name: cmake-windows-artifact
