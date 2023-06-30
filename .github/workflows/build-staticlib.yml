@@ -38,7 +38,7 @@ jobs:
       # 设置GCC版本
       - uses: fiam/arm-none-eabi-gcc@v1
         with:
-          release: "9-2019-q4"
+          release: "10-2020-q4"
       # 构建
       - name: Make static library at cortex-${{ matrix.target-cpu }}
         run: |
@@ -70,7 +70,7 @@ jobs:
       # 设置GCC版本
       - uses: fiam/arm-none-eabi-gcc@v1
         with:
-          release: "9-2019-q4"
+          release: "10-2020-q4"
       # 构建
       - name: Make static library at cortex-${{ matrix.target-cpu }}
         run: |
