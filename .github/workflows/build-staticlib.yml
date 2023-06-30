@@ -38,7 +38,7 @@ jobs:
       # 设置GCC版本
       - uses: fiam/arm-none-eabi-gcc@v1
         with:
-          release: "9-2019-q4"
+          release: "10-2020-q4"
       # 构建
       - name: Make static library at cortex-${{ matrix.target-cpu }}
         run: |
@@ -49,6 +49,7 @@ jobs:
           MTFMT_BUILD_TARGET_NAME: "mtfmt_${{ matrix.target-cpu }}"
       # 打包
       - name: Upload artifact
+        if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v3
         with:
           name: "gcc-lib-${{ matrix.target-cpu }}-without-div"
@@ -59,7 +60,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        target-cpu: ["m3", "m4", "m7"]
+        target-cpu: ["m3", "m4", "m7", "m23", "m33", "m55"]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -69,7 +70,7 @@ jobs:
       # 设置GCC版本
       - uses: fiam/arm-none-eabi-gcc@v1
         with:
-          release: "9-2019-q4"
+          release: "10-2020-q4"
       # 构建
       - name: Make static library at cortex-${{ matrix.target-cpu }}
         run: |
