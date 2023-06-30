@@ -39,6 +39,34 @@ typedef struct tagMStrFmtArgsContext
 } MStrFmtArgsContext;
 
 /**
+ * @brief 转换整数时采用的进制
+ *
+ */
+typedef enum tagMStrFmtIntIndex
+{
+    //! 转换为二进制字符串
+    MStrFmtIntIndex_Bin,
+
+    //! 转换为八进制字符串
+    MStrFmtIntIndex_Oct,
+
+    //! 转换为十进制字符串
+    MStrFmtIntIndex_Dec,
+
+    //! 转换为小写的十六进制值字符串
+    MStrFmtIntIndex_Hex,
+
+    //! 转换为大写的十六进制值字符串
+    MStrFmtIntIndex_Hex_UpperCase,
+
+    //! 转换为小写的十六进制值字符串, 带0x前缀
+    MStrFmtIntIndex_Hex_WithPrefix,
+
+    //! 转换为大写的十六进制值字符串, 带0X前缀
+    MStrFmtIntIndex_Hex_UpperCase_WithPrefix,
+} MStrFmtIntIndex;
+
+/**
  * @brief 格式化字符串
  *
  * @param[in] fmt: 格式化串
@@ -86,15 +114,21 @@ mstr_context_format(
 );
 
 /**
- * @brief 将无符号量化值转换为字符串
+ * @brief 将有符号整数转换为字符串
  *
  * @param[out] res_str: 转换结果
  * @param[in] value: 需要转换的值
- * @param[in] quat: 量化精度
+ * @param[in] index: Index
+ * @param[in] sign: 符号的显示方式
  *
  */
 MSTR_EXPORT_API(mstr_result_t)
-mstr_fmt_uqtoa(MString* res_str, uint32_t value, uint32_t quat);
+mstr_fmt_itoa(
+    MString* str,
+    int32_t value,
+    MStrFmtIntIndex index,
+    MStrFmtSignDisplay sign
+);
 
 /**
  * @brief 将无符号整数转换为字符串
@@ -106,6 +140,34 @@ mstr_fmt_uqtoa(MString* res_str, uint32_t value, uint32_t quat);
  */
 MSTR_EXPORT_API(mstr_result_t)
 mstr_fmt_utoa(MString* res_str, uint32_t value, MStrFmtIntIndex index);
+
+/**
+ * @brief 将有符号量化值转换为字符串
+ *
+ * @param[out] res_str: 转换结果
+ * @param[in] value: 需要转换的值
+ * @param[in] quat: 量化精度
+ * @param[in] sign: 符号的显示方式
+ *
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_fmt_iqtoa(
+    MString* res_str,
+    uint32_t value,
+    uint32_t quat,
+    MStrFmtSignDisplay sign
+);
+
+/**
+ * @brief 将无符号量化值转换为字符串
+ *
+ * @param[out] res_str: 转换结果
+ * @param[in] value: 需要转换的值
+ * @param[in] quat: 量化精度
+ *
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_fmt_uqtoa(MString* res_str, uint32_t value, uint32_t quat);
 
 /**
  * @brief 将日期时间值转换为字符串

@@ -141,7 +141,7 @@ export class CString implements CObject {
     public get(): string {
         const ret_handle = this.handle
         // as cptr
-        const c_rawstr = MtfmtWASM.mstr_as_cstr(ret_handle)
+        const c_rawstr = MtfmtWASM.mstr_c_str(ret_handle)
         // 取得字符串内容
         const buffer = MtfmtWASM.memory.buffer
         const length = MtfmtWASM.mstr_wasm_string_count(ret_handle)

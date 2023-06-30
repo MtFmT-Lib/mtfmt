@@ -32,7 +32,7 @@ $(wildcard ../../src/**/*.c)
 # 需要导出的函数
 C_EXPORT_FUNCS = \
 "EXPORTED_FUNCTIONS=[\
-_mstr_create,_mstr_as_cstr,_mstr_clear,\
+_mstr_create,_mstr_c_str,_mstr_clear,\
 _mstr_concat_cstr,_mstr_free,\
 _mstr_format,\
 _mstr_configure,\

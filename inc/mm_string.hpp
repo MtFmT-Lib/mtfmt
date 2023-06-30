@@ -828,9 +828,9 @@ public:
      *
      * @return const element_t*: c风格字符串指针吗
      */
-    const value_t* as_cstr() noexcept
+    const value_t* c_str() noexcept
     {
-        return mstr_as_cstr(&this_obj);
+        return mstr_c_str(&this_obj);
     }
 
     /**

@@ -14,11 +14,8 @@
 
 #include "mm_fmt.h"
 #include "mm_typedef.h"
-
-static void div_mod_10(uint32_t, uint32_t*, uint32_t*);
-static void div_mod_10_u64(uint64_t, uint64_t*, uint32_t*);
-static mstr_result_t bcdtoa(
-    MString*, uint32_t, uint32_t, uint32_t, mstr_bool_t
+static mstr_result_t convert_sign_helper(
+    MString*, int32_t, MStrFmtSignDisplay
 );
 static mstr_result_t uqtoa_impl(MString*, uint32_t, uint32_t);
 static mstr_result_t uqtoa_helper_dpart(MString*, uint32_t, uint32_t);
@@ -26,6 +23,93 @@ static mstr_result_t utoa_impl_2base(
     MString*, uint32_t, char, uint32_t
 );
 static mstr_result_t utoa_impl_10base(MString*, uint32_t);
+static mstr_result_t bcdtoa(
+    MString*, uint32_t, uint32_t, uint32_t, mstr_bool_t
+);
+static void div_mod_10(uint32_t, uint32_t*, uint32_t*);
+static void div_mod_10_u64(uint64_t, uint64_t*, uint32_t*);
+static uint32_t abs_u32(int32_t);
+
+MSTR_EXPORT_API(mstr_result_t)
+mstr_fmt_itoa(
+    MString* str,
+    int32_t value,
+    MStrFmtIntIndex index,
+    MStrFmtSignDisplay sign
+)
+{
+    mstr_result_t result = MStr_Ok;
+    // 转换符号
+    MSTR_AND_THEN(result, convert_sign_helper(str, value, sign));
+    // 转换无符号整数值
+    MSTR_AND_THEN(result, mstr_fmt_utoa(str, abs_u32(value), index));
+    // 返回
+    return result;
+}
+
+MSTR_EXPORT_API(mstr_result_t)
+mstr_fmt_utoa(MString* res_str, uint32_t value, MStrFmtIntIndex index)
+{
+    MString buff;
+    mstr_result_t alloc_result;
+    mstr_result_t result = MStr_Ok;
+    // 0x
+    if (index == MStrFmtIntIndex_Hex_WithPrefix) {
+        MSTR_AND_THEN(result, mstr_concat_cstr(res_str, "0x"));
+    }
+    else if (index == MStrFmtIntIndex_Hex_UpperCase_WithPrefix) {
+        MSTR_AND_THEN(result, mstr_concat_cstr(res_str, "0X"));
+    }
+    // 转换内容
+    MSTR_AND_THEN(result, mstr_create_empty(&buff));
+    alloc_result = result;
+    if (MSTR_SUCC(result)) {
+        switch (index) {
+        case MStrFmtIntIndex_Bin:
+            result = utoa_impl_2base(&buff, 2, 'a', value);
+            break;
+        case MStrFmtIntIndex_Oct:
+            result = utoa_impl_2base(&buff, 8, 'a', value);
+            break;
+        case MStrFmtIntIndex_Dec:
+            result = utoa_impl_10base(&buff, value);
+            break;
+        case MStrFmtIntIndex_Hex:
+        case MStrFmtIntIndex_Hex_WithPrefix:
+            result = utoa_impl_2base(&buff, 16, 'a', value);
+            break;
+        case MStrFmtIntIndex_Hex_UpperCase:
+        case MStrFmtIntIndex_Hex_UpperCase_WithPrefix:
+            result = utoa_impl_2base(&buff, 16, 'A', value);
+            break;
+        }
+        // 拼接到输出
+        MSTR_AND_THEN(result, mstr_concat(res_str, &buff));
+    }
+    if (MSTR_SUCC(alloc_result)) {
+        mstr_free(&buff);
+    }
+    return result;
+}
+
+MSTR_EXPORT_API(mstr_result_t)
+mstr_fmt_iqtoa(
+    MString* res_str,
+    uint32_t value,
+    uint32_t quat,
+    MStrFmtSignDisplay sign
+)
+{
+    mstr_result_t result = MStr_Ok;
+    // 转换符号
+    MSTR_AND_THEN(result, convert_sign_helper(res_str, value, sign));
+    // 转换无符号值
+    MSTR_AND_THEN(
+        result, mstr_fmt_uqtoa(res_str, abs_u32(value), quat)
+    );
+    // 返回
+    return result;
+}
 
 MSTR_EXPORT_API(mstr_result_t)
 mstr_fmt_uqtoa(MString* res_str, uint32_t value, uint32_t quat)
@@ -35,32 +119,20 @@ mstr_fmt_uqtoa(MString* res_str, uint32_t value, uint32_t quat)
         return MStr_Err_UnsupportQuantBits;
     }
     else {
-        return uqtoa_impl(res_str, value, quat);
+        MString buff;
+        mstr_result_t alloc_result;
+        mstr_result_t result = MStr_Ok;
+        MSTR_AND_THEN(result, mstr_create_empty(&buff));
+        alloc_result = result;
+        // 进行转换
+        MSTR_AND_THEN(result, uqtoa_impl(&buff, value, quat));
+        // 拼接到输出
+        MSTR_AND_THEN(result, mstr_concat(res_str, &buff));
+        if (MSTR_SUCC(alloc_result)) {
+            mstr_free(&buff);
+        }
+        return result;
     }
-}
-
-MSTR_EXPORT_API(mstr_result_t)
-mstr_fmt_utoa(MString* res_str, uint32_t value, MStrFmtIntIndex index)
-{
-    mstr_result_t result = MStr_Ok;
-    switch (index) {
-    case MStrFmtIntIndex_Bin:
-        result = utoa_impl_2base(res_str, 2, 'a', value);
-        break;
-    case MStrFmtIntIndex_Oct:
-        result = utoa_impl_2base(res_str, 8, 'a', value);
-        break;
-    case MStrFmtIntIndex_Dec:
-        result = utoa_impl_10base(res_str, value);
-        break;
-    case MStrFmtIntIndex_Hex:
-        result = utoa_impl_2base(res_str, 16, 'a', value);
-        break;
-    case MStrFmtIntIndex_Hex_UpperCase:
-        result = utoa_impl_2base(res_str, 16, 'A', value);
-        break;
-    }
-    return result;
 }
 
 MSTR_EXPORT_API(mstr_result_t)
@@ -142,6 +214,37 @@ mstr_fmt_ttoa(
 }
 
 /**
+ * @brief 转换符号
+ *
+ * @param[out] str: 转换结果
+ * @param[in] value: 转换值
+ * @param[in] sign: 符号的显示方式
+ */
+static mstr_result_t convert_sign_helper(
+    MString* str, int32_t value, MStrFmtSignDisplay sign
+)
+{
+    char sign_ch = '\0';
+    switch (sign) {
+    case MStrFmtSignDisplay_Always:
+        sign_ch = (value == 0) ? '\0' : (value > 0) ? '+' : '-';
+        break;
+    case MStrFmtSignDisplay_NegOnly:
+        sign_ch = (value >= 0) ? '\0' : '-';
+        break;
+    case MStrFmtSignDisplay_Neg_Or_Space:
+        sign_ch = (value >= 0) ? ' ' : '-';
+        break;
+    }
+    if (sign_ch != '\0') {
+        return mstr_append(str, sign_ch);
+    }
+    else {
+        return MStr_Ok;
+    }
+}
+
+/**
  * @brief utoa在index等于10的时候的实现
  *
  */
@@ -169,7 +272,7 @@ static mstr_result_t utoa_impl_10base(MString* str, uint32_t value)
         }
         // 翻转转换结果
         if (MSTR_SUCC(result)) {
-            mstr_reverse_self(str);
+            mstr_reverse_only(str);
         }
     }
     return result;
@@ -212,7 +315,7 @@ static mstr_result_t utoa_impl_2base(
         }
         // 翻转转换结果
         if (MSTR_SUCC(result)) {
-            mstr_reverse_self(str);
+            mstr_reverse_only(str);
         }
     }
     return result;
@@ -320,7 +423,7 @@ static mstr_result_t uqtoa_helper_dpart(
         }
         // 翻转结果
         if (MSTR_SUCC(result)) {
-            mstr_reverse_self(&buff);
+            mstr_reverse_only(&buff);
         }
     }
     // copy到输出
@@ -430,4 +533,13 @@ static void div_mod_10_u64(uint64_t x, uint64_t* div, uint32_t* rem)
         *rem = (uint32_t)(r & 0xffffffff);
     }
 #endif // _MSTR_USE_HARDWARE_DIV
+}
+
+/**
+ * @brief 计算|x|
+ *
+ */
+static uint32_t abs_u32(int32_t x)
+{
+    return x > 0 ? (uint32_t)x : (uint32_t)(-x);
 }

@@ -267,9 +267,19 @@ MSTR_EXPORT_API(void) mstr_clear(MString* str);
  *
  * @param[inout] str: 需要翻转的字符串
  *
- * @return mstr_result_t: 结果, 永远为MStr_Ok
  */
 MSTR_EXPORT_API(void) mstr_reverse_self(MString* str);
+
+/**
+ * @brief 翻转字符串, 不做任何其它处理
+ *
+ * @param[inout] str: 需要翻转的字符串
+ *
+ * @attention 通常情况下不需要使用此函数,
+ * 此函数不会保证反转后的编码正确。它设计出来是为了给明确只有ASCII字符的字符串做翻转的,
+ * 在UTF-8编码下, 该函数可降低很多操作
+ */
+MSTR_EXPORT_API(void) mstr_reverse_only(MString* str);
 
 /**
  * @brief 转换为cstr
@@ -277,7 +287,7 @@ MSTR_EXPORT_API(void) mstr_reverse_self(MString* str);
  * @param str: 字符串
  * @return const char*: C字符串指针
  */
-MSTR_EXPORT_API(const char*) mstr_as_cstr(MString* str);
+MSTR_EXPORT_API(const char*) mstr_c_str(MString* str);
 
 /**
  * @brief 判断两个字符串是否相等
