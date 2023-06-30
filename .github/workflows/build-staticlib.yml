@@ -60,7 +60,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        target-cpu: ["m3", "m4", "m7"]
+        target-cpu: ["m3", "m4", "m7", "m23", "m33", "m55"]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
