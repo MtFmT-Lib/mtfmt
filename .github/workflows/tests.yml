@@ -3,19 +3,23 @@ name: Tests
 on:
   push:
     paths:
-      - "**.c"
-      - "**.h"
-      - "**.hpp"
-      - "**.cpp"
+      - "inc/**.h"
+      - "inc/**.hpp"
+      - "src/**.c"
+      - "src/**.cpp"
+      - "tests/**.c"
+      - "tests/**.cpp"
       - "Makefile"
       - ".github/workflows/tests.yml"
   pull_request:
     branches: [master]
     paths:
-      - "**.c"
-      - "**.h"
-      - "**.hpp"
-      - "**.cpp"
+      - "inc/**.h"
+      - "inc/**.hpp"
+      - "src/**.c"
+      - "src/**.cpp"
+      - "tests/**.c"
+      - "tests/**.cpp"
       - "Makefile"
       - ".github/workflows/tests.yml"
   workflow_dispatch:
