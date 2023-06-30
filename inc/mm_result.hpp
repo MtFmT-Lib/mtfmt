@@ -26,28 +26,6 @@ namespace details
  */
 template <typename T, typename E> class result_base
 {
-protected:
-    /**
-     * @brief 类型标签
-     *
-     */
-    enum class TypeTag
-    {
-        SuccTag = 0,
-        ErrorTag = 1
-    };
-
-    /**
-     * @brief 类型标签
-     *
-     */
-    TypeTag type_tag;
-
-    union {
-        T t_val;
-        E e_val;
-    };
-
 public:
     using value_type = T;
     using error_type = E;
@@ -71,6 +49,28 @@ public:
             e_val.~E();
         }
     }
+
+protected:
+    /**
+     * @brief 类型标签
+     *
+     */
+    enum class TypeTag
+    {
+        SuccTag = 0,
+        ErrorTag = 1
+    };
+
+    /**
+     * @brief 类型标签
+     *
+     */
+    TypeTag type_tag;
+
+    union {
+        T t_val;
+        E e_val;
+    };
 };
 
 /**
