@@ -140,7 +140,7 @@
     }
 
     .nav-actived {
-        border-bottom: 2px solid var(--header-actived-border-color);
+        border-bottom: 2px solid var(--border-color);
     }
 
     .nav-inactived {
