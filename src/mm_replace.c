@@ -41,13 +41,18 @@ mstr_replace_set_target(
 }
 
 MSTR_EXPORT_API(mstr_result_t)
-mstr_retain(MString* str, const char* pattern)
+mstr_replace(MString* str, const char* pattern, const char* replace_to)
 {
     return MStr_Err_NoImplemention;
 }
 
 MSTR_EXPORT_API(mstr_result_t)
-mstr_replace(MString* str, const char* pattern, const char* replace_to)
+mstr_retain(
+    MString* str,
+    MStringReplaceOption opt,
+    const char* pattern,
+    usize_t pattern_cnt
+)
 {
     return MStr_Err_NoImplemention;
 }

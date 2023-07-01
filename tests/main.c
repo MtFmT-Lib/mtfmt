@@ -51,6 +51,8 @@ int main()
     // 初始化堆
     mstr_heap_init(heap, RUNTIME_HEAP_SIZE);
 
+    RUN_TEST(allocate_then_free);
+
     RUN_TEST(monadic_result_conjugate);
     RUN_TEST(monadic_result_flatten);
     RUN_TEST(monadic_result_map);
@@ -59,8 +61,6 @@ int main()
     RUN_TEST(monadic_result_or_else);
     RUN_TEST(monadic_result_or_value);
     RUN_TEST(monadic_result_or_exception);
-
-    RUN_TEST(allocate_then_free);
 
     RUN_TEST(string_copy_create);
     RUN_TEST(string_move_create);
@@ -92,7 +92,16 @@ int main()
     RUN_TEST(string_find_large);
     RUN_TEST(string_find_or_error);
     RUN_TEST(string_contain);
-    RUN_TEST(string_retain);
+
+    RUN_TEST(string_retain_all);
+    RUN_TEST(string_retain_endwith);
+    RUN_TEST(string_retain_startwith);
+
+    RUN_TEST(test_itoa_basic);
+
+    RUN_TEST(test_qtoa_basic);
+
+    RUN_TEST(test_ftoa_basic);
 
     RUN_TEST(fmt_align_left);
     RUN_TEST(fmt_align_left_fill);

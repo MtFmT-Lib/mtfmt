@@ -192,28 +192,6 @@ typedef enum tagMStrFmtFormatType
 } MStrFmtFormatType;
 
 /**
- * @brief 转换整数时采用的进制
- *
- */
-typedef enum tagMStrFmtIntIndex
-{
-    //! 转换为二进制字符串
-    MStrFmtIntIndex_Bin,
-
-    //! 转换为八进制字符串
-    MStrFmtIntIndex_Oct,
-
-    //! 转换为十进制字符串
-    MStrFmtIntIndex_Dec,
-
-    //! 转换为小写的十六进制值字符串
-    MStrFmtIntIndex_Hex,
-
-    //! 转换为大写的十六进制值字符串
-    MStrFmtIntIndex_Hex_UpperCase,
-} MStrFmtIntIndex;
-
-/**
  * @brief 一般变量的格式化描述标记
  *
  */

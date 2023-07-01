@@ -267,9 +267,19 @@ MSTR_EXPORT_API(void) mstr_clear(MString* str);
  *
  * @param[inout] str: 需要翻转的字符串
  *
- * @return mstr_result_t: 结果, 永远为MStr_Ok
  */
 MSTR_EXPORT_API(void) mstr_reverse_self(MString* str);
+
+/**
+ * @brief 翻转字符串, 不做任何其它处理
+ *
+ * @param[inout] str: 需要翻转的字符串
+ *
+ * @attention 通常情况下不需要使用此函数,
+ * 此函数不会保证反转后的编码正确。它设计出来是为了给明确只有ASCII字符的字符串做翻转的,
+ * 在UTF-8编码下, 该函数可降低很多操作
+ */
+MSTR_EXPORT_API(void) mstr_reverse_only(MString* str);
 
 /**
  * @brief 转换为cstr
@@ -277,7 +287,7 @@ MSTR_EXPORT_API(void) mstr_reverse_self(MString* str);
  * @param str: 字符串
  * @return const char*: C字符串指针
  */
-MSTR_EXPORT_API(const char*) mstr_as_cstr(MString* str);
+MSTR_EXPORT_API(const char*) mstr_c_str(MString* str);
 
 /**
  * @brief 判断两个字符串是否相等
@@ -409,10 +419,17 @@ mstr_replace_set_target(
  * @brief 从字符串中移除所有匹配substr的字符
  *
  * @param[inout] str: 字符串
+ * @param[in] opt: 替换模式
  * @param[in] pattern: 需要移除的pattern
+ * @param[in] pattern_cnt: 需要移除的pattern的字符计数
  */
 MSTR_EXPORT_API(mstr_result_t)
-mstr_retain(MString* str, const char* pattern);
+mstr_retain(
+    MString* str,
+    MStringReplaceOption opt,
+    const char* pattern,
+    usize_t pattern_cnt
+);
 
 /**
  * @brief 进行字符串替换(单个目标)
@@ -460,7 +477,7 @@ MSTR_EXPORT_API(void) mstr_iter(MStringIter* it, const MString* str);
 MSTR_EXPORT_API(usize_t) mstr_char_length(char lead);
 
 /**
- * @brief 判断buff的lead字符偏移量(取反)
+ * @brief 判断buff的lead字符偏移量(相反数, 比如偏移量是-2但是会返回2)
  *
  * @note 在UTF-8功能启用的情况下, 其判断UTF-8编码的字符长度, 错误返回0,
  * 否则, 该函数永远返回1

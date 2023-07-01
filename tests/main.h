@@ -16,6 +16,8 @@
 extern "C"
 {
 #endif
+    void allocate_then_free(void);
+
     void monadic_result_conjugate(void);
     void monadic_result_flatten(void);
     void monadic_result_map(void);
@@ -24,8 +26,6 @@ extern "C"
     void monadic_result_or_else(void);
     void monadic_result_or_value(void);
     void monadic_result_or_exception(void);
-
-    void allocate_then_free(void);
 
     void string_copy_create(void);
     void string_move_create(void);
@@ -55,9 +55,18 @@ extern "C"
 
     void string_find(void);
     void string_contain(void);
-    void string_retain(void);
     void string_find_large(void);
     void string_find_or_error(void);
+
+    void string_retain_all(void);
+    void string_retain_endwith(void);
+    void string_retain_startwith(void);
+
+    void test_itoa_basic(void);
+
+    void test_qtoa_basic(void);
+
+    void test_ftoa_basic(void);
 
     void fmt_align_left(void);
     void fmt_align_left_fill(void);

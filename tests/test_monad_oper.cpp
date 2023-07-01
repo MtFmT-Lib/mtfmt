@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    test_monad.cpp
+ * @file    test_monad_opers.cpp
  * @author  向阳 (hinata.hoshino@foxmail.com)
  * @brief   Monadic result
  * @version 1.0

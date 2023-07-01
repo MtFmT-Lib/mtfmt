@@ -47,15 +47,15 @@ static mstr_result_t
 static mstr_result_t convert_int(
     MString*, int32_t, MStrFmtSignDisplay, MStrFmtFormatType
 );
+static mstr_result_t convert_uint(
+    MString*, uint32_t, MStrFmtFormatType
+);
 static mstr_result_t convert_quat(
     MString*, int32_t, uint32_t, MStrFmtSignDisplay
 );
 static mstr_result_t convert_uquat(MString*, uint32_t, uint32_t);
-static mstr_result_t convert_uint(
-    MString*, uint32_t, MStrFmtFormatType
-);
-static mstr_result_t convert_sign_helper(
-    MString*, int32_t, MStrFmtSignDisplay
+static mstr_result_t fmt_type_as_integer_index(
+    MStrFmtIntIndex*, MStrFmtFormatType
 );
 
 //
@@ -171,6 +171,33 @@ mstr_context_format(
             }
         }
     }
+    return result;
+}
+
+/**
+ * @brief 解析replacement field
+ *
+ * @param[inout] ppfmt: & 格式化串
+ * @param[out] res_str: 结果输出
+ * @param[out] parser_result: 解析结果
+ *
+ */
+static mstr_result_t process_replacement_field(
+    char const** ppfmt, MStrFmtParseResult* parser_result
+)
+{
+    mstr_result_t result;
+    const char* pfmt = *ppfmt;
+    // 解析内容
+    MStrFmtParserState* state;
+    byte_t state_memory[MFMT_PARSER_STATE_SIZE];
+    mstr_fmt_parser_init(state_memory, pfmt, &state);
+    result = mstr_fmt_parse_goal(state, parser_result);
+    // 增加offset
+    if (MSTR_SUCC(result)) {
+        pfmt += mstr_fmt_parser_end_position(state, pfmt);
+    }
+    *ppfmt = pfmt;
     return result;
 }
 
@@ -563,15 +590,7 @@ static mstr_result_t convert_quat(
     MString* str, int32_t value, uint32_t qbits, MStrFmtSignDisplay sign
 )
 {
-    uint32_t uvalue;
-    mstr_result_t result = MStr_Ok;
-    // 转换符号
-    MSTR_AND_THEN(result, convert_sign_helper(str, value, sign));
-    // 转换无符号值
-    uvalue = value > 0 ? (uint32_t)value : (uint32_t)(-value);
-    MSTR_AND_THEN(result, convert_uquat(str, uvalue, qbits));
-    // 返回
-    return result;
+    return mstr_fmt_iqtoa(str, value, qbits, sign);
 }
 
 /**
@@ -596,43 +615,13 @@ static mstr_result_t convert_int(
     MStrFmtFormatType ftyp
 )
 {
-    uint32_t uvalue;
     mstr_result_t result = MStr_Ok;
-    // 转换符号
-    MSTR_AND_THEN(result, convert_sign_helper(str, value, sign));
-    // 转换无符号整数值
-    uvalue = value > 0 ? (uint32_t)value : (uint32_t)(-value);
-    MSTR_AND_THEN(result, convert_uint(str, uvalue, ftyp));
-    // 返回
+    MStrFmtIntIndex index = MStrFmtIntIndex_Dec;
+    // 取得对应的index
+    MSTR_AND_THEN(result, fmt_type_as_integer_index(&index, ftyp));
+    // 进行格式化
+    MSTR_AND_THEN(result, mstr_fmt_itoa(str, value, index, sign));
     return result;
-}
-
-/**
- * @brief 转换符号
- *
- */
-static mstr_result_t convert_sign_helper(
-    MString* str, int32_t value, MStrFmtSignDisplay sign
-)
-{
-    char sign_ch = '\0';
-    switch (sign) {
-    case MStrFmtSignDisplay_Always:
-        sign_ch = (value == 0) ? '\0' : (value > 0) ? '+' : '-';
-        break;
-    case MStrFmtSignDisplay_NegOnly:
-        sign_ch = (value >= 0) ? '\0' : '-';
-        break;
-    case MStrFmtSignDisplay_Neg_Or_Space:
-        sign_ch = (value >= 0) ? ' ' : '-';
-        break;
-    }
-    if (sign_ch != '\0') {
-        return mstr_append(str, sign_ch);
-    }
-    else {
-        return MStr_Ok;
-    }
 }
 
 /**
@@ -644,75 +633,53 @@ static mstr_result_t convert_uint(
 )
 {
     mstr_result_t result = MStr_Ok;
-    MString buff;
-    MSTR_AND_THEN(result, mstr_create_empty(&buff));
-    switch (ftyp) {
-    case MStrFmtFormatType_Binary:
-        result = mstr_fmt_utoa(&buff, value, MStrFmtIntIndex_Bin);
-        break;
-    case MStrFmtFormatType_Oct:
-        result = mstr_fmt_utoa(&buff, value, MStrFmtIntIndex_Oct);
-        break;
-    case MStrFmtFormatType_Deciaml:
-        result = mstr_fmt_utoa(&buff, value, MStrFmtIntIndex_Dec);
-        break;
-    case MStrFmtFormatType_Hex:
-        result = mstr_fmt_utoa(&buff, value, MStrFmtIntIndex_Hex);
-        break;
-    case MStrFmtFormatType_Hex_UpperCase:
-        result =
-            mstr_fmt_utoa(&buff, value, MStrFmtIntIndex_Hex_UpperCase);
-        break;
-    case MStrFmtFormatType_Hex_WithPrefix:
-        // 前面放0x
-        MSTR_AND_THEN(result, mstr_concat_cstr(str, "0x"));
-        // 格式化的内容
-        MSTR_AND_THEN(
-            result, mstr_fmt_utoa(&buff, value, MStrFmtIntIndex_Hex)
-        );
-        break;
-    case MStrFmtFormatType_Hex_UpperCase_WithPrefix:
-        // 前面放0x
-        MSTR_AND_THEN(result, mstr_concat_cstr(str, "0X"));
-        // 格式化的内容
-        MSTR_AND_THEN(
-            result,
-            mstr_fmt_utoa(&buff, value, MStrFmtIntIndex_Hex_UpperCase)
-        );
-        break;
-    case MStrFmtFormatType_UnSpec:
-        // 默认是十进制
-        result = mstr_fmt_utoa(&buff, value, MStrFmtIntIndex_Dec);
-        break;
-    }
-    // 然后跟上格式化的内容
-    MSTR_AND_THEN(result, mstr_concat(str, &buff));
+    MStrFmtIntIndex index = MStrFmtIntIndex_Dec;
+    // 取得对应的index
+    MSTR_AND_THEN(result, fmt_type_as_integer_index(&index, ftyp));
+    // 进行格式化
+    MSTR_AND_THEN(result, mstr_fmt_utoa(str, value, index));
     return result;
 }
 
 /**
- * @brief 解析replacement field
+ * @brief 把 MStrFmtFormatType 转为 整数的index
  *
- * @param[inout] ppfmt: & 格式化串
- * @param[out] res_str: 结果输出
- * @param[out] parser_result: 解析结果
- *
+ * @param[out] index: 结果
+ * @param[in] typ: MStrFmtFormatType
  */
-static mstr_result_t process_replacement_field(
-    char const** ppfmt, MStrFmtParseResult* parser_result
+static mstr_result_t fmt_type_as_integer_index(
+    MStrFmtIntIndex* index, MStrFmtFormatType typ
 )
 {
-    mstr_result_t result;
-    const char* pfmt = *ppfmt;
-    // 解析内容
-    MStrFmtParserState* state;
-    byte_t state_memory[MFMT_PARSER_STATE_SIZE];
-    mstr_fmt_parser_init(state_memory, pfmt, &state);
-    result = mstr_fmt_parse_goal(state, parser_result);
-    // 增加offset
-    if (MSTR_SUCC(result)) {
-        pfmt += mstr_fmt_parser_end_position(state, pfmt);
+    mstr_result_t result = MStr_Ok;
+    MStrFmtIntIndex index_map_result = MStrFmtIntIndex_Dec;
+    switch (typ) {
+    case MStrFmtFormatType_Binary:
+        index_map_result = MStrFmtIntIndex_Bin;
+        break;
+    case MStrFmtFormatType_Oct:
+        index_map_result = MStrFmtIntIndex_Oct;
+        break;
+    case MStrFmtFormatType_Deciaml:
+        index_map_result = MStrFmtIntIndex_Dec;
+        break;
+    case MStrFmtFormatType_Hex:
+        index_map_result = MStrFmtIntIndex_Hex;
+        break;
+    case MStrFmtFormatType_Hex_UpperCase:
+        index_map_result = MStrFmtIntIndex_Hex_UpperCase;
+        break;
+    case MStrFmtFormatType_Hex_WithPrefix:
+        index_map_result = MStrFmtIntIndex_Hex_WithPrefix;
+        break;
+    case MStrFmtFormatType_Hex_UpperCase_WithPrefix:
+        index_map_result = MStrFmtIntIndex_Hex_UpperCase_WithPrefix;
+        break;
+    case MStrFmtFormatType_UnSpec:
+        // 默认是十进制
+        index_map_result = MStrFmtIntIndex_Dec;
+        break;
     }
-    *ppfmt = pfmt;
+    *index = index_map_result;
     return result;
 }

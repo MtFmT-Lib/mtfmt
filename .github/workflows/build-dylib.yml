@@ -52,6 +52,7 @@ jobs:
           MTFMT_BUILD_TARGET_NAME: "mtfmt_${{ matrix.platform }}"
       # 打包
       - name: Upload artifact
+        if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v3
         with:
           name: dylib-artifact
@@ -86,6 +87,7 @@ jobs:
           MTFMT_BUILD_DYLIB_EXT: ".dll"
       # 打包
       - name: Upload artifact
+        if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v3
         with:
           name: dll-artifact

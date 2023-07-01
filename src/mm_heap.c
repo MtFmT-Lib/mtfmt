@@ -400,8 +400,8 @@ static FreeBlock* split_free_block(
     //   /|\            /|\       |
     //   删掉            返回
     // ```
-    iptr_t last_addr = (iptr_t)block;
-    iptr_t next_addr = last_addr + alloc_size;
+    uptr_t last_addr = (uptr_t)block;
+    uptr_t next_addr = (uptr_t)(last_addr + alloc_size);
     FreeBlock* cur_block = block;
     FreeBlock* new_block = (FreeBlock*)next_addr;
     new_block->align_fill = 0;

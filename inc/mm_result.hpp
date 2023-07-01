@@ -26,6 +26,30 @@ namespace details
  */
 template <typename T, typename E> class result_base
 {
+public:
+    using value_type = T;
+    using error_type = E;
+
+    constexpr result_base(T succ_val)
+        : type_tag(TypeTag::SuccTag), t_val(succ_val)
+    {
+    }
+
+    constexpr result_base(E err_val)
+        : type_tag(TypeTag::ErrorTag), e_val(err_val)
+    {
+    }
+
+    ~result_base()
+    {
+        if (type_tag == TypeTag::SuccTag) {
+            t_val.~T();
+        }
+        else {
+            e_val.~E();
+        }
+    }
+
 protected:
     /**
      * @brief 类型标签
@@ -47,40 +71,6 @@ protected:
         T t_val;
         E e_val;
     };
-
-public:
-    using succ_t = T;
-    using err_t = E;
-
-    constexpr result_base(T succ_val)
-        : type_tag(TypeTag::SuccTag), t_val(succ_val)
-    {
-    }
-
-    constexpr result_base(E err_val)
-        : type_tag(TypeTag::ErrorTag), e_val(err_val)
-    {
-    }
-
-    ~result_base()
-    {
-        if (type_tag == TypeTag::SuccTag) {
-            t_val.~T();
-        }
-        else {
-            e_val.~E();
-        }
-    }
-};
-
-/**
- * @brief 判断T是不是一个result类型
- *
- */
-template <typename T> struct is_result
-{
-    static constexpr bool value =
-        details::is_instance_of<result, T>::value;
 };
 
 /**
@@ -96,7 +86,23 @@ struct result_add_ctrl : result_base<T, E>
     // TODO
 };
 
+/**
+ * @brief 判断T是不是一个result类型
+ *
+ */
+template <typename T> struct is_result
+{
+    static constexpr bool value =
+        details::is_instance_of<result, T>::value;
+};
+
 } // namespace details
+
+/**
+ * @brief 表示单位类型
+ *
+ */
+using unit_t = details::unit_t;
 
 /**
  * @brief 返回值的错误结果
@@ -126,8 +132,8 @@ class result final : public details::result_add_ctrl<T, E>
 {
 public:
     using base_t = details::result_add_ctrl<T, E>;
-    using succ_t = typename base_t::succ_t;
-    using err_t = typename base_t::err_t;
+    using value_type = typename base_t::value_type;
+    using error_type = typename base_t::error_type;
     using base_t::base_t;
 
     /**
@@ -153,7 +159,7 @@ public:
      *
      * @attention 只有在 is_succ() 返回 true 时才是有意义的
      */
-    succ_t unsafe_get_succ_value() const noexcept
+    value_type unsafe_get_succ_value() const noexcept
     {
         return base_t::t_val;
     }
@@ -163,7 +169,7 @@ public:
      *
      * @attention 只有在 is_err() 返回 true 时才是有意义的
      */
-    err_t unsafe_get_err_value() const noexcept
+    error_type unsafe_get_err_value() const noexcept
     {
         return base_t::e_val;
     }
@@ -191,10 +197,10 @@ public:
     template <typename T1 = T>
     details::enable_if_t<
         details::is_result<T1>::value,
-        result<typename T1::succ_t, E>>
+        result<typename T1::value_type, E>>
         flatten() const noexcept
     {
-        static_assert(std::is_same<typename T1::err_t, E>::value);
+        static_assert(std::is_same<typename T1::error_type, E>::value);
         if (is_succ()) {
             const auto& ref_succ = base_t::t_val;
             if (ref_succ.is_succ()) {
@@ -273,7 +279,7 @@ public:
         typename R1 = details::function_return_type_t<F>,
         typename R = details::enable_if_t<
             details::is_result<R1>::value,
-            typename R1::succ_t>>
+            typename R1::value_type>>
     details::enable_if_t<
         details::holds_prototype<F, result<R, E>, T>::value,
         result<R, E>>
@@ -297,7 +303,7 @@ public:
         typename R1 = details::function_return_type_t<F>,
         typename R = details::enable_if_t<
             details::is_result<R1>::value,
-            typename R1::err_t>>
+            typename R1::error_type>>
     details::enable_if_t<
         details::holds_prototype<F, result<T, R>, E>::value,
         result<T, R>>

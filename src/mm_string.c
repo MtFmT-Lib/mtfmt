@@ -36,6 +36,8 @@
 static mstr_bool_t mstr_compare_helper(
     const char*, const char*, usize_t
 );
+static void
+    mstr_reverse_unicode_helper(mstr_char_t*, const mstr_char_t*);
 static void* mstr_string_realloc(void*, mstr_bool_t, usize_t, usize_t);
 static mstr_result_t mstr_expand_size(MString*, usize_t);
 static usize_t mstr_resize_tactic(usize_t, usize_t);
@@ -230,11 +232,15 @@ MSTR_EXPORT_API(void) mstr_clear(MString* str)
 
 MSTR_EXPORT_API(void) mstr_reverse_self(MString* str)
 {
+    mstr_char_t* pe = str->buff + str->count;
+    mstr_reverse_only(str);
+    mstr_reverse_unicode_helper(str->buff, pe);
+}
+
+MSTR_EXPORT_API(void) mstr_reverse_only(MString* str)
+{
     mstr_char_t* p2 = str->buff + str->count - 1;
     mstr_char_t* p1 = str->buff;
-#if _MSTR_USE_UTF_8
-    mstr_char_t* pe = str->buff + str->count;
-#endif // _MSTR_USE_UTF_8
     while (p1 < p2) {
         char v = *p2;
         *p2 = *p1;
@@ -243,65 +249,9 @@ MSTR_EXPORT_API(void) mstr_reverse_self(MString* str)
         p1 += 1;
         p2 -= 1;
     }
-#if _MSTR_USE_UTF_8
-    // UTF-8考虑的地方在于 <= 0x7f 是ASCII
-    // 而其余情况都是UTF-8字符串
-    // 那么就可以先反转每个bytes:
-    // >> [char1: 110xxxxx 10xxxxxx], [char2: 110xxxxx 10xxxxxx]
-    // => [char2: 10xxxxxx 110xxxxx], [char1: 10xxxxxx 110xxxxx]
-    // 再去遍历一遍字符串, 跳过ascii, 并在发现lead character的时候
-    // 把上次的位置到目前lead character的字符交换
-    p1 = str->buff;
-    p2 = str->buff;
-    while (p2 < pe) {
-        mstr_char_t ch = *p2;
-        p2 += 1;
-        if ((ch & 0x80) == 0) {
-            // ASCII
-            p1 = p2;
-        }
-        else if ((ch & 0xc0) == 0xc0) {
-            // 2~6bytes UTF-8的lead character
-            mstr_char_t* t = p2;
-            usize_t byte_len = (usize_t)(p2 - p1);
-            // 因为一些编译器会抱怨case后无break
-            // 因此这里用goto做
-            switch (byte_len) {
-            case 4: goto proc_4;
-            case 3: goto proc_3;
-            case 2: goto proc_2;
-            default: mstr_unreachable(); goto end;
-            }
-        proc_4:
-            //  3    2    1    0
-            // /|\            /|\ 4个byte长度
-            //  p1             p2
-            // 交换p1和p2, 然后变成下面的样子
-            //  0    2    1    3
-            //      /|\  /|\ 2个byte长度
-            //       p1   p2
-            // 交给proc_2以一样的方式交换p1和p2即可
-            ch = *p1;
-            *p1++ = *--p2;
-            *p2 = ch;
-            goto proc_2;
-        proc_3:
-            // str[1]和str[1]不需要交换
-            goto proc_2;
-        proc_2:
-            ch = *p1;
-            *p1++ = *--p2;
-            *p2 = ch;
-            goto end;
-        end:
-            p1 = t;
-            p2 = t;
-        }
-    }
-#endif // _MSTR_USE_UTF_8
 }
 
-MSTR_EXPORT_API(const char*) mstr_as_cstr(MString* str)
+MSTR_EXPORT_API(const char*) mstr_c_str(MString* str)
 {
     // 在length的地方补上0
     // 因为cap_size至少比length大1, 因此不需要担心内存问题
@@ -747,6 +697,78 @@ static mstr_result_t mstr_strlen(
 }
 
 /**
+ * @brief 翻转Unicode字符编码, 让其正确, 在UTF-8关闭的情况下,
+ * 该函数不做任何操作
+ *
+ * @param[inout] buff: 操作数组
+ * @param[in] pe: 数组的末尾位置
+ */
+static void mstr_reverse_unicode_helper(
+    mstr_char_t* buff, const mstr_char_t* pe
+)
+{
+#if _MSTR_USE_UTF_8
+    mstr_char_t* p1 = buff;
+    mstr_char_t* p2 = buff;
+    // UTF-8考虑的地方在于 <= 0x7f 是ASCII
+    // 而其余情况都是UTF-8字符串
+    // 那么就可以先反转每个bytes:
+    // >> [char1: 110xxxxx 10xxxxxx], [char2: 110xxxxx 10xxxxxx]
+    // => [char2: 10xxxxxx 110xxxxx], [char1: 10xxxxxx 110xxxxx]
+    // 再去遍历一遍字符串, 跳过ascii, 并在发现lead character的时候
+    // 把上次的位置到目前lead character的字符交换
+    while (p2 < pe) {
+        mstr_char_t ch = *p2;
+        p2 += 1;
+        if ((ch & 0x80) == 0) {
+            // ASCII
+            p1 = p2;
+        }
+        else if ((ch & 0xc0) == 0xc0) {
+            // 2~6bytes UTF-8的lead character
+            mstr_char_t* t = p2;
+            usize_t byte_len = (usize_t)(p2 - p1);
+            // 因为一些编译器会抱怨case后无break
+            // 因此这里用goto做
+            switch (byte_len) {
+            case 4: goto proc_4;
+            case 3: goto proc_3;
+            case 2: goto proc_2;
+            default: mstr_unreachable(); goto end;
+            }
+        proc_4:
+            //  3    2    1    0
+            // /|\            /|\ 4个byte长度
+            //  p1             p2
+            // 交换p1和p2, 然后变成下面的样子
+            //  0    2    1    3
+            //      /|\  /|\ 2个byte长度
+            //       p1   p2
+            // 交给proc_2以一样的方式交换p1和p2即可
+            ch = *p1;
+            *p1++ = *--p2;
+            *p2 = ch;
+            goto proc_2;
+        proc_3:
+            // str[1]和str[1]不需要交换
+            goto proc_2;
+        proc_2:
+            ch = *p1;
+            *p1++ = *--p2;
+            *p2 = ch;
+            goto end;
+        end:
+            p1 = t;
+            p2 = t;
+        }
+    }
+#else
+    (void)buff;
+    (void)pe;
+#endif // _MSTR_USE_UTF_8
+}
+
+/**
  * @brief 比较相同长度len的字串a和b是否一致
  *
  * @param a: 字符串a
@@ -764,7 +786,7 @@ static mstr_bool_t mstr_compare_helper(
         uint32_t ch_a = a[i];
         uint32_t ch_b = b[i];
         // equ
-        bit |= ch_a - ch_b;
+        bit |= ch_a ^ ch_b;
     }
     return bit == 0;
 }
