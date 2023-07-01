@@ -10,6 +10,7 @@
     --border-color: #{$border-color};
     --border-color-middle: #{mix($border-color, black, 80%)};
     --border-color-deep: #{mix($border-color, black, 50%)};
+    --header-actived-border-color: #ccc;
     --footer-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
     --footer-content-color: #666;
     --odd-content-bg-color: #{mix($bg-color, #f8f9fa, 20%)};

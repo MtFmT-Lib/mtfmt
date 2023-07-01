@@ -212,6 +212,10 @@
         width: 80%;
         max-width: $content-max-width;
         margin: 0 auto;
+
+        @media screen and (width < $lg) {
+            width: 100%;
+        }
     }
 
     .markdown-index {
@@ -219,17 +223,40 @@
         width: 25%;
         box-sizing: border-box;
         padding: 1em 1em;
+
+        @media screen and (width < $md) {
+            display: none;
+        }
+
+        @media screen and (width > $xl) {
+            width: 360px;
+        }
     }
 
     .markdown-content {
         margin-left: 25%;
         max-width: $content-text-max-width;
         border-left: 1px solid var(--border-color);
+
+        @media screen and (width < $md) {
+            border: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+
+        @media screen and (width > $xl) {
+            margin-left: 360px;
+        }
     }
 
     .markdown-box {
         box-sizing: border-box;
         padding: 1em 1.5em;
+
+        @media screen and (width < $md) {
+            padding: 1em 0.8em;
+        }
     }
 
     .markdown-toolbar {
@@ -257,43 +284,6 @@
 
         &:first-child {
             border: none;
-        }
-    }
-
-    @media screen and (width < 1080px) {
-        .markdown-inner {
-            width: 100%;
-        }
-    }
-
-    @media screen and (width < 720px) {
-        .markdown-toolbar,
-        .markdown-box,
-        .markdown-inner,
-        .markdown-content {
-            width: 100%;
-            max-width: initial;
-        }
-
-        .markdown-content {
-            border: none;
-            padding: 0;
-            margin: 0;
-            width: 100%;
-        }
-
-        .markdown-index {
-            display: none;
-        }
-    }
-
-    @media screen and (width > $xl) {
-        .markdown-index {
-            width: 360px;
-        }
-
-        .markdown-content {
-            margin-left: 360px;
         }
     }
 </style>
