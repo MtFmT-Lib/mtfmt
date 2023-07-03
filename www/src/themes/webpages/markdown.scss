@@ -17,14 +17,6 @@
         }
     }
 
-    .toc-hyper-link {
-        text-decoration: none;
-    }
-
-    .toc-hyper-link:hover {
-        color: var(--hpyer-link-color-hover);
-    }
-
     .toc-level1-content {
         font-weight: var(--caption-text-weight);
         letter-spacing: 0.5px;
@@ -131,12 +123,6 @@
     }
 
     a {
-        text-decoration: none;
-
-        &:hover {
-            color: var(--hpyer-link-color-hover);
-        }
-
         .bio-reading-bold {
             color: inherit;
         }

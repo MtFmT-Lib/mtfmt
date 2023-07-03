@@ -162,7 +162,7 @@
                     {#if $cur_language === 'en'}
                         <div class="reader-tool-item">
                             <Toggler
-                                title="Disable the bio-reading mode"
+                                title="Enable/Disable the bio-reading mode"
                                 checked={$enable_bio_reader}
                                 on:toggle={set_bio_mode}
                             >

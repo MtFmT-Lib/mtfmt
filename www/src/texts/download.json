@@ -1,0 +1,131 @@
+{
+    "opts": {
+        "prebuild": {
+            "typ-dylib": {
+                "display_name": "Dymatic library",
+                "title": "Dymatic library prebuild"
+            },
+            "typ-lib": {
+                "display_name": "Static library",
+                "title": "Static library prebuild"
+            },
+            "typ-wasm": {
+                "display_name": "WASM",
+                "title": "WASM prebuild"
+            },
+            "typ-src": {
+                "display_name": "Sources",
+                "title": "Source code"
+            }
+        },
+        "OS": {
+            "os-win": {
+                "display_name": "Windows",
+                "requires": [
+                    "typ-lib",
+                    "typ-dylib"
+                ]
+            },
+            "os-unix": {
+                "display_name": "Linux",
+                "requires": [
+                    "typ-lib",
+                    "typ-dylib"
+                ]
+            },
+            "os-none": {
+                "display_name": "None",
+                "requires": [
+                    "typ-wasm",
+                    "typ-src",
+                    "typ-lib"
+                ]
+            }
+        },
+        "ISA/CPU": {
+            "cpu-cortex-m0": {
+                "display_name": "ARM Cortex-M0",
+                "requires": [
+                    "typ-lib&os-none"
+                ]
+            },
+            "cpu-cortex-m0+": {
+                "display_name": "ARM Cortex-M0+",
+                "requires": [
+                    "typ-lib&os-none"
+                ]
+            },
+            "cpu-cortex-m3": {
+                "display_name": "ARM Cortex-M3",
+                "requires": [
+                    "typ-lib&os-none"
+                ]
+            },
+            "cpu-cortex-m4": {
+                "display_name": "ARM Cortex-M4",
+                "requires": [
+                    "typ-lib&os-none"
+                ]
+            },
+            "cpu-cortex-m7": {
+                "display_name": "ARM Cortex-M7",
+                "requires": [
+                    "typ-lib&os-none"
+                ]
+            },
+            "cpu-cortex-m23": {
+                "display_name": "ARM Cortex-M23",
+                "requires": [
+                    "typ-lib&os-none"
+                ]
+            },
+            "cpu-cortex-m33": {
+                "display_name": "ARM Cortex-M33",
+                "requires": [
+                    "typ-lib&os-none"
+                ]
+            },
+            "cpu-cortex-m55": {
+                "display_name": "ARM Cortex-M55",
+                "requires": [
+                    "typ-lib&os-none"
+                ]
+            },
+            "cpu-amd64": {
+                "display_name": "AMD64",
+                "requires": [
+                    "typ-dylib",
+                    "typ-lib",
+                    "os-win",
+                    "os-unix"
+                ]
+            },
+            "cpu-x86": {
+                "display_name": "x86",
+                "requires": [
+                    "typ-dylib",
+                    "typ-lib",
+                    "os-win",
+                    "os-unix"
+                ]
+            },
+            "cpu-wasm": {
+                "display_name": "WASM",
+                "requires": [
+                    "typ-wasm"
+                ]
+            },
+            "cpu-any": {
+                "display_name": "Any",
+                "requires": [
+                    "typ-src"
+                ]
+            }
+        }
+    },
+    "default": {
+        "prebuild": "typ-dylib",
+        "OS": "os-win",
+        "ISA/CPU": "cpu-x86"
+    }
+}

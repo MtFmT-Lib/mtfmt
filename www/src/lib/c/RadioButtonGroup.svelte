@@ -40,6 +40,11 @@
      */
     export let group_name = 'radiogroup'
 
+    /**
+     * 默认选中项
+     */
+    export let default_selected: string | undefined = undefined
+
     const dispatch = createEventDispatcher<RadioGroupEvent>()
 
     /**
@@ -56,15 +61,32 @@
 <div class="groups">
     {#each items as item}
         <div class="group-item">
-            <input
-                type="radio"
-                name={group_name}
-                value={item[0]}
-                id={item[0]}
-                title={item[1].title ?? item[1].display_name}
-                on:click={() => on_click(item[0])}
-                disabled={diasble_items.includes(item[0])}
-            />
+            {#if diasble_items.includes(item[0])}
+                <input
+                    type="radio"
+                    name={group_name}
+                    value={item[0]}
+                    id={item[0]}
+                    class="radio-disable"
+                    title={item[1].title ?? item[1].display_name}
+                    on:click={() => on_click(item[0])}
+                    disabled
+                    checked={false}
+                />
+            {:else}
+                <input
+                    type="radio"
+                    name={group_name}
+                    value={item[0]}
+                    id={item[0]}
+                    class="radio"
+                    title={item[1].title ?? item[1].display_name}
+                    on:click={() => on_click(item[0])}
+                    checked={default_selected
+                        ? default_selected === item[0]
+                        : false}
+                />
+            {/if}
             <label for={item[0]} title={item[1].title ?? item[1].display_name}>
                 {item[1].display_name}
             </label>
@@ -104,7 +126,15 @@
             white-space: nowrap;
         }
 
-        input[type='radio']:checked + label {
+        input[type='radio']:disabled + label {
+            background-color: #f3f3f3;
+        }
+
+        input[type='radio'].radio:checked + label {
+            background-color: #aaa;
+        }
+
+        input[type='radio'].radio:hover + label {
             background-color: #aaa;
         }
     }

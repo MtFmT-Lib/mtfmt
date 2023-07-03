@@ -8,6 +8,7 @@
     import * as InstallText from '@text/install.md'
     import RadioButtonGroup from '@comp/RadioButtonGroup.svelte'
     import { writable } from 'svelte/store'
+    import download_opts from '@text/download.json'
 
     /**
      * apply函数
@@ -25,66 +26,88 @@
     type Item = {
         display_name: string
         title?: string
-    }
+    } & { requires?: string[] }
 
     /**
      * 步骤的type
      */
-    type StepItem = Map<string, Item & { requires?: string[] }>
+    type StepItem = Map<string, Item>
 
     /**
-     * 依赖关系
+     * 不可使用的项
      */
-    const deps = writable<Record<GroupName, string[]>>()
+    const disable_items = writable<Map<string, string[]>>(new Map())
 
     /**
      * 当前选中的值
      */
-    const selected = writable<Record<GroupName, string>>()
+    const selected = writable<Record<GroupName, string>>(download_opts.default)
 
     /**
      * 步骤
      */
-    const steps: Record<GroupName, StepItem> = {
-        prebuild: new Map([
-            [
-                'dylib',
-                {
-                    display_name: 'Dymatic library',
-                    title: 'Dymatic library prebuild',
-                },
-            ],
-            [
-                'lib',
-                {
-                    display_name: 'Static library',
-                    title: 'Static library prebuild',
-                },
-            ],
-        ]),
-        OS: new Map([
-            [
-                'win',
-                {
-                    display_name: 'Windows',
-                    requires: ['lib', 'dylib'],
-                },
-            ],
-            [
-                'unix',
-                {
-                    display_name: 'Linux',
-                },
-            ],
-        ]),
-    }
+    const steps: Map<GroupName, StepItem> = parsed_from_json()
 
     selected.subscribe((new_val) => {
         if (new_val === undefined) {
             return
         }
-        console.log(new_val)
+        const result: Map<GroupName, string[]> = new Map()
+        for (const key of steps.keys()) {
+            // 如果有 requires, 确认其在 selected_values 中, 不然认为不可选中
+            const disables: string[] = []
+            steps.get(key)?.forEach((value, key) => {
+                if (dete_should_disable(new_val, value)) {
+                    disables.push(key)
+                }
+            })
+            if (disables.length > 0) {
+                result.set(key, disables)
+            }
+        }
+        disable_items.set(result)
     })
+
+    /**
+     * 判断item是否应该被disable
+     */
+    function dete_should_disable(
+        cur_selected: Record<GroupName, string>,
+        item: Item
+    ): boolean {
+        if (item.requires === undefined) {
+            return false
+        }
+        const requires = item.requires
+        const values = Object.values(cur_selected)
+        // 每一条requires是or的关系
+        for (const require of requires) {
+            // 分开每个and的依赖项
+            const req_item = require.split('&')
+            const filted = req_item.filter((s) => values.includes(s))
+            if (filted.length === req_item.length) {
+                // 存在requires满足的情况
+                return false
+            }
+        }
+        return true
+    }
+
+    /**
+     * 从json生成选中项
+     */
+    function parsed_from_json(): Map<GroupName, StepItem> {
+        const opts = download_opts.opts
+        const result = new Map<GroupName, StepItem>()
+        for (const values of Object.entries(opts)) {
+            const item_map = new Map<string, Item>()
+            for (const items of Object.entries(values[1])) {
+                item_map.set(items[0], items[1])
+            }
+            result.set(values[0] as GroupName, item_map)
+        }
+        return result
+    }
 
     /**
      * 选中项改变
@@ -92,16 +115,6 @@
     function on_change_select(arg: { value: string; group: string }) {
         const group = arg.group as GroupName
         selected.update((last) => ({ ...last, [group]: arg.value }))
-    }
-
-    /**
-     * 取得group name
-     */
-    function disable_items(
-        items: Record<GroupName, string[]> | undefined,
-        name: string
-    ): string[] {
-        return items ? items[name as GroupName] : []
     }
 </script>
 
@@ -111,14 +124,15 @@
         {@html InstallText.html}
     </div>
     <ul class="steps">
-        {#each Object.entries(steps) as step}
+        {#each steps as step}
             <li>
                 <div class="step-name">{step[0]}</div>
                 <div class="step-selector">
                     <RadioButtonGroup
                         group_name={step[0]}
                         items={step[1]}
-                        diasble_items={disable_items($deps, step[0])}
+                        default_selected={$selected[step[0]]}
+                        diasble_items={$disable_items.get(step[0]) ?? []}
                         on:change={event_fun(on_change_select)}
                     />
                 </div>

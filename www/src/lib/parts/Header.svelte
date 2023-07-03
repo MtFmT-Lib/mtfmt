@@ -87,11 +87,6 @@
         box-sizing: border-box;
         padding-left: 1em;
 
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
         @media screen and (width < $md) {
             padding-left: 0.6em;
             font-size: 150%;
@@ -116,17 +111,6 @@
 
             &:last-child {
                 padding-right: 0;
-            }
-        }
-
-        a {
-            font-size: inherit;
-            white-space: nowrap;
-            text-decoration: none;
-            color: var(--hpyer-link-color);
-
-            &:hover {
-                color: var(--hpyer-link-color-hover);
             }
         }
 
