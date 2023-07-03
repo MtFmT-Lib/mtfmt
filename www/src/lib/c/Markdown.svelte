@@ -7,7 +7,9 @@
     import { writable } from 'svelte/store'
     import get_html from './markdown_trans'
     import * as Mts from './markdown_trans'
+    import { curry_2 } from '$lib/fp/fun'
     import { into_boolean } from '$lib/fp/cast'
+    import { apply_svelte } from '$lib/fp/apply'
     import * as Storager from '$lib/local_storager'
     import { set_language_attrs } from './theme_lang'
     import theme_info, { type Theme } from './theme_storager'
@@ -22,6 +24,11 @@
      * 内容
      */
     export let contents: Mts.BuildinContent
+
+    /**
+     * apply函数
+     */
+    const event_fun = curry_2(apply_svelte)
 
     /**
      * 支持的语言
@@ -107,18 +114,16 @@
     /**
      * 更新选中的主题
      */
-    function update_cur_theme(arg: CustomEvent<{ value: string }>) {
-        const target = arg.detail
-        const cur_theme = target.value as Theme
+    function update_cur_theme(arg: { value: string }) {
+        const cur_theme = arg.value as Theme
         set_theme(cur_theme)
     }
 
     /**
      * 更新选中的语言
      */
-    function update_cur_language(arg: CustomEvent<{ value: string }>) {
-        const target = arg.detail
-        const language = target.value as Mts.LanguageKey
+    function update_cur_language(arg: { value: string }) {
+        const language = arg.value as Mts.LanguageKey
         cur_language.set(language)
         Storager.write_local_storager(LANGUAGE_ITEM_KEY, language)
     }
@@ -176,7 +181,7 @@
                                 display_name: v.toUpperCase(),
                             }))}
                             selected_item={get_storager_theme()}
-                            on:picknew={update_cur_theme}
+                            on:picknew={event_fun(update_cur_theme)}
                         />
                     </div>
                     <!-- 语言 -->
@@ -188,7 +193,7 @@
                                 display_name: v.display_name,
                             }))}
                             selected_item={get_default_language()}
-                            on:picknew={update_cur_language}
+                            on:picknew={event_fun(update_cur_language)}
                         />
                     </div>
                 </div>
