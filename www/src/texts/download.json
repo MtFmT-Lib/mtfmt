@@ -13,6 +13,10 @@
                 "display_name": "WASM",
                 "title": "WASM prebuild"
             },
+            "typ-cmsis-pack": {
+                "display_name": "CMSIS Pack",
+                "title": "CMSIS pack"
+            },
             "typ-src": {
                 "display_name": "Sources",
                 "title": "Source code"
@@ -38,7 +42,8 @@
                 "requires": [
                     "typ-wasm",
                     "typ-src",
-                    "typ-lib"
+                    "typ-lib",
+                    "typ-cmsis-pack"
                 ]
             }
         },
@@ -112,13 +117,14 @@
             "cpu-wasm": {
                 "display_name": "WASM",
                 "requires": [
-                    "typ-wasm"
+                    "typ-wasm&os-none"
                 ]
             },
             "cpu-any": {
                 "display_name": "Any",
                 "requires": [
-                    "typ-src"
+                    "typ-src",
+                    "typ-cmsis-pack"
                 ]
             }
         }

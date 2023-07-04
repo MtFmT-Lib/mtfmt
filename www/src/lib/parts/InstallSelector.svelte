@@ -41,38 +41,40 @@
     /**
      * 当前选中的值
      */
-    const selected = writable<Record<GroupName, string>>(download_opts.default)
+    const selected = writable<Record<GroupName, string | null>>(
+        download_opts.default
+    )
 
     /**
      * 步骤
      */
     const steps: Map<GroupName, StepItem> = parsed_from_json()
 
-    selected.subscribe((new_val) => {
-        if (new_val === undefined) {
-            return
-        }
-        const result: Map<GroupName, string[]> = new Map()
+    /**
+     * 计算出应该被disable的项
+     */
+    function dete_disable_items(
+        cur_selected: Record<GroupName, string | null>
+    ): Map<GroupName, string[]> {
+        const result = new Map<GroupName, string[]>()
         for (const key of steps.keys()) {
-            // 如果有 requires, 确认其在 selected_values 中, 不然认为不可选中
             const disables: string[] = []
             steps.get(key)?.forEach((value, key) => {
-                if (dete_should_disable(new_val, value)) {
+                if (dete_should_disable(cur_selected, value)) {
                     disables.push(key)
                 }
             })
-            if (disables.length > 0) {
-                result.set(key, disables)
-            }
+            // 记录下来
+            result.set(key, disables)
         }
-        disable_items.set(result)
-    })
+        return result
+    }
 
     /**
      * 判断item是否应该被disable
      */
     function dete_should_disable(
-        cur_selected: Record<GroupName, string>,
+        cur_selected: Record<GroupName, string | null>,
         item: Item
     ): boolean {
         if (item.requires === undefined) {
@@ -84,7 +86,9 @@
         for (const require of requires) {
             // 分开每个and的依赖项
             const req_item = require.split('&')
-            const filted = req_item.filter((s) => values.includes(s))
+            const filted = req_item.filter((s) =>
+                values ? values.includes(s) : false
+            )
             if (filted.length === req_item.length) {
                 // 存在requires满足的情况
                 return false
@@ -110,11 +114,46 @@
     }
 
     /**
+     * 从step里面选一个default item, 并排除其在disables中的项
+     * 如果找不到会返回null
+     */
+    function get_default_item(
+        key: GroupName,
+        disables: Map<GroupName, string[]>
+    ): string | null {
+        const disable_items = disables.get(key) ?? []
+        for (const item_group of steps.get(key) ?? []) {
+            const fn = (s: string) => s === item_group[0]
+            if (disable_items.findIndex(fn) === -1) {
+                // 选择该项作为合理的项
+                return item_group[0]
+            }
+        }
+        return null
+    }
+
+    /**
      * 选中项改变
      */
     function on_change_select(arg: { value: string; group: string }) {
         const group = arg.group as GroupName
-        selected.update((last) => ({ ...last, [group]: arg.value }))
+        selected.update((last) => {
+            const new_val = { ...last, [group]: arg.value }
+            // 更新disable items
+            let disables = new Map<GroupName, string[]>()
+            // 保证当前select不是disable items
+            for (const key of steps.keys()) {
+                disables = dete_disable_items(new_val)
+                const disable_items = disables.get(key) ?? []
+                const in_newval = (s: string) => s === new_val[key] ?? false
+                if (disable_items.findIndex(in_newval) !== -1) {
+                    // 尝试选择一个合理的项
+                    new_val[key] = get_default_item(key, disables)
+                }
+            }
+            disable_items.set(disables)
+            return new_val
+        })
     }
 </script>
 
@@ -131,7 +170,7 @@
                     <RadioButtonGroup
                         group_name={step[0]}
                         items={step[1]}
-                        default_selected={$selected[step[0]]}
+                        default_selected={$selected[step[0]] ?? undefined}
                         diasble_items={$disable_items.get(step[0]) ?? []}
                         on:change={event_fun(on_change_select)}
                     />

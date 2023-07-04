@@ -15,6 +15,11 @@
     --odd-content-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
     --even-content-bg-color: #{$bg-color};
     --text-block-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
+    --radio-bg-color: #{mix($bg-color, #b2cca6, 70%)};
+    --radio-hover-bg-color: #95b188;
+    --radio-selected-bg-color: #b2cca6;
+    --radio-disable-color: #aaa;
+    --radio-disable-bg-color: #f8f9fa;
     --quote-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
     --quote-code-bg-color: #{mix(#f8f9fa, #a3a3a2, 80%)};
     --quote-caption-color: #{$text-color};
