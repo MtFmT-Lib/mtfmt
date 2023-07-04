@@ -23,12 +23,34 @@ theme_info.subscribe(val => {
 export type EditorWorkerMap = Map<string, () => Promise<Worker> | Worker>
 
 /**
+ * 语言支持
+ */
+export type EditorLanguageSupport = {
+    /**
+     * 语言支持信息
+     */
+    language: monaco.languages.ILanguageExtensionPoint,
+
+    /**
+     * Token
+     */
+    token_provider?: monaco.languages.IMonarchLanguage
+    | monaco.Thenable<monaco.languages.IMonarchLanguage>,
+
+    /**
+     * 自动完成
+     */
+    comp_provider?: monaco.languages.CompletionItemProvider
+}
+
+/**
  * 异步加载编辑器
  */
 export async function load_editor_module(
     div_element: HTMLDivElement,
     workers: EditorWorkerMap,
-    theme_info: ThemeInfo
+    theme_info: ThemeInfo,
+    languages?: EditorLanguageSupport[]
 ): Promise<void> {
     self.MonacoEnvironment = {
         getWorker: (workerId: string, label: string) => {
@@ -39,12 +61,35 @@ export async function load_editor_module(
         createTrustedTypesPolicy: undefined,
     }
     // 加载
-    const Monaco = await import('monaco-editor/esm/vs/editor/editor.api')
+    const monaco = await import('monaco-editor/esm/vs/editor/editor.api')
+    // 注册语言
+    if (languages) {
+        for (const language of languages) {
+            const language_id = language.language.id
+            // 注册语言
+            monaco.languages.register(language.language)
+            // token provider
+            if (language.token_provider) {
+                monaco.languages.setMonarchTokensProvider(
+                    language_id, language.token_provider
+                )
+            }
+            // 自动完成
+            if (language.comp_provider) {
+                monaco.languages.registerCompletionItemProvider(
+                    language_id, language.comp_provider
+                )
+            }
+        }
+    }
     // 创建元素
-    const editor = Monaco.editor.create(div_element, {
+    const editor = monaco.editor.create(div_element, {
         value: 'function x() {\n    console.log("Hello world!");\n}',
         language: 'javascript',
-        theme: get_monaco_theme_name(theme_info)
+        theme: get_monaco_theme_name(theme_info),
+        minimap: {
+            enabled: false
+        }
     })
     monaco_editor = editor
 }

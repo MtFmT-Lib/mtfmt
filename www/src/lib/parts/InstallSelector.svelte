@@ -64,7 +64,7 @@
         {/each}
         <li>
             <div class="finally-step-name">Download</div>
-            <div class="step-selector">TODO</div>
+            <div class="step-selector">{JSON.stringify($selected)}</div>
         </li>
     </ul>
 </div>
@@ -76,6 +76,8 @@
         font-family: $text-font-en;
         letter-spacing: 0.25px;
         line-height: 180%;
+        margin-top: 0;
+        margin-bottom: 2em;
     }
 
     .steps {
