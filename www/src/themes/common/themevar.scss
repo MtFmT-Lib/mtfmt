@@ -7,22 +7,28 @@
     --bg-color: #{$bg-color};
     --text-color: #{$text-color};
     --weak-color: #999;
-    --border-color: #{$border-color};
-    --border-color-middle: #{mix($border-color, black, 80%)};
-    --border-color-deep: #{mix($border-color, black, 50%)};
-    --footer-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
-    --footer-content-color: #666;
     --odd-content-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
     --even-content-bg-color: #{$bg-color};
     --text-block-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
+    --quote-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
+    --quote-code-bg-color: #{mix(#f8f9fa, #a3a3a2, 80%)};
+    --quote-caption-color: #{$text-color};
+
+    // 边框颜色
+    --border-color: #{$border-color};
+    --border-color-middle: #{mix($border-color, black, 80%)};
+    --border-color-deep: #{mix($border-color, black, 50%)};
+
+    // 页脚
+    --footer-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
+    --footer-content-color: #666;
+
+    // 单选按钮
     --radio-bg-color: #{mix($bg-color, #b2cca6, 70%)};
     --radio-hover-bg-color: #95b188;
     --radio-selected-bg-color: #b2cca6;
     --radio-disable-color: #aaa;
     --radio-disable-bg-color: #f8f9fa;
-    --quote-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
-    --quote-code-bg-color: #{mix(#f8f9fa, #a3a3a2, 80%)};
-    --quote-caption-color: #{$text-color};
 
     // 超链接
     --hpyer-link-color: #{$hpyer-link-color};
@@ -59,16 +65,27 @@
     --bg-color: #{$bg-color-dark};
     --text-color: #{invert($text-color)};
     --weak-color: #999;
-    --border-color: #{mix($bg-color-dark, $border-color, 75%)};
-    --border-color-deep: #{$table-border-color};
-    --footer-bg-color: #{mix($bg-color-dark, invert(#f8f9fa), 80%)};
-    --footer-content-color: #ccc;
     --odd-content-bg-color: #{mix($bg-color-dark, invert(#f8f9fa), 60%)};
     --even-content-bg-color: #{mix($bg-color-dark, invert(#f8f9fa), 80%)};
     --text-block-bg-color: #{mix($bg-color-dark, #f8f9fa, 90%)};
     --quote-bg-color: #{mix($bg-color-dark, #f8f9fa, 95%)};
     --quote-code-bg-color: #{mix($bg-color-dark, #f8f9fa, 85%)};
     --quote-caption-color: #{invert($text-color)};
+
+    // 边框颜色
+    --border-color: #{mix($bg-color-dark, $border-color, 75%)};
+    --border-color-deep: #{$table-border-color};
+
+    // 页脚
+    --footer-bg-color: #{mix($bg-color-dark, invert(#f8f9fa), 80%)};
+    --footer-content-color: #ccc;
+
+    // 单选按钮
+    --radio-bg-color: #{mix($bg-color-dark, #b2cca6, 95%)};
+    --radio-hover-bg-color: #555;
+    --radio-selected-bg-color: #444;
+    --radio-disable-color: #666;
+    --radio-disable-bg-color: #{mix($bg-color-dark, white, 95%)};
 
     // 超链接
     --hpyer-link-color: #{mix($hpyer-link-color, white, 80%)};
@@ -83,16 +100,27 @@
 [page-theme='warm'] {
     --weak-color: #888;
     --bg-color: #{$bg-color-warm};
-    --border-color: #{mix($bg-color-warm, $text-color, 50%)};
-    --border-color-deep: #{$table-border-color};
-    --footer-bg-color: #{$bg-color-warm};
-    --footer-content-color: #{$text-color};
     --odd-content-bg-color: #{mix($bg-color-warm,#b68d4c, 80%)};
     --even-content-bg-color: #{mix($bg-color-warm, #b68d4c, 100%)};
     --text-block-bg-color: #{mix($bg-color-warm, $text-color, 85%)};
     --quote-bg-color: #{mix($bg-color-warm, #f8f9fa, 95%)};
     --quote-code-bg-color: #{mix($bg-color-warm, $text-color, 92%)};
     --quote-caption-color: #{$text-color};
+
+    // 边框颜色
+    --border-color: #{mix($bg-color-warm, $text-color, 50%)};
+    --border-color-deep: #{$table-border-color};
+
+    // 页脚
+    --footer-bg-color: #{$bg-color-warm};
+    --footer-content-color: #{$text-color};
+
+    // 单选按钮
+    --radio-bg-color: #{mix($bg-color-warm, #deb068, 70%)};
+    --radio-hover-bg-color: #deb068;
+    --radio-selected-bg-color: #{mix($bg-color-warm, #deb068, 20%)};
+    --radio-disable-color: #aaa;
+    --radio-disable-bg-color: #{mix($bg-color-warm, #deb068, 85%)};
 
     // 按钮
     --button-hover-bg-color: #{mix($bg-color-warm, black, 90%)};
