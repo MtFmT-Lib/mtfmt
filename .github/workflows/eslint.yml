@@ -5,6 +5,7 @@ on:
     paths:
       - "www/**.ts"
       - "www/**.js"
+      - "www/**.svelte"
       - "www/.eslintrc.yml"
       - "www/.stylelintrc.json"
       - ".github/workflows/eslint.yml"
@@ -13,6 +14,7 @@ on:
     paths:
       - "www/**.ts"
       - "www/**.js"
+      - "www/**.svelte"
       - "www/.eslintrc.yml"
       - "www/.stylelintrc.json"
       - ".github/workflows/eslint.yml"
