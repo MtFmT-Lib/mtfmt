@@ -129,6 +129,12 @@
             }
         }
     },
+    "download": {
+        "typ-src": {
+            "type": "get",
+            "addr": "https://github.com/MtFmT-Lib/mtfmt/archive/refs/heads/master.zip"
+        }
+    },
     "default": {
         "prebuild": "typ-dylib",
         "OS": "os-win",
