@@ -34,8 +34,7 @@ export type EditorLanguageSupport = {
     /**
      * Token
      */
-    token_provider?: monaco.languages.IMonarchLanguage
-    | monaco.Thenable<monaco.languages.IMonarchLanguage>,
+    token_provider?: monaco.Thenable<monaco.languages.IMonarchLanguage>,
 
     /**
      * 自动完成
@@ -73,7 +72,7 @@ export async function load_editor_module(
             // token provider
             if (language.token_provider) {
                 monaco.languages.setMonarchTokensProvider(
-                    language_id, language.token_provider
+                    language_id, await language.token_provider
                 )
             }
             // 自动完成

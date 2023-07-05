@@ -88,7 +88,7 @@
                 />
             {/if}
             <label for={item[0]} title={item[1].title ?? item[1].display_name}>
-                {item[1].display_name}
+                <div>{item[1].display_name}</div>
             </label>
         </div>
     {/each}
@@ -98,8 +98,8 @@
     @import '@theme/stylevars.scss';
 
     .groups {
-        width: 100%;
-        height: 100%;
+        width: inherit;
+        height: inherit;
         gap: 0.25em;
         display: grid;
         align-items: baseline;
@@ -108,6 +108,13 @@
         grid-column-gap: 0.25em;
         grid-template-rows: 1fr auto;
         grid-template-columns: repeat(auto-fit, minmax(8.5em, 1fr));
+
+        @media screen and (width < $sm) {
+            align-items: stretch;
+            grid-row-gap: 0.25em;
+            grid-column-gap: 0.2em;
+            grid-template-columns: repeat(auto-fit, minmax(6.5em, 1fr));
+        }
     }
 
     .group-item {
@@ -118,13 +125,27 @@
         }
 
         label {
-            background-color: var(--radio-bg-color);
-            display: inline-block;
+            // 宽高
             width: 100%;
+            height: 100%;
+
+            // 颜色和断行
+            background-color: var(--radio-bg-color);
             box-sizing: border-box;
+            white-space: nowrap;
+
+            // 内容垂直居中
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            // 内边距
             padding-top: 0.5em;
             padding-bottom: 0.5em;
-            white-space: nowrap;
+
+            @media screen and (width < $sm) {
+                white-space: break-spaces;
+            }
         }
 
         input[type='radio']:disabled + label {

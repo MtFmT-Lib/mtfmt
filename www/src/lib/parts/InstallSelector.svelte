@@ -5,7 +5,7 @@
     import Caption from './Caption.svelte'
     import { curry_2 } from '$lib/fp/fun'
     import { apply_svelte } from '$lib/fp/apply'
-    import * as InstallText from '@text/install.md'
+    import * as InstallText from '@text/install.txt?raw'
     import RadioButtonGroup from '@comp/RadioButtonGroup.svelte'
     import { writable } from 'svelte/store'
     import { default_opts, steps } from './install_selector'
@@ -20,7 +20,9 @@
     /**
      * 不可使用的项
      */
-    const disable_items = writable<Map<string, string[]>>(new Map())
+    const disable_items = writable<Map<string, string[]>>(
+        generate_new_disable_items(default_opts)
+    )
 
     /**
      * 当前选中的值
@@ -45,7 +47,7 @@
 <div>
     <Caption caption_text="Download MtFmt" />
     <div class="install-hints">
-        {@html InstallText.html}
+        {@html InstallText.default}
     </div>
     <ul class="steps">
         {#each steps as step}

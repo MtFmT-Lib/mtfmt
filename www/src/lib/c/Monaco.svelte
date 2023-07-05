@@ -18,23 +18,26 @@
      */
     export let workers: MonacoWrap.EditorWorkerMap = new Map()
 
+    /**
+     * 默认显示的代码的语言
+     */
+    export let default_lang: string = 'cpp'
+
+    /**
+     * 默认显示的代码
+     */
+    export let default_code: string = ''
+
     onMount(async () =>
         MonacoWrap.load_editor_module(
             div_element,
             workers,
             $theme_info,
-            'fmt-c',
-            [
-                '#include <stdio.h>',
-                '',
-                'int main(void) {',
-                '    puts("Hello, World");',
-                '    return 0;',
-                '}',
-            ].join('\n'),
+            default_lang,
+            default_code,
             [
                 {
-                    language: { id: 'fmt-c' },
+                    language: { id: 'cpp' },
                     token_provider: LSP.token_provider,
                 },
             ]
