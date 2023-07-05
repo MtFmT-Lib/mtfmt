@@ -50,6 +50,8 @@ export async function load_editor_module(
     div_element: HTMLDivElement,
     workers: EditorWorkerMap,
     theme_info: ThemeInfo,
+    lang?: string,
+    content?: string,
     languages?: EditorLanguageSupport[]
 ): Promise<void> {
     self.MonacoEnvironment = {
@@ -84,8 +86,8 @@ export async function load_editor_module(
     }
     // 创建元素
     const editor = monaco.editor.create(div_element, {
-        value: 'function x() {\n    console.log("Hello world!");\n}',
-        language: 'javascript',
+        value: content ?? '',
+        language: lang ?? '',
         theme: get_monaco_theme_name(theme_info),
         minimap: {
             enabled: false

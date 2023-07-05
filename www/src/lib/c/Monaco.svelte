@@ -6,6 +6,7 @@
     import { onMount, onDestroy } from 'svelte'
     import theme_info from './theme_storager'
     import * as MonacoWrap from './monaco_wrap'
+    import * as LSP from '$lib/lsp'
 
     /**
      * 编辑器的div
@@ -18,7 +19,26 @@
     export let workers: MonacoWrap.EditorWorkerMap = new Map()
 
     onMount(async () =>
-        MonacoWrap.load_editor_module(div_element, workers, $theme_info)
+        MonacoWrap.load_editor_module(
+            div_element,
+            workers,
+            $theme_info,
+            'fmt-c',
+            [
+                '#include <stdio.h>',
+                '',
+                'int main(void) {',
+                '    puts("Hello, World");',
+                '    return 0;',
+                '}',
+            ].join('\n'),
+            [
+                {
+                    language: { id: 'fmt-c' },
+                    token_provider: LSP.token_provider,
+                },
+            ]
+        )
     )
 
     onDestroy(MonacoWrap.destroy_instance)
