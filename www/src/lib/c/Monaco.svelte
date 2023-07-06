@@ -21,12 +21,12 @@
     /**
      * 默认显示的代码的语言
      */
-    export let default_lang: string = 'cpp'
+    export let default_lang = 'cpp'
 
     /**
      * 默认显示的代码
      */
-    export let default_code: string = ''
+    export let default_code = ''
 
     onMount(async () =>
         MonacoWrap.load_editor_module(
