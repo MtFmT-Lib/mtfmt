@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: LGPL-3.0
 import download_opts from '@text/download.json'
+import { record_to_map } from '$lib/fp/cast'
+import type { GroupItem } from '@comp/radio_button_group'
 
 /**
  * 分的group name
  */
-export type GroupName = 'prebuild' | 'OS'
+export type GroupName = string
 
 /**
  * 选中的Group类型
@@ -14,10 +16,7 @@ export type SelectedGroup = Record<GroupName, string | null>
 /**
  * 每个group的项的type
  */
-export type Item = {
-    display_name: string
-    title?: string
-} & { requires?: string[] }
+export type Item = GroupItem & { requires?: string[] }
 
 /**
  * 步骤的type
@@ -125,14 +124,8 @@ function dete_should_disable(
  * 从json生成选中项
  */
 function parsed_from_json(): Map<GroupName, StepItem> {
-    const opts = download_opts.opts
-    const result = new Map<GroupName, StepItem>()
-    for (const values of Object.entries(opts)) {
-        const item_map = new Map<string, Item>()
-        for (const items of Object.entries(values[1])) {
-            item_map.set(items[0], items[1])
-        }
-        result.set(values[0] as GroupName, item_map)
-    }
-    return result
+    return record_to_map(
+        download_opts.opts,
+        s => record_to_map<string, Item>(s, r => r)
+    )
 }

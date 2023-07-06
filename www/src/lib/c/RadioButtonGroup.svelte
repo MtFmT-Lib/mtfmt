@@ -3,17 +3,7 @@
 -->
 <script lang="ts">
     import { createEventDispatcher } from 'svelte'
-
-    /**
-     * 项的类型
-     */
-    type GroupItems = Map<
-        string,
-        {
-            display_name: string
-            title?: string
-        }
-    >
+    import type { GroupItems } from './radio_button_group'
 
     /**
      * 事件类型

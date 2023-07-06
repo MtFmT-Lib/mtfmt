@@ -4,21 +4,66 @@
 <script lang="ts">
     import Header from '@part/Header.svelte'
     import Footer from '@part/Footer.svelte'
+    import Caption from '@part/Caption.svelte'
+    import TransText from '@part/TransText.svelte'
     import OnlineDemo from '@part/OnlineDemo.svelte'
+    import SeealsoJSON from '@text/seealso.json'
+    import FeaturesJSON from '@text/features.json'
+    import { record_to_map } from '$lib/fp/cast'
+    import * as BriefText from '@text/brief.txt?raw'
+    import FeaturesBlock from '@part/FeaturesBlock.svelte'
     import InstallSelector from '@part/InstallSelector.svelte'
+    import type { ItemContent } from '@part/features_block'
+
+    /**
+     * features
+     */
+    const feature_item = record_to_map<string, ItemContent>(
+        FeaturesJSON,
+        (s) => s
+    )
+
+    /**
+     * see also
+     */
+    const seealso_item = record_to_map<string, ItemContent>(
+        SeealsoJSON,
+        (s) => s
+    )
 </script>
 
 <div class="container">
     <Header />
-    <div class="top">TODO</div>
+    <div class="top">
+        <div class="top-inner">
+            <div class="top-logo">
+                <TransText text="MtFmt" />
+            </div>
+            <div class="top-brief">
+                {@html BriefText.default}
+            </div>
+        </div>
+    </div>
     <div class="content-box-odd">
         <div class="contents">
-            <OnlineDemo />
+            <Caption caption_text="features" />
+            <FeaturesBlock items={feature_item} />
         </div>
     </div>
     <div class="content-box">
         <div class="contents">
+            <OnlineDemo />
+        </div>
+    </div>
+    <div class="content-box-odd">
+        <div class="contents">
             <InstallSelector />
+        </div>
+    </div>
+    <div class="content-box">
+        <div class="contents">
+            <Caption caption_text="see also" />
+            <FeaturesBlock items={seealso_item} />
         </div>
     </div>
     <Footer />
@@ -47,11 +92,25 @@
     }
 
     .top {
-        width: 100%;
         height: 80%;
         display: flex;
+        margin: 0 auto;
         align-items: center;
         justify-content: center;
+    }
+
+    .top-inner {
+        text-align: center;
+    }
+
+    .top-logo {
+        font-size: 250%;
+        letter-spacing: 0.5px;
+        font-weight: var(--caption-text-weight);
+    }
+
+    .top-brief {
+        font-size: 150%;
     }
 
     .content-box,

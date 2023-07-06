@@ -25,3 +25,17 @@ export function into_boolean<T>(v: T): boolean {
         throw new IntoConvertError('Unsupport value type: ' + typeof (v))
     }
 }
+
+/**
+ * Record<K, V>转为Map<K, V>
+ */
+export function record_to_map<K extends string, V, R = V>(
+    record: Record<K, V>, map_to: (v: V) => R
+): Map<K, R> {
+    const vals = Object.entries<V>(record)
+    const map = new Map<K, R>()
+    for (const val of vals) {
+        map.set(val[0] as K, map_to(val[1]))
+    }
+    return map
+}
