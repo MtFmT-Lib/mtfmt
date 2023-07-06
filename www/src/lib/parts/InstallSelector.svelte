@@ -103,8 +103,9 @@
     .finally-step-name,
     .step-name {
         padding: 0.5em 1.5em;
-        flex-basis: 8vw;
+        flex: 0 0 4em;
         text-transform: capitalize;
+        overflow: hidden;
     }
 
     .step-name {

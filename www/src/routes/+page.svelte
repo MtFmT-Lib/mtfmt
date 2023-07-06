@@ -97,6 +97,10 @@
         margin: 0 auto;
         align-items: center;
         justify-content: center;
+
+        @media screen and (width < $sm) {
+            height: 40%;
+        }
     }
 
     .top-inner {
@@ -107,10 +111,18 @@
         font-size: 250%;
         letter-spacing: 0.5px;
         font-weight: var(--caption-text-weight);
+
+        @media screen and (width < $sm) {
+            font-size: 225%;
+        }
     }
 
     .top-brief {
         font-size: 150%;
+
+        @media screen and (width < $sm) {
+            font-size: 125%;
+        }
     }
 
     .content-box,

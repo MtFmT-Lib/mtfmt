@@ -75,6 +75,10 @@
         grid-column-gap: 0.25em;
         grid-template-rows: 1fr 1fr;
         grid-template-columns: 1fr 1fr 1fr;
+
+        @media screen and (width < $sm) {
+            grid-template-columns: 1fr 1fr;
+        }
     }
 
     .section {

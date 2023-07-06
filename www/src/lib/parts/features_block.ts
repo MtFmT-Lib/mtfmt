@@ -5,7 +5,7 @@
 export type ItemDetails = {
     type: string
     value: string
-    attach?: string
+    text?: string
 }
 
 /**

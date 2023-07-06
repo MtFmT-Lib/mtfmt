@@ -37,6 +37,7 @@
 
     // 按钮
     --button-color: #{$button-color};
+    --button-bg-color: #{mix($bg-color, #f8f9fa, 20%)};
     --button-hover-bg-color: #{mix($bg-color, $text-color, 80%)};
     --button-actived-bg-color: #{mix($bg-color, $text-color, 75%)};
 

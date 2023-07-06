@@ -1,6 +1,48 @@
 {
-    "C99 support": {
-        "brief": "TODO C99",
+    "Fixed-point supports": {
+        "brief": "The library implementation q_1 to q_31 fixed-point number formatting.",
+        "details": {
+            "type": "expand",
+            "value": "TODO"
+        }
+    },
+    "No divider operator": {
+        "brief": "The implementation was not required hardware divide operator.",
+        "details": {
+            "type": "expand",
+            "value": "TODO"
+        }
+    },
+    "UTF-8 supports": {
+        "brief": "The string support UTF-8 encoding.",
+        "details": {
+            "type": "expand",
+            "value": "TODO"
+        }
+    },
+    "Array formtting": {
+        "brief": "The library provides array formatting.",
+        "details": {
+            "type": "expand",
+            "value": "TODO"
+        }
+    },
+    "Chrono formatting": {
+        "brief": "The library provides RTC time formatting.",
+        "details": {
+            "type": "expand",
+            "value": "TODO"
+        }
+    },
+    "String operators": {
+        "brief": "The library provides few string operators include append, replace, search, etc.",
+        "details": {
+            "type": "expand",
+            "value": "TODO"
+        }
+    },
+    "Build-in heap manager": {
+        "brief": "The library provides an optional build-in heap manager for embed system.",
         "details": {
             "type": "expand",
             "value": "TODO"
