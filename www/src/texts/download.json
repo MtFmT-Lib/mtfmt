@@ -129,12 +129,18 @@
             }
         }
     },
-    "download": {
-        "typ-src": {
-            "type": "get",
+    "download": [
+        {
+            "cond": "typ-src",
+            "type": "hyper",
             "addr": "https://github.com/MtFmT-Lib/mtfmt/archive/refs/heads/master.zip"
+        },
+        {
+            "cond": "typ-wasm&os-none&cpu-wasm",
+            "type": "artifact",
+            "addr": "build-wasm.yml"
         }
-    },
+    ],
     "default": {
         "prebuild": "typ-dylib",
         "OS": "os-win",

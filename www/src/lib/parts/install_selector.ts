@@ -74,6 +74,33 @@ export function generate_new_disable_items(
 }
 
 /**
+ * 取得下载配置
+ */
+export function get_download_configure(
+    cur_selected: Record<GroupName, string | null>
+): Record<'addr' | 'type', string> | null {
+    const downloads = download_opts.download
+    const values = Object.values(cur_selected)
+        .filter(s => s !== null)
+        .map(s => s as string)
+    // 找到每个项在当前选中项中的匹配个数
+    const download_matchs = downloads.flatMap((s, org_idx) => {
+        const conds = s.cond.split('&')
+        const filter_res = conds.filter(v => {
+            const idx = values.findIndex(f => f === v)
+            return idx !== -1
+        })
+        return { origin_index: org_idx, count: filter_res.length }
+    })
+    // 找到最佳匹配(即count最大的那个)
+    const best_matched = download_matchs.reduce(
+        (pre_val, cur_val) => pre_val.count > cur_val.count ? pre_val : cur_val,
+        download_matchs[0]
+    )
+    return best_matched.count > 0 ? downloads[best_matched.origin_index] : null
+}
+
+/**
  * 计算出应该被disable的项
  */
 function dete_disable_items(

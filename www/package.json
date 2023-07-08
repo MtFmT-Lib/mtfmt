@@ -45,6 +45,7 @@
     },
     "type": "module",
     "dependencies": {
+        "axios": "^1.4.0",
         "monaco-editor": "^0.39.0"
     }
 }

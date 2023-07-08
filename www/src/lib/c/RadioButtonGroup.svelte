@@ -120,7 +120,7 @@
             height: 100%;
 
             // 颜色和断行
-            background-color: var(--radio-bg-color);
+            background-color: var(--button2-bg-color);
             box-sizing: border-box;
             white-space: nowrap;
 
@@ -133,22 +133,25 @@
             padding-top: 0.5em;
             padding-bottom: 0.5em;
 
+            // 边缘的圆角
+            border-radius: 2px;
+
             @media screen and (width < $sm) {
                 white-space: break-spaces;
             }
         }
 
         input[type='radio']:disabled + label {
-            color: var(--radio-disable-color);
-            background-color: var(--radio-disable-bg-color);
+            color: var(--button2-disable-color);
+            background-color: var(--button2-disable-bg-color);
         }
 
         input[type='radio'].radio:checked + label {
-            background-color: var(--radio-selected-bg-color);
+            background-color: var(--button2-selected-bg-color);
         }
 
         input[type='radio'].radio:hover + label {
-            background-color: var(--radio-hover-bg-color);
+            background-color: var(--button2-hover-bg-color);
         }
     }
 </style>

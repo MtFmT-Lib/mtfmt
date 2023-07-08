@@ -2,8 +2,10 @@
 #  SPDX-License-Identifier: LGPL-3.0
 -->
 <script lang="ts">
+    import * as API from '$lib/github_api'
     import Caption from './Caption.svelte'
     import { curry_2 } from '$lib/fp/fun'
+    import Button from '@comp/Button.svelte'
     import { apply_svelte } from '$lib/fp/apply'
     import * as InstallText from '@text/install.txt?raw'
     import RadioButtonGroup from '@comp/RadioButtonGroup.svelte'
@@ -11,6 +13,7 @@
     import { default_opts, steps } from './install_selector'
     import { generate_new_disable_items } from './install_selector'
     import type { GroupName, SelectedGroup } from './install_selector'
+    import { get_download_configure } from './install_selector'
 
     /**
      * apply函数
@@ -42,6 +45,37 @@
             return new_val
         })
     }
+
+    /**
+     * 请求下载文件
+     */
+    function request_download_file() {
+        // 取得下载配置
+        const cfg = get_download_configure($selected)
+        if (cfg !== null) {
+            // 找到了合适的情况
+            if (cfg.type === 'hyper') {
+                // 超链接
+                const addr = cfg.addr
+                console.log(addr)
+            } else if (cfg.type === 'artifact') {
+                // github action存档
+                const file = cfg.addr
+                API.get_workflows_status(file)
+                    .then((res) => {
+                        console.log(res)
+                        return API.get_workflows_runs_artifacts(
+                            res.workflow_runs[0].id
+                        )
+                    })
+                    .then((res) => {
+                        console.log(res)
+                    })
+            }
+        } else {
+            // TODO 没有找到
+        }
+    }
 </script>
 
 <div>
@@ -66,7 +100,11 @@
         {/each}
         <li>
             <div class="finally-step-name">Download</div>
-            <div class="step-selector">{JSON.stringify($selected)}</div>
+            <div class="step-selector">
+                <Button on:click={request_download_file}>
+                    {JSON.stringify($selected)}
+                </Button>
+            </div>
         </li>
     </ul>
 </div>
@@ -93,7 +131,7 @@
             display: flex;
             flex-wrap: nowrap;
             flex-direction: row;
-            align-items: stretch;
+            align-items: baseline;
             justify-content: flex-start;
             margin-top: 0.5em;
             margin-bottom: 0.5em;
