@@ -12,7 +12,6 @@
     import { record_to_map } from '$lib/fp/cast'
     import * as BriefText from '@text/brief.txt?raw'
     import FeaturesBlock from '@part/FeaturesBlock.svelte'
-    import InstallSelector from '@part/InstallSelector.svelte'
     import type { ItemContent } from '@part/features_block'
 
     /**
@@ -51,11 +50,6 @@
         </div>
     </div>
     <div class="content-box">
-        <div class="contents">
-            <OnlineDemo />
-        </div>
-    </div>
-    <div class="content-box-odd">
         <div class="contents">
             <Caption caption_text="see also" />
             <FeaturesBlock items={seealso_item} />
