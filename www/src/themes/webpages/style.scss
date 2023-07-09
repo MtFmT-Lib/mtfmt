@@ -14,47 +14,33 @@ body {
     background-color: var(--bg-color);
 }
 
+// 动画
+a,
+button,
+select,
+option,
+input[type='radio']+label {
+    transition: color 0.4s, background-color 0.4s, transform 0.4s;
+    transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
 // a, button,select样式
 a,
 button,
 select,
 option {
     color: var(--hpyer-link-color);
-    transition: color 0.2s, background-color 0.1s, transform 0.25s;
-    transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--hpyer-link-color-hover);
 }
 
 // bio reading 加粗的内容
 .bio-reading-bold {
     color: var(--text-color);
-}
-
-// 页面内容
-.content-page {
-    border-radius: 2px;
-    border: 1px solid var(--border-color);
-    max-width: 800px;
-    width: 80%;
-    margin: 0 auto;
-    margin-top: 3em;
-    margin-bottom: 3em;
-    padding: 1em;
-}
-
-@media screen and (width < 720px) {
-    .content-page {
-        width: 90%;
-    }
-}
-
-@media screen and (width < 640px) {
-    .content-page {
-        width: initial;
-        border-left: none;
-        border-right: none;
-        border-radius: 0;
-        padding: 0;
-        margin-left: 1em;
-        margin-right: 1em;
-    }
 }

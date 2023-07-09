@@ -51,21 +51,37 @@ export function get_support_languages(build_in: BuildinContent): Language[] {
  */
 export function get_build_in_html(language: BuildinLanguageKey, build_in: BuildinContent): string {
     const content = build_in[language]
-    return generate_toc(content.html, content.toc)
+    return generate_toc(content.html, content.toc)[1]
+}
+
+/**
+ * 取得内建的目录内容
+ */
+export function get_build_in_toc(language: BuildinLanguageKey, build_in: BuildinContent): string {
+    const content = build_in[language]
+    return generate_toc(content.html, content.toc)[0]
 }
 
 /**
  * 取得翻译出来的html
  */
-export default function get_content_html(result: Writable<string>, language: LanguageKey, build_in: BuildinContent) {
+export default function get_html(
+    result: Writable<string>,
+    toc_result: Writable<string>,
+    language: LanguageKey,
+    build_in: BuildinContent
+) {
     const keys = [...Object.keys(build_in)]
     if (keys.findIndex(s => s === language) != -1) {
         const html = get_build_in_html(language as BuildinLanguageKey, build_in)
         result.set(html)
+        const toc = get_build_in_toc(language as BuildinLanguageKey, build_in)
+        toc_result.set(toc)
     }
     else {
         // 不可达branch
         result.set('The language is not supported.')
+        toc_result.set('')
     }
 }
 

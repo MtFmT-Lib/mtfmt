@@ -6,16 +6,16 @@
 export default function generate_toc(
     html_raw: string,
     toc: { level: string; content: string }[]
-): string {
+): [string, string] {
     const len = '<p>[toc]</p>'.length
     const pos = html_raw.search(/(<p>\[(toc)|(TOC)\]<\/p>)/g)
     if (pos == -1) {
-        return html_raw
+        return ['', html_raw]
     } else {
         const part1 = html_raw.slice(0, pos)
         const part2 = html_raw.slice(pos + len)
         const toc_html = generate_toc_helper(toc)
-        return part1 + toc_html + part2
+        return [toc_html, part1 + part2]
     }
 }
 

@@ -4,6 +4,25 @@
 
 // SPDX-License-Identifier: LGPL-3.0
 
+.markdown-index {
+    .toc-tree {
+        margin: 0;
+        padding: 0;
+        padding-left: 1.25em;
+        list-style: none;
+        font-family: var(--caption-font);
+
+        .toc-tree {
+            padding-left: 1em;
+        }
+    }
+
+    .toc-level1-content {
+        font-weight: var(--caption-text-weight);
+        letter-spacing: 0.5px;
+    }
+}
+
 .markdown-box {
     font-size: var(--text-font-size);
     font-family: var(--text-font);
@@ -104,12 +123,6 @@
     }
 
     a {
-        text-decoration: none;
-
-        &:hover {
-            color: var(--hpyer-link-color-hover);
-        }
-
         .bio-reading-bold {
             color: inherit;
         }
@@ -164,27 +177,6 @@
         }
     }
 
-    // 目录
-    .toc-tree {
-        padding: 0;
-        padding-left: 2em;
-        list-style: none;
-        font-family: var(--caption-font);
-
-        .toc-tree {
-            padding-left: 1.5em;
-        }
-    }
-
-    .toc-hyper-link:hover {
-        color: var(--hpyer-link-color-hover);
-    }
-
-    .toc-level1-content {
-        font-weight: var(--caption-text-weight);
-        letter-spacing: 0.5px;
-    }
-
     // 图注
     .img-caption {
         display: block;
@@ -223,12 +215,12 @@
         th {
             text-align: center;
             font-weight: var(--text-bold-weight);
-            border-top: 2px solid var(--table-border-color);
-            border-bottom: 1px solid var(--table-border-color);
+            border-top: 2px solid var(--border-color-deep);
+            border-bottom: 1px solid var(--border-color-deep);
         }
 
         tr:last-child td {
-            border-bottom: 2px solid var(--table-border-color);
+            border-bottom: 2px solid var(--border-color-deep);
         }
     }
 
@@ -252,14 +244,14 @@
     }
 }
 
-@media screen and (width < 1280px) {
+@media screen and (width < $xl) {
     .markdown-box table {
         padding-left: 3em;
         padding-right: 3em;
     }
 }
 
-@media screen and (width < 720px) {
+@media screen and (width < $md) {
     .markdown-box {
         table {
             padding-left: 1em;

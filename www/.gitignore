@@ -32,4 +32,5 @@ node_modules
 !*.webp
 !*.gif
 !*.png
+!*.txt
 
