@@ -57,11 +57,6 @@
     </div>
     <div class="content-box-odd">
         <div class="contents">
-            <InstallSelector />
-        </div>
-    </div>
-    <div class="content-box">
-        <div class="contents">
             <Caption caption_text="see also" />
             <FeaturesBlock items={seealso_item} />
         </div>
@@ -83,6 +78,10 @@
         left: 0;
         right: 0;
         bottom: 0;
+
+        // 祈愿可以让width, height按照屏幕大小计算
+        // 并且允许内容溢出
+        overflow: visible;
     }
 
     .contents {

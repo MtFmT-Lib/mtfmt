@@ -24,6 +24,34 @@ export type Item = GroupItem & { requires?: string[] }
 export type StepItem = Map<string, Item>
 
 /**
+ * 下载的类型
+ */
+export type DownloadInfoType = 'hyper' | 'artifact'
+
+/**
+ * 构建配置信息
+ */
+export type BuildConfigure = {
+    malloc: boolean,
+    hardware_div: boolean,
+    std_io: boolean,
+    align: number,
+    fp16: boolean,
+    fp32: boolean,
+    fp64: boolean
+}
+
+/**
+ * 下载的信息
+ */
+export type DownloadInfo = {
+    type: DownloadInfoType
+    addr: string
+    file?: string
+    build?: BuildConfigure
+}
+
+/**
  * 步骤
  */
 export const steps: Map<GroupName, StepItem> = parsed_from_json()
@@ -78,8 +106,11 @@ export function generate_new_disable_items(
  */
 export function get_download_configure(
     cur_selected: Record<GroupName, string | null>
-): Record<'addr' | 'type', string> | null {
-    const downloads = download_opts.download
+): DownloadInfo | null {
+    const downloads = download_opts.download.map(s => {
+        const typ = s.type as unknown as DownloadInfoType
+        return { ...s, type: typ }
+    })
     const values = Object.values(cur_selected)
         .filter(s => s !== null)
         .map(s => s as string)
@@ -90,14 +121,16 @@ export function get_download_configure(
             const idx = values.findIndex(f => f === v)
             return idx !== -1
         })
-        return { origin_index: org_idx, count: filter_res.length }
+        return {
+            origin_index: org_idx,
+            diff: Math.abs(filter_res.length - conds.length)
+        }
     })
-    // 找到最佳匹配(即count最大的那个)
-    const best_matched = download_matchs.reduce(
-        (pre_val, cur_val) => pre_val.count > cur_val.count ? pre_val : cur_val,
-        download_matchs[0]
-    )
-    return best_matched.count > 0 ? downloads[best_matched.origin_index] : null
+    // 找到最佳匹配(即diff是0的那个)
+    const best_matches = download_matchs.filter(s => s.diff === 0)
+    return best_matches.length > 0
+        ? downloads[best_matches[0].origin_index]
+        : null
 }
 
 /**

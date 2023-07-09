@@ -138,12 +138,52 @@
         {
             "cond": "typ-wasm&os-none&cpu-wasm",
             "type": "artifact",
-            "addr": "build-wasm.yml"
+            "addr": "build-wasm.yml",
+            "build": {
+                "utf-8": true,
+                "malloc": true,
+                "hardware_div": false,
+                "std_io": false,
+                "align": 4,
+                "fp16": false,
+                "fp32": false,
+                "fp64": false
+            }
+        },
+        {
+            "cond": "typ-cmsis-pack&os-none",
+            "type": "artifact",
+            "addr": "cmsis-pack.yml"
+        },
+        {
+            "cond": "typ-lib&os-none&cpu-cortex-m3",
+            "type": "artifact",
+            "addr": "build-staticlib.yml",
+            "file": "gcc-lib-m3",
+            "build": {
+                "malloc": false,
+                "hardware_div": true,
+                "std_io": false,
+                "align": 4,
+                "fp16": false,
+                "fp32": false,
+                "fp64": false
+            }
         }
     ],
     "default": {
         "prebuild": "typ-dylib",
         "OS": "os-win",
         "ISA/CPU": "cpu-x86"
+    },
+    "configure": {
+        "utf-8": "_MSTR_USE_UTF_8",
+        "malloc": "_MSTR_USE_MALLOC",
+        "hardware_div": "_MSTR_USE_HARDWARE_DIV",
+        "std_io": "_MSTR_USE_STD_IO",
+        "align": "_MSTR_RUNTIME_HEAP_ALIGN",
+        "fp16": "_MSTR_USE_FP_FLOAT16",
+        "fp32": "_MSTR_USE_FP_FLOAT32",
+        "fp64": "_MSTR_USE_FP_FLOAT64"
     }
 }

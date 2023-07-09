@@ -36,11 +36,15 @@ export type WorkflowStatus = {
  *      ?apiVersion=2022-11-28#list-workflow-run-artifacts
  */
 export type WorkflowRunsArtifacts = {
-    id: number,
-    name: string,
-    archive_download_url: string,
-    created_at: string,
-    expires_at: string
+    total_count: number,
+    artifacts: {
+        id: number,
+        name: string,
+        archive_download_url: string,
+        created_at: string,
+        expires_at: string,
+        expired: boolean
+    }[]
 }
 
 /**

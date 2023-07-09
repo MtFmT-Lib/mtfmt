@@ -1,4 +1,5 @@
 {
     "action-template": "https://api.github.com/repos/MtFmT-Lib/mtfmt/actions/workflows/$workflows$/runs?per_page=24&branch=master&status=success",
-    "artifact-template": "https://api.github.com/repos/MtFmT-Lib/mtfmt/actions/runs/$runs_id$/artifacts?per_page=24"
+    "artifact-template": "https://api.github.com/repos/MtFmT-Lib/mtfmt/actions/runs/$runs_id$/artifacts?per_page=24",
+    "workflow_base_url": "https://github.com/MtFmT-Lib/mtfmt/actions/workflows"
 }
