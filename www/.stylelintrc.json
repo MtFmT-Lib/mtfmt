@@ -1,9 +1,0 @@
-{
-    "extends": "stylelint-config-standard-scss",
-    "rules": {
-        "selector-id-pattern": null,
-        "selector-class-pattern": null,
-        "color-function-notation": null,
-        "scss/no-global-function-names": null
-    }
-}
