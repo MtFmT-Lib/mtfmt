@@ -1,0 +1,16 @@
+*
+!*/
+
+.idea
+.pyenv
+.vscode
+lib
+pack
+build
+target
+target_package
+target_coverage
+cmake-build-debug
+
+!*.scss
+!.gitignore

@@ -1,4 +1,4 @@
-name: Document
+name: Doxygen
 
 on:
   push:
@@ -62,9 +62,9 @@ jobs:
       - name: Doxygen scss compile
         uses: gha-utilities/sass-build@v0.5.1
         with:
-          source: "./www/src/themes/doxygen/css/style.scss"
-          destination: "./www/src/themes/doxygen/html/style.css"
-          includePaths: "./www/src/themes/doxygen/:./www/src/themes/common/"
+          source: "./support/themes/doxygen/css/style.scss"
+          destination: "./support/themes/doxygen/html/style.css"
+          includePaths: "./support/themes/doxygen/:./support/themes/common/"
           outputStyle: compressed
       # Doxygen
       - name: Doxygen
@@ -72,41 +72,19 @@ jobs:
         with:
           working-directory: "./"
           doxyfile-path: "support/Doxyfile"
-      # WASM
-      - name: Setup emsdk
-        uses: mymindstorm/setup-emsdk@v12
-      - name: WASM build
-        working-directory: "./www/wasm"
-        run: |
-          emmake make
-      # 网页
-      - name: Yarn
-        working-directory: "./www"
-        run: |
-          yarn install
-          yarn build
-      # 移除node module
-      - name: Remove node module
-        run: |
-          rm -rf www/node_modules
-      # 把文件移动到_site
-      - name: Move outputs
-        run: |
-          mkdir _site
-          mv www/dist/* _site
       # 打包
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
 
-  # 进行部署 (仅master branch)
-  deploy:
-    if: github.ref == 'refs/heads/master'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: [build]
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
+# 进行部署 (仅master branch)
+#   deploy:
+#     if: github.ref == 'refs/heads/master'
+#     environment:
+#       name: github-pages
+#       url: ${{ steps.deployment.outputs.page_url }}
+#     runs-on: ubuntu-latest
+#     needs: [build]
+#     steps:
+#       - name: Deploy to GitHub Pages
+#         id: deployment
+#         uses: actions/deploy-pages@v2

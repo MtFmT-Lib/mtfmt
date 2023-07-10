@@ -1,0 +1,59 @@
+// SPDX-License-Identifier: AGPL-3.0
+$bg-color: #fff;
+$bg-color-dark: #2d3138;
+$bg-color-warm: #f1e3d3;
+
+// 跨儿旗
+$transflag-blue: #5bcefa;
+$transflag-white: #f0f0f0;
+$transflag-pink: #f6a8b8;
+$transflag-gray: #ccc;
+
+// 尺寸范围
+$xs: 520px;
+$sm: 640px;
+$md: 768px;
+$lg: 1024px;
+$xl: 1280px;
+
+// 内容的最大宽度
+$header-max-width: 1280px;
+$content-max-width: 1280px;
+$content-toc-max-width: 360px;
+$content-text-max-width: $content-max-width - $content-toc-max-width;
+$footer-max-width: 1280px;
+
+// 边框颜色
+$border-color: #f0f0f0;
+
+// 表格边框颜色
+$table-border-color: #666;
+
+// 超链接颜色
+$hpyer-link-color: #198619;
+
+// 按钮颜色
+$button-color: #198619;
+$button-bg-color: $bg-color;
+
+// 中文字体
+$text-font-zh: "TIBch", "Diatype T", "Segoe UI", "Helvetica Neue",
+    arial, "Hiragino Sans GB", "PingFang SC", "Heiti SC", "Noto Sans CJK SC",
+    "Source Han Sans SC", "Microsoft YaHei UI", "Microsoft YaHei";
+
+// 西文字体
+$text-font-en: "Overpass", -apple-system,
+    blinkmacsystemfont, "Segoe UI", roboto, oxygen,
+    ubuntu, cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+
+// 代码块的等宽字符
+$mono-text-font: 'Cascadia Mono', 'Consolas', 'Courier New', monospace;
+
+// 内联代码块的字体(en)
+$inline-code-text-font-en: 'Consolas', 'Courier New', monospace;
+
+// 内联代码块的字体(zh)
+$inline-code-text-font-zh: $inline-code-text-font-en;
+
+// 文本颜色
+$text-color: #4f4f4f;
