@@ -7,32 +7,16 @@ on:
       - "src/**.c"
       - "inc/**.h"
       - "inc/**.hpp"
-      - ".github/workflows/document.yml"
-      - "www/**.ts"
-      - "www/**.js"
-      - "www/**.md"
-      - "www/**.svg"
-      - "www/**.html"
-      - "www/**.scss"
-      - "www/**.svelte"
-      - "www/wasm/**"
-      - "www/package.json"
+      - "support/Doxygen"
+      - ".github/workflows/doxygen.yml"
   pull_request:
     branches: [master]
     paths:
       - "src/**.c"
       - "inc/**.h"
       - "inc/**.hpp"
-      - ".github/workflows/document.yml"
-      - "www/**.ts"
-      - "www/**.js"
-      - "www/**.md"
-      - "www/**.svg"
-      - "www/**.html"
-      - "www/**.scss"
-      - "www/**.svelte"
-      - "www/wasm/**"
-      - "www/package.json"
+      - "support/Doxygen"
+      - ".github/workflows/doxygen.yml"
   workflow_dispatch:
     inputs:
       logLevel:
