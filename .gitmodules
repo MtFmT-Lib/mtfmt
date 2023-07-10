@@ -1,3 +1,6 @@
 [submodule "thirds/unity"]
 	path = thirds/unity
 	url = https://github.com/ThrowTheSwitch/Unity.git
+[submodule "thirds/zipack"]
+	path = thirds/zipack
+	url = https://github.com/MtFmT-Lib/zipack.git
