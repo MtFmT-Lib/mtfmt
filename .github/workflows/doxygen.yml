@@ -56,10 +56,6 @@ jobs:
         with:
           working-directory: "./"
           doxyfile-path: "support/Doxyfile"
-      # index.html
-      - name: Gnerate root html
-        run: |
-          sudo echo 'The root page is NOT available. View the <a href="/">mtfmt.cc</a>' > _site/index.html
       # 打包
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
