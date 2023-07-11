@@ -97,7 +97,11 @@ int main()
     RUN_TEST(string_retain_endwith);
     RUN_TEST(string_retain_startwith);
 
-    RUN_TEST(test_itoa_basic);
+    RUN_TEST(test_itoa_int_index);
+    RUN_TEST(test_itoa_int_type);
+    RUN_TEST(test_itoa_int_sign);
+    RUN_TEST(test_itoa_uint_index);
+    RUN_TEST(test_itoa_uint_type);
 
     RUN_TEST(test_qtoa_basic);
 
