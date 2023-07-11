@@ -12,11 +12,14 @@
 #if !defined(_INCLUDE_MM_STRING_HPP_)
 #define _INCLUDE_MM_STRING_HPP_ 1
 #include "mm_cfg.h"
+#include "mm_fmt.h"
 #include "mm_result.hpp"
 #include "mm_string.h"
 #include <array>
 #include <cstddef>
+#include <functional>
 #include <iterator>
+#include <limits>
 #include <string.h>
 #include <string>
 namespace mtfmt
@@ -215,6 +218,23 @@ public:
         return it != rhs.it;
     }
 };
+
+/**
+ * @brief 定点数值wrapper, 方便做overload
+ *
+ */
+template <typename T> struct fixed_wrapper
+{
+    using value_t = T;
+
+    T value;
+};
+
+/**
+ * @brief 取得 XXX_wrapper 包的那个类型
+ *
+ */
+template <typename T> using wrapper_t = typename T::value_t;
 
 } // namespace details
 
@@ -906,6 +926,122 @@ public:
     }
 
     /**
+     * @brief 对有符号整数值进行格式化, 并填充到this中
+     *
+     * @param[in] value: 需要转换的值
+     * @param[in] index: 指定转换的进制
+     * @param[in] sign: 指定转换过程中的符号处理方式
+     */
+    template <typename T>
+    details::enable_if_t<
+        std::is_signed<T>::value &&
+            std::numeric_limits<T>::is_integer &&
+            sizeof(T) <= sizeof(int32_t),
+        result<unit_t, error_code_t>>
+        append_from(
+            const T& value,
+            MStrFmtIntIndex index = MStrFmtIntIndex_Dec,
+            MStrFmtSignDisplay sign = MStrFmtSignDisplay_NegOnly
+        ) noexcept
+    {
+        error_code_t res = mstr_fmt_itoa(
+            &this_obj, static_cast<int32_t>(value), index, sign
+        );
+        if (MSTR_SUCC(res)) {
+            return unit_t{};
+        }
+        else {
+            return res;
+        }
+    }
+
+    /**
+     * @brief 对无符号整数值进行格式化, 并填充到this中
+     *
+     * @param[in] value: 需要转换的值
+     * @param[in] index: 指定转换的进制
+     */
+    template <typename T>
+    details::enable_if_t<
+        std::is_unsigned<T>::value &&
+            std::numeric_limits<T>::is_integer &&
+            sizeof(T) <= sizeof(uint32_t),
+        result<unit_t, error_code_t>>
+        append_from(
+            const T& value, MStrFmtIntIndex index = MStrFmtIntIndex_Dec
+        ) noexcept
+    {
+        error_code_t res = mstr_fmt_utoa(
+            &this_obj, static_cast<uint32_t>(value), index
+        );
+        if (MSTR_SUCC(res)) {
+            return unit_t{};
+        }
+        else {
+            return res;
+        }
+    }
+
+    /**
+     * @brief 对有符号量化值进行格式化, 并填充到this中
+     *
+     * @attention 定点数类型应该是整数类型的type alias,
+     * 并使用mtfmt::fixed_value转一下
+     *
+     * @param[in] value: 需要转换的值
+     * @param[in] q: 指定转换的量化值的精度
+     * @param[in] sign: 指定转换过程中的符号处理方式
+     */
+    template <typename T>
+    details::enable_if_t<
+        std::is_signed<details::wrapper_t<T>>::value &&
+            details::is_instance_of<details::fixed_wrapper, T>::value,
+        result<unit_t, error_code_t>>
+        append_from(
+            const T& value,
+            int32_t p,
+            MStrFmtSignDisplay sign = MStrFmtSignDisplay_NegOnly
+        ) noexcept
+    {
+        error_code_t res = mstr_fmt_iqtoa(
+            &this_obj, static_cast<int32_t>(value.value), p, sign
+        );
+        if (MSTR_SUCC(res)) {
+            return unit_t{};
+        }
+        else {
+            return res;
+        }
+    }
+
+    /**
+     * @brief 对无符号量化值进行格式化, 并填充到this中
+     *
+     * @attention 定点数类型应该是整数类型的type alias,
+     * 并使用mtfmt::fixed_value转一下
+     *
+     * @param[in] value: 需要转换的值
+     * @param[in] q: 指定转换的量化值的精度
+     */
+    template <typename T>
+    details::enable_if_t<
+        std::is_unsigned<details::wrapper_t<T>>::value &&
+            details::is_instance_of<details::fixed_wrapper, T>::value,
+        result<unit_t, error_code_t>>
+        append_from(const T& value, uint32_t p) noexcept
+    {
+        error_code_t res = mstr_fmt_uqtoa(
+            &this_obj, static_cast<uint32_t>(value.value), p
+        );
+        if (MSTR_SUCC(res)) {
+            return unit_t{};
+        }
+        else {
+            return res;
+        }
+    }
+
+    /**
      * @brief 取得Unicode代码点的字符
      *
      * @param u8char: utf-8字符串
@@ -988,6 +1124,19 @@ protected:
         return this_obj;
     }
 };
+
+/**
+ * @brief 标记该值是一个定点数
+ *
+ * @note 咱也不知道把它放到哪里..但是只有这一个函数, 那么就塞一起,
+ * 是不是很棒呢
+ *
+ */
+template <typename T>
+details::fixed_wrapper<T> fixed_value(const T& value)
+{
+    return details::fixed_wrapper<T>{value};
+}
 
 namespace literals
 {
