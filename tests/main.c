@@ -103,7 +103,8 @@ int main()
     RUN_TEST(test_itoa_uint_index);
     RUN_TEST(test_itoa_uint_type);
 
-    RUN_TEST(test_qtoa_basic);
+    RUN_TEST(test_qtoa_signed);
+    RUN_TEST(test_qtoa_unsigned);
 
     RUN_TEST(test_ftoa_basic);
 

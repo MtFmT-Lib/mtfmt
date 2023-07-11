@@ -225,8 +225,16 @@ public:
  */
 template <typename T> struct fixed_wrapper
 {
+    using value_t = T;
+
     T value;
 };
+
+/**
+ * @brief 取得 XXX_wrapper 包的那个类型
+ *
+ */
+template <typename T> using wrapper_t = typename T::value_t;
 
 } // namespace details
 
@@ -986,16 +994,44 @@ public:
      */
     template <typename T>
     details::enable_if_t<
-        details::is_instance_of<details::fixed_wrapper, T>::value,
+        std::is_signed<details::wrapper_t<T>>::value &&
+            details::is_instance_of<details::fixed_wrapper, T>::value,
         result<unit_t, error_code_t>>
         append_from(
             const T& value,
-            uint32_t p,
+            int32_t p,
             MStrFmtSignDisplay sign = MStrFmtSignDisplay_NegOnly
         ) noexcept
     {
         error_code_t res = mstr_fmt_iqtoa(
-            &this_obj, static_cast<int32_t>(value), p, sign
+            &this_obj, static_cast<int32_t>(value.value), p, sign
+        );
+        if (MSTR_SUCC(res)) {
+            return unit_t{};
+        }
+        else {
+            return res;
+        }
+    }
+
+    /**
+     * @brief 对无符号量化值进行格式化, 并填充到this中
+     *
+     * @attention 定点数类型应该是整数类型的type alias,
+     * 并使用mtfmt::fixed_value转一下
+     *
+     * @param[in] value: 需要转换的值
+     * @param[in] q: 指定转换的量化值的精度
+     */
+    template <typename T>
+    details::enable_if_t<
+        std::is_unsigned<details::wrapper_t<T>>::value &&
+            details::is_instance_of<details::fixed_wrapper, T>::value,
+        result<unit_t, error_code_t>>
+        append_from(const T& value, uint32_t p) noexcept
+    {
+        error_code_t res = mstr_fmt_uqtoa(
+            &this_obj, static_cast<uint32_t>(value.value), p
         );
         if (MSTR_SUCC(res)) {
             return unit_t{};

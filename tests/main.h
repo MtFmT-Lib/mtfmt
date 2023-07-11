@@ -68,7 +68,8 @@ extern "C"
     void test_itoa_uint_index(void);
     void test_itoa_uint_type(void);
 
-    void test_qtoa_basic(void);
+    void test_qtoa_signed(void);
+    void test_qtoa_unsigned(void);
 
     void test_ftoa_basic(void);
 
