@@ -15,10 +15,10 @@ MtFmT
 [![CLANG-FORMAT](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/format-checker.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/format-checker.yml)
 
 
-\[ [HomePage](https://mtfmt-lib.github.io/mtfmt/) \]
-\[ [Document](https://mtfmt-lib.github.io/mtfmt/doc) \]
-\[ [Code Document](https://mtfmt-lib.github.io/mtfmt/doxygen/html/) \]
-\[ [Pre-build Download](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-staticlib.yml) \]
+\[ [HomePage](https://mtfmt.cc/mtfmt/) \]
+\[ [Document](https://mtfmt.cc/mtfmt/doc) \]
+\[ [Code Document](https://mtfmt.cc/mtfmt/html/) \]
+\[ [Pre-build Libs](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-staticlib.yml) \]
 \[ [Pre-build DLLs](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-dylib.yml) \]
 
 
