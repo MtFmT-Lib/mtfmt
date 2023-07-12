@@ -19,13 +19,9 @@ extern "C"
     void allocate_then_free(void);
 
     void monadic_result_object_basic(void);
-    void monadic_result_copy_trivial_type(void);
     void monadic_result_copy_non_trivial_type(void);
-    void monadic_result_move_trivial_type(void);
     void monadic_result_move_non_trivial_type(void);
-    void monadic_result_copy_assign_trivial_type(void);
     void monadic_result_copy_assign_non_trivial_type(void);
-    void monadic_result_move_assign_trivial_type(void);
     void monadic_result_move_assign_non_trivial_type(void);
 
     void monadic_result_conjugate(void);

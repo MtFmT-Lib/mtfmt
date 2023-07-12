@@ -30,7 +30,7 @@ public:
     static constexpr uint32_t MASK_COPY_ASSIGN = 0x04;
     static constexpr uint32_t MASK_MOVE_ASSIGN = 0x08;
 
-    NonTrivialType(T val = 0) noexcept : value(val), mask(0)
+    NonTrivialType(T val) noexcept : value(val), mask(0)
     {
     }
 
@@ -71,12 +71,16 @@ public:
     }
 };
 
-using TrivialValue = int;
-using NonTrivialValue = NonTrivialType<TrivialValue>;
+struct TrivialValue
+{
+    int value;
+};
+
+using NonTrivialValue = NonTrivialType<int>;
 
 extern "C" void monadic_result_object_basic(void)
 {
-    NonTrivialValue val_origin;
+    NonTrivialValue val_origin = 0;
     ASSERT_ISSET_BIT(val_origin.get_mask(), 0);
     // copy ctor
     NonTrivialValue val_copy = val_origin;
@@ -84,49 +88,38 @@ extern "C" void monadic_result_object_basic(void)
         val_copy.get_mask(), NonTrivialValue::MASK_COPY_CTOR
     );
     // move ctor
-    NonTrivialValue val_move = std::move(NonTrivialValue{});
+    NonTrivialValue val_move = std::move(NonTrivialValue{0});
     ASSERT_ISSET_BIT(
         val_move.get_mask(), NonTrivialValue::MASK_MOVE_CTOR
     );
     // copy assign
-    NonTrivialValue val_copy_assign;
+    NonTrivialValue val_copy_assign = 0;
     val_copy_assign = val_origin;
     ASSERT_ISSET_BIT(
         val_copy_assign.get_mask(), NonTrivialValue::MASK_COPY_ASSIGN
     );
     // move assign
-    NonTrivialValue val_move_assign;
-    val_move_assign = std::move(NonTrivialValue{});
+    NonTrivialValue val_move_assign = 0;
+    val_move_assign = std::move(NonTrivialValue{0});
     ASSERT_ISSET_BIT(
         val_move_assign.get_mask(), NonTrivialValue::MASK_MOVE_ASSIGN
     );
 }
 
-extern "C" void monadic_result_copy_trivial_type(void)
-{
-}
-
 extern "C" void monadic_result_copy_non_trivial_type(void)
 {
-}
-
-extern "C" void monadic_result_move_trivial_type(void)
-{
+    using Result = mtfmt::result<NonTrivialValue, int>;
+    NonTrivialValue val_origin = 0;
+    ASSERT_ISSET_BIT(val_origin.get_mask(), 0);
+    // 构造result
+    // Result res = val_origin;
 }
 
 extern "C" void monadic_result_move_non_trivial_type(void)
 {
 }
 
-extern "C" void monadic_result_copy_assign_trivial_type(void)
-{
-}
-
 extern "C" void monadic_result_copy_assign_non_trivial_type(void)
-{
-}
-
-extern "C" void monadic_result_move_assign_trivial_type(void)
 {
 }
 

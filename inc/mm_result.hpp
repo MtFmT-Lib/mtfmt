@@ -21,26 +21,156 @@ template <typename T, typename E> class result;
 namespace details
 {
 /**
+ * @brief 结果类型的stroager的types
+ *
+ */
+template <typename... Targ> struct result_storager_type
+{
+    /**
+     * @brief 存储的数据大小
+     *
+     */
+    static constexpr std::size_t size =
+        max_value<sizeof(Targ)...>::value;
+
+    /**
+     * @brief 存储的数据的内存对齐
+     *
+     */
+    static constexpr std::size_t align =
+        max_value<alignof(Targ)...>::value;
+
+    /**
+     * @brief 借助std storager实现数据存放
+     *
+     */
+    using storager_t = typename std::aligned_storage<size, align>::type;
+};
+
+/**
  * @brief 结果类型的基类
  *
  */
-template <typename T, typename E> class result_base
+template <typename T, typename E> class result_non_trivial_base
 {
 public:
     using value_type = T;
     using error_type = E;
+    using const_reference_value_type = const T&;
+    using const_reference_error_type = const E&;
+    using storager_t = typename result_storager_type<T, E>::storager_t;
 
-    constexpr result_base(T succ_val)
-        : type_tag(TypeTag::SuccTag), t_val(succ_val)
+private:
+    // TODO 暂时不提供 ...
+
+    /**
+     * @brief 从succ value构造
+     *
+     */
+    result_non_trivial_base(T succ_val) : type_tag(TypeTag::SuccTag)
     {
     }
 
-    constexpr result_base(E err_val)
-        : type_tag(TypeTag::ErrorTag), e_val(err_val)
+    /**
+     * @brief 从err value构造
+     *
+     */
+    result_non_trivial_base(E err_val) : type_tag(TypeTag::ErrorTag)
     {
     }
 
-    ~result_base()
+    ~result_non_trivial_base()
+    {
+    }
+
+protected:
+    /**
+     * @brief 类型标签
+     *
+     */
+    enum class TypeTag
+    {
+        SuccTag = 0,
+        ErrorTag = 1
+    };
+
+    /**
+     * @brief 类型标签
+     *
+     */
+    TypeTag type_tag;
+
+    void unsafe_set_succ_value(const T& value) noexcept
+    {
+        type_tag = TypeTag::SuccTag;
+    }
+
+    void unsafe_set_err_value(const E& value) noexcept
+    {
+        type_tag = TypeTag::ErrorTag;
+    }
+
+    const_reference_value_type unsafe_get_succ_value() const noexcept
+    {
+        mstr_assert(type_tag == TypeTag::SuccTag);
+    }
+
+    const_reference_error_type unsafe_get_err_value() const noexcept
+    {
+        mstr_assert(type_tag == TypeTag::ErrorTag);
+    }
+
+private:
+    /**
+     * @brief 数据存放在这里
+     *
+     * @note 这里用一个足够大的buffer实现union
+     *
+     */
+    storager_t storager;
+};
+
+/**
+ * @brief 结果类型的基类(trivial type)
+ *
+ * @note trivial type有copy ctor, copy assign等一系列的内容,
+ * 所以不需要检查啦
+ */
+template <typename T, typename E> class result_trivial_base
+{
+    union {
+        T t_val;
+        E e_val;
+    };
+
+public:
+    using value_type = T;
+    using error_type = E;
+    using const_reference_value_type = const T&;
+    using const_reference_error_type = const E&;
+    using storager_t = typename result_storager_type<T, E>::storager_t;
+
+    /**
+     * @brief 从succ value构造
+     *
+     */
+    constexpr result_trivial_base(T succ_val)
+        : t_val(succ_val), type_tag(TypeTag::SuccTag)
+    {
+    }
+
+    /**
+     * @brief 从err value构造
+     *
+     */
+    constexpr result_trivial_base(E err_val)
+        : e_val(err_val), type_tag(TypeTag::ErrorTag)
+    {
+    }
+
+    // ctor为default, assign为default
+
+    ~result_trivial_base()
     {
         if (type_tag == TypeTag::SuccTag) {
             t_val.~T();
@@ -67,23 +197,29 @@ protected:
      */
     TypeTag type_tag;
 
-    union {
-        T t_val;
-        E e_val;
-    };
-};
+    void unsafe_set_succ_value(const T& value) noexcept
+    {
+        t_val = value;
+        type_tag = TypeTag::SuccTag;
+    }
 
-/**
- * @brief 继承该类型为result增加合适的拷贝, 移动constructor/assign
- *
- */
-template <typename T, typename E>
-struct result_add_ctrl : result_base<T, E>
-{
-    using base_t = details::result_base<T, E>;
-    using base_t::base_t;
+    void unsafe_set_err_value(const E& value) noexcept
+    {
+        e_val = value;
+        type_tag = TypeTag::ErrorTag;
+    }
 
-    // TODO
+    const_reference_value_type unsafe_get_succ_value() const noexcept
+    {
+        mstr_assert(type_tag == TypeTag::SuccTag);
+        return t_val;
+    }
+
+    const_reference_error_type unsafe_get_err_value() const noexcept
+    {
+        mstr_assert(type_tag == TypeTag::ErrorTag);
+        return e_val;
+    }
 };
 
 /**
@@ -95,6 +231,48 @@ template <typename T> struct is_result
     static constexpr bool value =
         details::is_instance_of<result, T>::value;
 };
+
+/**
+ * @brief 帮助判断T是trivial或者trivial result (case1)
+ *
+ */
+
+template <typename T> struct is_trivial_or_trivial_result
+{
+    static constexpr bool value = std::is_trivial<T>::value;
+};
+
+/**
+ * @brief 帮助判断T是trivial或者trivial result (case2)
+ *
+ */
+template <typename... T>
+struct is_trivial_or_trivial_result<result<T...>>
+{
+    static constexpr bool value =
+        disjunction<is_trivial_or_trivial_result<T>::value...>::value;
+};
+
+/**
+ * @brief 帮助判断result<T, E>是不是trivial
+ *
+ */
+template <typename T, typename E> struct is_trivial_result
+{
+    static constexpr bool value =
+        is_trivial_or_trivial_result<T>::value &&
+        is_trivial_or_trivial_result<E>::value;
+};
+
+/**
+ * @brief result的基类
+ *
+ */
+template <typename T, typename E>
+using result_base_t = typename std::conditional<
+    is_trivial_result<T, E>::value,
+    result_trivial_base<T, E>,
+    result_non_trivial_base<T, E>>::type;
 
 } // namespace details
 
@@ -128,12 +306,16 @@ public:
  * @tparam E: 失败时的结果
  */
 template <typename T, typename E>
-class result final : public details::result_add_ctrl<T, E>
+class result final : public details::result_base_t<T, E>
 {
 public:
-    using base_t = details::result_add_ctrl<T, E>;
+    using base_t = details::result_base_t<T, E>;
     using value_type = typename base_t::value_type;
     using error_type = typename base_t::error_type;
+    using const_reference_value_type =
+        typename base_t::const_reference_value_type;
+    using const_reference_error_type =
+        typename base_t::const_reference_error_type;
     using base_t::base_t;
 
     /**
@@ -159,9 +341,9 @@ public:
      *
      * @attention 只有在 is_succ() 返回 true 时才是有意义的
      */
-    value_type unsafe_get_succ_value() const noexcept
+    const_reference_value_type unsafe_get_succ_value() const noexcept
     {
-        return base_t::t_val;
+        return base_t::unsafe_get_succ_value();
     }
 
     /**
@@ -169,9 +351,9 @@ public:
      *
      * @attention 只有在 is_err() 返回 true 时才是有意义的
      */
-    error_type unsafe_get_err_value() const noexcept
+    const_reference_error_type unsafe_get_err_value() const noexcept
     {
-        return base_t::e_val;
+        return base_t::unsafe_get_err_value();
     }
 
     /**
@@ -202,7 +384,7 @@ public:
     {
         static_assert(std::is_same<typename T1::error_type, E>::value);
         if (is_succ()) {
-            const auto& ref_succ = base_t::t_val;
+            const auto& ref_succ = unsafe_get_succ_value();
             if (ref_succ.is_succ()) {
                 return ref_succ.unsafe_get_succ_value();
             }
@@ -211,7 +393,7 @@ public:
             }
         }
         else {
-            return base_t::e_val;
+            return unsafe_get_err_value();
         }
     }
 
@@ -241,10 +423,10 @@ public:
         map(F map_to) const
     {
         if (is_succ()) {
-            return map_to(base_t::t_val);
+            return map_to(base_t::unsafe_get_succ_value());
         }
         else {
-            return base_t::e_val;
+            return base_t::unsafe_get_err_value();
         }
     }
 
@@ -262,10 +444,10 @@ public:
         map_err(F map_to) const
     {
         if (is_succ()) {
-            return base_t::t_val;
+            return base_t::unsafe_get_succ_value();
         }
         else {
-            return map_to(base_t::e_val);
+            return map_to(base_t::unsafe_get_err_value());
         }
     }
 
@@ -286,10 +468,10 @@ public:
         and_then(F then_do) const
     {
         if (is_succ()) {
-            return then_do(base_t::t_val);
+            return then_do(base_t::unsafe_get_succ_value());
         }
         else {
-            return base_t::e_val;
+            return base_t::unsafe_get_err_value();
         }
     }
 
@@ -310,10 +492,10 @@ public:
         or_else(F else_do) const
     {
         if (is_succ()) {
-            return base_t::t_val;
+            return base_t::unsafe_get_succ_value();
         }
         else {
-            return else_do(base_t::e_val);
+            return else_do(base_t::unsafe_get_err_value());
         }
     }
 
@@ -324,7 +506,7 @@ public:
     T or_value(T or_val) const noexcept
     {
         if (is_succ()) {
-            return base_t::t_val;
+            return base_t::unsafe_get_succ_value();
         }
         else {
             return or_val;
@@ -346,14 +528,14 @@ public:
         or_exception(F cont) const
     {
         if (is_succ()) {
-            return base_t::t_val;
+            return base_t::unsafe_get_succ_value();
         }
         else {
 #if _MSTR_USE_CPP_EXCEPTION
-            throw cont(base_t::e_val);
+            throw cont(base_t::unsafe_get_err_value());
 #else
             (void)cont;
-            mstr_cause_exception(base_t::e_val);
+            mstr_cause_exception(base_t::unsafe_get_err_value());
 #endif // _MSTR_USE_CPP_EXCEPTION
         }
     }
