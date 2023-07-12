@@ -27,6 +27,17 @@
     } while (0)
 
 /**
+ * @brief 确定一个值里面包括一个位
+ *
+ */
+#define ASSERT_ISSET_BIT(val1, val2)                             \
+    do {                                                         \
+        TEST_ASSERT_TRUE_MESSAGE(                                \
+            ((val1) & (val2)) == (val2), #val1 " not set " #val2 \
+        );                                                       \
+    } while (0)
+
+/**
  * @brief 确定两个值不相等
  *
  */
