@@ -168,17 +168,20 @@ public:
     {
     }
 
+    //
     // ctor为default, assign为default
+    // trivial destructor不会执行任何东东
+    // 所以都可以default啦 !!!
+    //
 
-    ~result_trivial_base()
-    {
-        if (type_tag == TypeTag::SuccTag) {
-            t_val.~T();
-        }
-        else {
-            e_val.~E();
-        }
-    }
+    result_trivial_base(result_trivial_base&&) = default;
+    result_trivial_base(const result_trivial_base&) = default;
+
+    result_trivial_base& operator=(result_trivial_base&&) = default;
+    result_trivial_base& operator=(const result_trivial_base&) =
+        default;
+
+    ~result_trivial_base() = default;
 
 protected:
     /**
