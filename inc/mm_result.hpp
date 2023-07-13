@@ -53,34 +53,94 @@ template <typename... Targ> struct result_storager_type
  */
 template <typename T, typename E> class result_non_trivial_base
 {
+    using dtor_t = typename std::add_pointer<void(void*)>::type;
+    using storager_t = typename result_storager_type<T, E>::storager_t;
+
+    /**
+     * @brief 数据存放在这里
+     *
+     * @note 这里用一个足够大的buffer实现union
+     *
+     */
+    storager_t storager;
+
+    /**
+     * @brief 这里存着析构函数
+     *
+     */
+    dtor_t dtor;
+
 public:
     using value_type = T;
     using error_type = E;
+    using reference_value_type = T&;
+    using reference_error_type = E&;
     using const_reference_value_type = const T&;
     using const_reference_error_type = const E&;
-    using storager_t = typename result_storager_type<T, E>::storager_t;
-
-private:
-    // TODO 暂时不提供 ...
 
     /**
      * @brief 从succ value构造
      *
      */
-    result_non_trivial_base(T succ_val) : type_tag(TypeTag::SuccTag)
+    result_non_trivial_base(const_reference_value_type succ_val)
+        : dtor([](void* ptr) {
+              return (*reinterpret_cast<T*>(ptr)).~T();
+          }),
+          type_tag(TypeTag::SuccTag)
     {
+        unsafe_set_succ_value(succ_val);
     }
 
     /**
      * @brief 从err value构造
      *
      */
-    result_non_trivial_base(E err_val) : type_tag(TypeTag::ErrorTag)
+    result_non_trivial_base(const_reference_error_type err_val)
+        : dtor([](void* ptr) {
+              return (*reinterpret_cast<E*>(ptr)).~E();
+          }),
+          type_tag(TypeTag::ErrorTag)
     {
+        unsafe_set_err_value(err_val);
+    }
+
+    result_non_trivial_base(const result_non_trivial_base& rhs)
+        : dtor(rhs.dtor), type_tag(rhs.type_tag)
+    {
+        if (type_tag == TypeTag::SuccTag) {
+            const T& value = *reinterpret_cast<const T*>(&storager);
+            unsafe_set_succ_value(value);
+        }
+        else {
+            mstr_assert(type_tag == TypeTag::ErrorTag);
+            const E& value = *reinterpret_cast<const E*>(&storager);
+            unsafe_set_err_value(value);
+        }
+    }
+
+    result_non_trivial_base& operator=(
+        const result_non_trivial_base& rhs
+    )
+    {
+        // TODO 需要处理下自
+        this->~result_non_trivial_base();
+        if (rhs.type_tag == TypeTag::SuccTag) {
+            const T& value = *reinterpret_cast<const T*>(&rhs.storager);
+            unsafe_set_succ_value(value);
+        }
+        else {
+            mstr_assert(rhs.type_tag == TypeTag::ErrorTag);
+            const E& value = *reinterpret_cast<const E*>(&rhs.storager);
+            unsafe_set_err_value(value);
+        }
+        return *this;
     }
 
     ~result_non_trivial_base()
     {
+        mstr_assert(dtor != nullptr);
+        dtor(reinterpret_cast<void*>(&storager));
+        dtor = nullptr;
     }
 
 protected:
@@ -100,34 +160,58 @@ protected:
      */
     TypeTag type_tag;
 
-    void unsafe_set_succ_value(const T& value) noexcept
+    enable_if_t<std::is_copy_constructible<T>::value, void>
+        unsafe_set_succ_value(const T& value) noexcept
     {
         type_tag = TypeTag::SuccTag;
+        void* ptr = reinterpret_cast<void*>(&storager);
+        // 用placement new把对象放到 storager 里面
+        new (ptr) T(value);
     }
 
-    void unsafe_set_err_value(const E& value) noexcept
+    enable_if_t<std::is_copy_constructible<E>::value, void>
+        unsafe_set_err_value(const E& value) noexcept
     {
         type_tag = TypeTag::ErrorTag;
+        void* ptr = reinterpret_cast<void*>(&storager);
+        new (ptr) E(value);
     }
 
-    const_reference_value_type unsafe_get_succ_value() const noexcept
+    enable_if_t<
+        std::is_copy_constructible<T>::value,
+        const_reference_value_type>
+        unsafe_get_succ_value() const noexcept
     {
         mstr_assert(type_tag == TypeTag::SuccTag);
+        return *reinterpret_cast<const T*>(&storager);
     }
 
-    const_reference_error_type unsafe_get_err_value() const noexcept
+    enable_if_t<
+        std::is_copy_constructible<E>::value,
+        const_reference_error_type>
+        unsafe_get_err_value() const noexcept
     {
         mstr_assert(type_tag == TypeTag::ErrorTag);
+        return *reinterpret_cast<const E*>(&storager);
     }
 
-private:
-    /**
-     * @brief 数据存放在这里
-     *
-     * @note 这里用一个足够大的buffer实现union
-     *
-     */
-    storager_t storager;
+    enable_if_t<
+        std::is_copy_constructible<T>::value,
+        reference_value_type>
+        unsafe_get_succ_value_mut() noexcept
+    {
+        mstr_assert(type_tag == TypeTag::SuccTag);
+        return *reinterpret_cast<T*>(&storager);
+    }
+
+    enable_if_t<
+        std::is_copy_constructible<E>::value,
+        reference_error_type>
+        unsafe_get_err_value_mut() noexcept
+    {
+        mstr_assert(type_tag == TypeTag::ErrorTag);
+        return *reinterpret_cast<E*>(&storager);
+    }
 };
 
 /**
@@ -146,9 +230,10 @@ template <typename T, typename E> class result_trivial_base
 public:
     using value_type = T;
     using error_type = E;
+    using reference_value_type = T&;
+    using reference_error_type = E&;
     using const_reference_value_type = const T&;
     using const_reference_error_type = const E&;
-    using storager_t = typename result_storager_type<T, E>::storager_t;
 
     /**
      * @brief 从succ value构造
@@ -223,6 +308,18 @@ protected:
         mstr_assert(type_tag == TypeTag::ErrorTag);
         return e_val;
     }
+
+    reference_value_type unsafe_get_succ_value_mut() noexcept
+    {
+        mstr_assert(type_tag == TypeTag::SuccTag);
+        return t_val;
+    }
+
+    reference_error_type unsafe_get_err_value_mut() noexcept
+    {
+        mstr_assert(type_tag == TypeTag::ErrorTag);
+        return e_val;
+    }
 };
 
 /**
@@ -239,7 +336,6 @@ template <typename T> struct is_result
  * @brief 帮助判断T是trivial或者trivial result (case1)
  *
  */
-
 template <typename T> struct is_trivial_or_trivial_result
 {
     static constexpr bool value = std::is_trivial<T>::value;
@@ -315,6 +411,8 @@ public:
     using base_t = details::result_base_t<T, E>;
     using value_type = typename base_t::value_type;
     using error_type = typename base_t::error_type;
+    using reference_value_type = typename base_t::reference_value_type;
+    using reference_error_type = typename base_t::reference_error_type;
     using const_reference_value_type =
         typename base_t::const_reference_value_type;
     using const_reference_error_type =
@@ -357,6 +455,26 @@ public:
     const_reference_error_type unsafe_get_err_value() const noexcept
     {
         return base_t::unsafe_get_err_value();
+    }
+
+    /**
+     * @brief 取得succ的值(可变引用)
+     *
+     * @attention 只有在 is_succ() 返回 true 时才是有意义的
+     */
+    reference_value_type unsafe_get_succ_value_mut() noexcept
+    {
+        return base_t::unsafe_get_succ_value_mut();
+    }
+
+    /**
+     * @brief 取得err的值(可变引用)
+     *
+     * @attention 只有在 is_err() 返回 true 时才是有意义的
+     */
+    reference_error_type unsafe_get_err_value_mut() noexcept
+    {
+        return base_t::unsafe_get_err_value_mut();
     }
 
     /**

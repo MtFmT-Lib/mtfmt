@@ -69,6 +69,11 @@ public:
     {
         return mask;
     }
+
+    inline void clear_mask() noexcept
+    {
+        mask = 0;
+    }
 };
 
 struct TrivialValue
@@ -108,11 +113,47 @@ extern "C" void monadic_result_object_basic(void)
 
 extern "C" void monadic_result_copy_non_trivial_type(void)
 {
-    using Result = mtfmt::result<NonTrivialValue, int>;
-    NonTrivialValue val_origin = 0;
-    ASSERT_ISSET_BIT(val_origin.get_mask(), 0);
+    using Result1 = mtfmt::result<NonTrivialValue, int>;
+    using Result2 = mtfmt::result<int, NonTrivialValue>;
+    // succ的情况
+    NonTrivialValue val_origin_succ = 0;
+    ASSERT_ISSET_BIT(val_origin_succ.get_mask(), 0);
     // 构造result
-    // Result res = val_origin;
+    Result1 res_succ_1 = val_origin_succ;
+    ASSERT_EQUAL_VALUE(res_succ_1.is_succ(), true);
+    ASSERT_EQUAL_VALUE(
+        res_succ_1.unsafe_get_succ_value().get_value(), 0
+    );
+    // copy ctor
+    res_succ_1.unsafe_get_succ_value_mut().clear_mask();
+    Result1 res_succ_2 = res_succ_1;
+    ASSERT_EQUAL_VALUE(res_succ_2.is_succ(), true);
+    ASSERT_ISSET_BIT(
+        res_succ_2.unsafe_get_succ_value().get_mask(),
+        NonTrivialValue::MASK_COPY_CTOR
+    );
+    // fail case
+    Result1 res_fail_1 = 1;
+    ASSERT_EQUAL_VALUE(res_fail_1.is_err(), true);
+    ASSERT_EQUAL_VALUE(res_fail_1.unsafe_get_err_value(), 1);
+    // copy ctor
+    Result1 res_fail_2 = res_fail_1;
+    ASSERT_EQUAL_VALUE(res_fail_2.is_err(), true);
+    // 构造result (fail)
+    NonTrivialValue val_origin_err = 0;
+    ASSERT_ISSET_BIT(val_origin_err.get_mask(), 0);
+    // 构造result
+    Result2 res_err_1 = val_origin_err;
+    ASSERT_EQUAL_VALUE(res_err_1.is_err(), true);
+    ASSERT_EQUAL_VALUE(res_err_1.unsafe_get_err_value().get_value(), 0);
+    // copy ctor
+    res_err_1.unsafe_get_err_value_mut().clear_mask();
+    Result2 res_err_2 = res_err_1;
+    ASSERT_EQUAL_VALUE(res_err_2.is_err(), true);
+    ASSERT_ISSET_BIT(
+        res_err_2.unsafe_get_err_value().get_mask(),
+        NonTrivialValue::MASK_COPY_CTOR
+    );
 }
 
 extern "C" void monadic_result_move_non_trivial_type(void)
@@ -121,6 +162,7 @@ extern "C" void monadic_result_move_non_trivial_type(void)
 
 extern "C" void monadic_result_copy_assign_non_trivial_type(void)
 {
+    // TODO
 }
 
 extern "C" void monadic_result_move_assign_non_trivial_type(void)
