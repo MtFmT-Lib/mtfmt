@@ -156,10 +156,6 @@ extern "C" void monadic_result_copy_non_trivial_type(void)
     );
 }
 
-extern "C" void monadic_result_move_non_trivial_type(void)
-{
-}
-
 extern "C" void monadic_result_copy_assign_non_trivial_type(void)
 {
     using Result1 = mtfmt::result<NonTrivialValue, int>;
@@ -208,8 +204,4 @@ extern "C" void monadic_result_copy_assign_non_trivial_type(void)
         res_err_2.unsafe_get_err_value().get_mask(),
         NonTrivialValue::MASK_COPY_CTOR
     );
-}
-
-extern "C" void monadic_result_move_assign_non_trivial_type(void)
-{
 }

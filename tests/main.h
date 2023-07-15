@@ -20,9 +20,7 @@ extern "C"
 
     void monadic_result_object_basic(void);
     void monadic_result_copy_non_trivial_type(void);
-    void monadic_result_move_non_trivial_type(void);
     void monadic_result_copy_assign_non_trivial_type(void);
-    void monadic_result_move_assign_non_trivial_type(void);
 
     void monadic_result_conjugate(void);
     void monadic_result_flatten(void);

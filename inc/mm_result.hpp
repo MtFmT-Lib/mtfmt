@@ -177,23 +177,6 @@ protected:
      */
     TypeTag type_tag;
 
-    enable_if_t<std::is_copy_constructible<T>::value, void>
-        unsafe_set_succ_value(const T& value) noexcept
-    {
-        type_tag = TypeTag::SuccTag;
-        void* ptr = reinterpret_cast<void*>(&storager);
-        // 用placement new把对象放到 storager 里面
-        new (ptr) T(value);
-    }
-
-    enable_if_t<std::is_copy_constructible<E>::value, void>
-        unsafe_set_err_value(const E& value) noexcept
-    {
-        type_tag = TypeTag::ErrorTag;
-        void* ptr = reinterpret_cast<void*>(&storager);
-        new (ptr) E(value);
-    }
-
     enable_if_t<
         std::is_copy_constructible<T>::value,
         const_reference_value_type>
@@ -228,6 +211,24 @@ protected:
     {
         mstr_assert(type_tag == TypeTag::ErrorTag);
         return *reinterpret_cast<E*>(&storager);
+    }
+
+private:
+    enable_if_t<std::is_copy_constructible<T>::value, void>
+        unsafe_set_succ_value(const T& value) noexcept
+    {
+        type_tag = TypeTag::SuccTag;
+        void* ptr = reinterpret_cast<void*>(&storager);
+        // 用placement new把对象放到 storager 里面
+        new (ptr) T(value);
+    }
+
+    enable_if_t<std::is_copy_constructible<E>::value, void>
+        unsafe_set_err_value(const E& value) noexcept
+    {
+        type_tag = TypeTag::ErrorTag;
+        void* ptr = reinterpret_cast<void*>(&storager);
+        new (ptr) E(value);
     }
 };
 
@@ -301,18 +302,6 @@ protected:
      *
      */
     TypeTag type_tag;
-
-    void unsafe_set_succ_value(const T& value) noexcept
-    {
-        t_val = value;
-        type_tag = TypeTag::SuccTag;
-    }
-
-    void unsafe_set_err_value(const E& value) noexcept
-    {
-        e_val = value;
-        type_tag = TypeTag::ErrorTag;
-    }
 
     const_reference_value_type unsafe_get_succ_value() const noexcept
     {

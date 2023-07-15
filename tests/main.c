@@ -55,9 +55,7 @@ int main()
 
     RUN_TEST(monadic_result_object_basic);
     RUN_TEST(monadic_result_copy_non_trivial_type);
-    RUN_TEST(monadic_result_move_non_trivial_type);
     RUN_TEST(monadic_result_copy_assign_non_trivial_type);
-    RUN_TEST(monadic_result_move_assign_non_trivial_type);
 
     RUN_TEST(monadic_result_conjugate);
     RUN_TEST(monadic_result_flatten);

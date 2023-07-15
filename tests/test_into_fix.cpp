@@ -60,7 +60,7 @@ extern "C" void qtoa_unsigned_from(void)
     // @mstr_fmt_uqtoa
     // 这个函数的所有功能在其它地方测试过啦
     // 所以简单确认下wrapper是否正确
-    mtfmt::string str =
-        mtfmt::string::from(mtfmt::fixed_value(1), 2).or_value("error");
+    mtfmt::string str = mtfmt::string::from(mtfmt::fixed_value(1u), 2)
+                            .or_value("error");
     ASSERT_EQUAL_VALUE(str, u8"0.25");
 }
