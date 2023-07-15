@@ -22,10 +22,6 @@ constexpr mtfmt::unicode_t unicode_char(const char (&u8char)[N])
     return mtfmt::string::unicode_char(u8char);
 }
 
-extern "C" void string_replace(void)
-{
-}
-
 extern "C" void string_retain_all(void)
 {
 }

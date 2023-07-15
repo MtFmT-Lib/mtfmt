@@ -204,6 +204,44 @@ template <typename F, typename R, typename... T> struct holds_prototype
 template <bool cond, typename T>
 using enable_if_t = typename std::enable_if<cond, T>::type;
 
+/**
+ * @brief 取得最大值
+ *
+ */
+template <std::size_t A1, std::size_t... An> struct max_value;
+
+template <std::size_t A1> struct max_value<A1>
+{
+    static constexpr size_t value = A1;
+};
+
+template <std::size_t A1, std::size_t A2, std::size_t... An>
+struct max_value<A1, A2, An...>
+{
+    static constexpr size_t value = A1 >= A2 ?
+                                        max_value<A1, An...>::value :
+                                        max_value<A2, An...>::value;
+};
+
+/**
+ * @brief 取得and
+ *
+ * @note 该模板功能和 std::disjunction 一致, 只是因为C++11没有提供
+ *
+ */
+template <bool A1, bool... An> struct disjunction;
+
+template <bool A1> struct disjunction<A1>
+{
+    static constexpr bool value = A1;
+};
+
+template <bool A1, bool A2, bool... An>
+struct disjunction<A1, A2, An...>
+{
+    static constexpr bool value = A1 && disjunction<A2, An...>::value;
+};
+
 } // namespace details
 } // namespace mtfmt
 #endif // _INCLUDE_MM_HELPER_HPP_
