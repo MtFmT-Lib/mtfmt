@@ -116,6 +116,13 @@ int main()
 
     RUN_TEST(ftoa_basic);
 
+    RUN_TEST(fmt_integer_i8);
+    RUN_TEST(fmt_integer_i16);
+    RUN_TEST(fmt_integer_i32);
+    RUN_TEST(fmt_integer_u8);
+    RUN_TEST(fmt_integer_u16);
+    RUN_TEST(fmt_integer_u32);
+
     RUN_TEST(fmt_align_left);
     RUN_TEST(fmt_align_left_fill);
     RUN_TEST(fmt_align_left_long);

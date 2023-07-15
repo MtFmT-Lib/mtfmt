@@ -78,6 +78,7 @@
  * @brief 对某个表达式求值
  *
  */
-#define EVAL(expr) TEST_ASSERT_TRUE(MSTR_SUCC(expr))
+#define EVAL(expr) \
+    TEST_ASSERT_TRUE_MESSAGE(MSTR_SUCC(expr), #expr "!= OK")
 
 #endif // _INCLUDE_TEST_HELPER_H_
