@@ -162,7 +162,52 @@ extern "C" void monadic_result_move_non_trivial_type(void)
 
 extern "C" void monadic_result_copy_assign_non_trivial_type(void)
 {
-    // TODO
+    using Result1 = mtfmt::result<NonTrivialValue, int>;
+    using Result2 = mtfmt::result<int, NonTrivialValue>;
+    // succ的情况
+    NonTrivialValue val_origin_succ = 0;
+    ASSERT_ISSET_BIT(val_origin_succ.get_mask(), 0);
+    // 构造result
+    Result1 res_succ_1 = val_origin_succ;
+    ASSERT_EQUAL_VALUE(res_succ_1.is_succ(), true);
+    ASSERT_EQUAL_VALUE(
+        res_succ_1.unsafe_get_succ_value().get_value(), 0
+    );
+    res_succ_1.unsafe_get_succ_value_mut().clear_mask();
+    // result 2
+    Result1 res_succ_2 = 1;
+    ASSERT_EQUAL_VALUE(res_succ_2.is_succ(), false);
+    // copy result_1
+    res_succ_2 = res_succ_1;
+    ASSERT_EQUAL_VALUE(res_succ_2.is_succ(), true);
+    ASSERT_EQUAL_VALUE(
+        res_succ_2.unsafe_get_succ_value().get_value(), 0
+    );
+    // copy 的实现其实是靠 copy ctor 做的, 不是 copy assign
+    ASSERT_ISSET_BIT(
+        res_succ_2.unsafe_get_succ_value().get_mask(),
+        NonTrivialValue::MASK_COPY_CTOR
+    );
+    // error 的情况
+    NonTrivialValue val_origin_err = 0;
+    ASSERT_ISSET_BIT(val_origin_err.get_mask(), 0);
+    // 构造result
+    Result2 res_err_1 = val_origin_err;
+    ASSERT_EQUAL_VALUE(res_err_1.is_err(), true);
+    ASSERT_EQUAL_VALUE(res_err_1.unsafe_get_err_value().get_value(), 0);
+    res_err_1.unsafe_get_err_value_mut().clear_mask();
+    // result 2
+    Result2 res_err_2 = 1;
+    ASSERT_EQUAL_VALUE(res_err_2.is_err(), false);
+    // copy result_1
+    res_err_2 = res_err_1;
+    ASSERT_EQUAL_VALUE(res_err_2.is_err(), true);
+    ASSERT_EQUAL_VALUE(res_err_2.unsafe_get_err_value().get_value(), 0);
+    // copy 的实现其实是靠 copy ctor 做的, 不是 copy assign
+    ASSERT_ISSET_BIT(
+        res_err_2.unsafe_get_err_value().get_mask(),
+        NonTrivialValue::MASK_COPY_CTOR
+    );
 }
 
 extern "C" void monadic_result_move_assign_non_trivial_type(void)

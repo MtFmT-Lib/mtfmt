@@ -70,6 +70,22 @@ template <typename T, typename E> class result_non_trivial_base
      */
     dtor_t dtor;
 
+    /**
+     * @brief 析构函数 (T type)
+     */
+    static void dtor_succ_type(void* ptr) noexcept
+    {
+        return (*reinterpret_cast<T*>(ptr)).~T();
+    }
+
+    /**
+     * @brief 析构函数 (E type)
+     */
+    static void dtor_err_type(void* ptr) noexcept
+    {
+        return (*reinterpret_cast<E*>(ptr)).~E();
+    }
+
 public:
     using value_type = T;
     using error_type = E;
@@ -83,10 +99,7 @@ public:
      *
      */
     result_non_trivial_base(const_reference_value_type succ_val)
-        : dtor([](void* ptr) {
-              return (*reinterpret_cast<T*>(ptr)).~T();
-          }),
-          type_tag(TypeTag::SuccTag)
+        : dtor(dtor_succ_type), type_tag(TypeTag::SuccTag)
     {
         unsafe_set_succ_value(succ_val);
     }
@@ -96,25 +109,26 @@ public:
      *
      */
     result_non_trivial_base(const_reference_error_type err_val)
-        : dtor([](void* ptr) {
-              return (*reinterpret_cast<E*>(ptr)).~E();
-          }),
-          type_tag(TypeTag::ErrorTag)
+        : dtor(dtor_err_type), type_tag(TypeTag::ErrorTag)
     {
         unsafe_set_err_value(err_val);
     }
 
     result_non_trivial_base(const result_non_trivial_base& rhs)
-        : dtor(rhs.dtor), type_tag(rhs.type_tag)
+        : type_tag(rhs.type_tag)
     {
         if (type_tag == TypeTag::SuccTag) {
             const T& value = *reinterpret_cast<const T*>(&storager);
             unsafe_set_succ_value(value);
+            // 更新析构
+            dtor = dtor_succ_type;
         }
         else {
             mstr_assert(type_tag == TypeTag::ErrorTag);
             const E& value = *reinterpret_cast<const E*>(&storager);
             unsafe_set_err_value(value);
+            // 更新析构
+            dtor = dtor_err_type;
         }
     }
 
@@ -122,16 +136,19 @@ public:
         const result_non_trivial_base& rhs
     )
     {
-        // TODO 需要处理下自
         this->~result_non_trivial_base();
         if (rhs.type_tag == TypeTag::SuccTag) {
             const T& value = *reinterpret_cast<const T*>(&rhs.storager);
             unsafe_set_succ_value(value);
+            // 更新析构
+            dtor = dtor_succ_type;
         }
         else {
             mstr_assert(rhs.type_tag == TypeTag::ErrorTag);
             const E& value = *reinterpret_cast<const E*>(&rhs.storager);
             unsafe_set_err_value(value);
+            // 更新析构
+            dtor = dtor_err_type;
         }
         return *this;
     }
