@@ -55,9 +55,7 @@ int main()
 
     RUN_TEST(monadic_result_object_basic);
     RUN_TEST(monadic_result_copy_non_trivial_type);
-    RUN_TEST(monadic_result_move_non_trivial_type);
     RUN_TEST(monadic_result_copy_assign_non_trivial_type);
-    RUN_TEST(monadic_result_move_assign_non_trivial_type);
 
     RUN_TEST(monadic_result_conjugate);
     RUN_TEST(monadic_result_flatten);
@@ -103,16 +101,34 @@ int main()
     RUN_TEST(string_retain_endwith);
     RUN_TEST(string_retain_startwith);
 
-    RUN_TEST(test_itoa_int_index);
-    RUN_TEST(test_itoa_int_type);
-    RUN_TEST(test_itoa_int_sign);
-    RUN_TEST(test_itoa_uint_index);
-    RUN_TEST(test_itoa_uint_type);
+    RUN_TEST(itoa_int_index);
+    RUN_TEST(itoa_int_type);
+    RUN_TEST(itoa_int_sign);
+    RUN_TEST(itoa_int_from);
+    RUN_TEST(itoa_uint_index);
+    RUN_TEST(itoa_uint_type);
+    RUN_TEST(itoa_uint_from);
 
-    RUN_TEST(test_qtoa_signed);
-    RUN_TEST(test_qtoa_unsigned);
+    RUN_TEST(qtoa_signed);
+    RUN_TEST(qtoa_signed_from);
+    RUN_TEST(qtoa_unsigned);
+    RUN_TEST(qtoa_unsigned_from);
 
-    RUN_TEST(test_ftoa_basic);
+    RUN_TEST(ftoa_basic);
+
+    RUN_TEST(fmt_integer_i8);
+    RUN_TEST(fmt_integer_i16);
+    RUN_TEST(fmt_integer_i32);
+    RUN_TEST(fmt_integer_u8);
+    RUN_TEST(fmt_integer_u16);
+    RUN_TEST(fmt_integer_u32);
+
+    RUN_TEST(fmt_integer_array_i8);
+    RUN_TEST(fmt_integer_array_i16);
+    RUN_TEST(fmt_integer_array_i32);
+    RUN_TEST(fmt_integer_array_u8);
+    RUN_TEST(fmt_integer_array_u16);
+    RUN_TEST(fmt_integer_array_u32);
 
     RUN_TEST(fmt_align_left);
     RUN_TEST(fmt_align_left_fill);

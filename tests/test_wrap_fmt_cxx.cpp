@@ -15,9 +15,13 @@
 #include "unity.h"
 #include <stddef.h>
 #include <stdio.h>
+#include <tuple>
 
 extern "C" void cpp_wrap_fmt(void)
 {
+    mtfmt::string str = mtfmt::string::format_variable("{0:i32}", 123)
+                            .or_value("error");
+    ASSERT_EQUAL_VALUE(str, "123");
 }
 
 extern "C" void cpp_wrap_fmt_parser(void)

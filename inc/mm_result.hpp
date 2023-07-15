@@ -177,23 +177,6 @@ protected:
      */
     TypeTag type_tag;
 
-    enable_if_t<std::is_copy_constructible<T>::value, void>
-        unsafe_set_succ_value(const T& value) noexcept
-    {
-        type_tag = TypeTag::SuccTag;
-        void* ptr = reinterpret_cast<void*>(&storager);
-        // 用placement new把对象放到 storager 里面
-        new (ptr) T(value);
-    }
-
-    enable_if_t<std::is_copy_constructible<E>::value, void>
-        unsafe_set_err_value(const E& value) noexcept
-    {
-        type_tag = TypeTag::ErrorTag;
-        void* ptr = reinterpret_cast<void*>(&storager);
-        new (ptr) E(value);
-    }
-
     enable_if_t<
         std::is_copy_constructible<T>::value,
         const_reference_value_type>
@@ -228,6 +211,24 @@ protected:
     {
         mstr_assert(type_tag == TypeTag::ErrorTag);
         return *reinterpret_cast<E*>(&storager);
+    }
+
+private:
+    enable_if_t<std::is_copy_constructible<T>::value, void>
+        unsafe_set_succ_value(const T& value) noexcept
+    {
+        type_tag = TypeTag::SuccTag;
+        void* ptr = reinterpret_cast<void*>(&storager);
+        // 用placement new把对象放到 storager 里面
+        new (ptr) T(value);
+    }
+
+    enable_if_t<std::is_copy_constructible<E>::value, void>
+        unsafe_set_err_value(const E& value) noexcept
+    {
+        type_tag = TypeTag::ErrorTag;
+        void* ptr = reinterpret_cast<void*>(&storager);
+        new (ptr) E(value);
     }
 };
 
@@ -301,18 +302,6 @@ protected:
      *
      */
     TypeTag type_tag;
-
-    void unsafe_set_succ_value(const T& value) noexcept
-    {
-        t_val = value;
-        type_tag = TypeTag::SuccTag;
-    }
-
-    void unsafe_set_err_value(const E& value) noexcept
-    {
-        e_val = value;
-        type_tag = TypeTag::ErrorTag;
-    }
 
     const_reference_value_type unsafe_get_succ_value() const noexcept
     {
@@ -641,7 +630,9 @@ public:
      * @brief 如果为T则返回T, 不然返回or_val
      *
      */
-    T or_value(T or_val) const noexcept
+    const_reference_value_type or_value(
+        const_reference_value_type or_val
+    ) const noexcept
     {
         if (is_succ()) {
             return base_t::unsafe_get_succ_value();
@@ -662,7 +653,9 @@ public:
         typename R1 = details::function_return_type_t<F>,
         typename R = details::
             enable_if_t<std::is_base_of<std::exception, R1>::value, R1>>
-    details::enable_if_t<details::holds_prototype<F, R, E>::value, T>
+    details::enable_if_t<
+        details::holds_prototype<F, R, E>::value,
+        const_reference_value_type>
         or_exception(F cont) const
     {
         if (is_succ()) {

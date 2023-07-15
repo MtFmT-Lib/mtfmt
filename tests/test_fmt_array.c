@@ -25,7 +25,6 @@ void fmt_array(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    // 1/4096 ..
     EVAL(mstr_format(&s, "@{[0:i32]}@", 2, array, ARRAY_SIZE));
     ASSERT_EQUAL_STRING(&s, "@1, 1, 4, 5, 1, 4@");
     mstr_free(&s);
@@ -35,7 +34,6 @@ void fmt_array_userdefind_split(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    // 1/4096 ..
     EVAL(mstr_format(&s, "@{[0:i32|:#]}@", 2, array, ARRAY_SIZE));
     ASSERT_EQUAL_STRING(&s, "@1#1#4#5#1#4@");
     mstr_free(&s);
@@ -45,7 +43,6 @@ void fmt_array_element_style(void)
 {
     MString s;
     EVAL(mstr_create_empty(&s));
-    // 1/4096 ..
     EVAL(mstr_format(&s, "@{[0:i32|:#:x]}@", 2, array, ARRAY_SIZE));
     ASSERT_EQUAL_STRING(&s, "@0x1#0x1#0x4#0x5#0x1#0x4@");
     mstr_free(&s);

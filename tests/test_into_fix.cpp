@@ -16,7 +16,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-extern "C" void test_qtoa_signed(void)
+extern "C" void qtoa_signed(void)
 {
     // @mstr_fmt_iqtoa
     mtfmt::string str = u8"";
@@ -33,7 +33,17 @@ extern "C" void test_qtoa_signed(void)
     ASSERT_EQUAL_VALUE(str_zero, u8"0");
 }
 
-extern "C" void test_qtoa_unsigned(void)
+extern "C" void qtoa_signed_from(void)
+{
+    // @mstr_fmt_iqtoa
+    // 这个函数的所有功能在其它地方测试过啦
+    // 所以简单确认下wrapper是否正确
+    mtfmt::string str =
+        mtfmt::string::from(mtfmt::fixed_value(1), 2).or_value("error");
+    ASSERT_EQUAL_VALUE(str, u8"0.25");
+}
+
+extern "C" void qtoa_unsigned(void)
 {
     // @mstr_fmt_uqtoa
     mtfmt::string str = u8"";
@@ -43,4 +53,14 @@ extern "C" void test_qtoa_unsigned(void)
     mtfmt::string str_zero = u8"";
     str_zero.append_from(mtfmt::fixed_value(0u), 2);
     ASSERT_EQUAL_VALUE(str_zero, u8"0");
+}
+
+extern "C" void qtoa_unsigned_from(void)
+{
+    // @mstr_fmt_uqtoa
+    // 这个函数的所有功能在其它地方测试过啦
+    // 所以简单确认下wrapper是否正确
+    mtfmt::string str = mtfmt::string::from(mtfmt::fixed_value(1u), 2)
+                            .or_value("error");
+    ASSERT_EQUAL_VALUE(str, u8"0.25");
 }
