@@ -88,6 +88,13 @@ extern "C"
     void fmt_integer_u16(void);
     void fmt_integer_u32(void);
 
+    void fmt_integer_array_i8(void);
+    void fmt_integer_array_i16(void);
+    void fmt_integer_array_i32(void);
+    void fmt_integer_array_u8(void);
+    void fmt_integer_array_u16(void);
+    void fmt_integer_array_u32(void);
+
     void fmt_align_left(void);
     void fmt_align_left_fill(void);
     void fmt_align_left_long(void);

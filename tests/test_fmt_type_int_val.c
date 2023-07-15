@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    test_fmt_type_int.c
+ * @file    test_fmt_type_int_val.c
  * @author  向阳 (hinata.hoshino@foxmail.com)
  * @brief   格式化的整数值类型测试
  * @version 1.0
