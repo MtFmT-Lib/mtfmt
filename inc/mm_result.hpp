@@ -641,7 +641,9 @@ public:
      * @brief 如果为T则返回T, 不然返回or_val
      *
      */
-    T or_value(T or_val) const noexcept
+    const_reference_value_type or_value(
+        const_reference_value_type or_val
+    ) const noexcept
     {
         if (is_succ()) {
             return base_t::unsafe_get_succ_value();
@@ -662,7 +664,9 @@ public:
         typename R1 = details::function_return_type_t<F>,
         typename R = details::
             enable_if_t<std::is_base_of<std::exception, R1>::value, R1>>
-    details::enable_if_t<details::holds_prototype<F, R, E>::value, T>
+    details::enable_if_t<
+        details::holds_prototype<F, R, E>::value,
+        const_reference_value_type>
         or_exception(F cont) const
     {
         if (is_succ()) {

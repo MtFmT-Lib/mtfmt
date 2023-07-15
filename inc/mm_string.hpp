@@ -1042,6 +1042,129 @@ public:
     }
 
     /**
+     * @brief 对有符号整数值进行格式化并返回
+     *
+     * @param[in] value: 需要转换的值
+     * @param[in] index: 指定转换的进制
+     * @param[in] sign: 指定转换过程中的符号处理方式
+     */
+    template <typename T>
+    static details::enable_if_t<
+        std::is_signed<T>::value &&
+            std::numeric_limits<T>::is_integer &&
+            sizeof(T) <= sizeof(int32_t),
+        result<string, error_code_t>>
+        from(
+            const T& value,
+            MStrFmtIntIndex index = MStrFmtIntIndex_Dec,
+            MStrFmtSignDisplay sign = MStrFmtSignDisplay_NegOnly
+        ) noexcept
+    {
+        string ret_str;
+        error_code_t res = mstr_fmt_itoa(
+            &ret_str.this_obj, static_cast<int32_t>(value), index, sign
+        );
+        if (MSTR_SUCC(res)) {
+            return ret_str;
+        }
+        else {
+            return res;
+        }
+    }
+
+    /**
+     * @brief 对无符号整数值进行格式化并返回
+     *
+     * @param[in] value: 需要转换的值
+     * @param[in] index: 指定转换的进制
+     */
+    template <typename T>
+    static details::enable_if_t<
+        std::is_unsigned<T>::value &&
+            std::numeric_limits<T>::is_integer &&
+            sizeof(T) <= sizeof(uint32_t),
+        result<string, error_code_t>>
+        from(
+            const T& value, MStrFmtIntIndex index = MStrFmtIntIndex_Dec
+        ) noexcept
+    {
+        string ret_str;
+        error_code_t res = mstr_fmt_utoa(
+            &ret_str.this_obj, static_cast<uint32_t>(value), index
+        );
+        if (MSTR_SUCC(res)) {
+            return ret_str;
+        }
+        else {
+            return res;
+        }
+    }
+
+    /**
+     * @brief 对有符号量化值进行格式化并返回
+     *
+     * @attention 定点数类型应该是整数类型的type alias,
+     * 并使用mtfmt::fixed_value转一下
+     *
+     * @param[in] value: 需要转换的值
+     * @param[in] q: 指定转换的量化值的精度
+     * @param[in] sign: 指定转换过程中的符号处理方式
+     */
+    template <typename T>
+    static details::enable_if_t<
+        std::is_signed<details::wrapper_t<T>>::value &&
+            details::is_instance_of<details::fixed_wrapper, T>::value,
+        result<string, error_code_t>>
+        from(
+            const T& value,
+            int32_t p,
+            MStrFmtSignDisplay sign = MStrFmtSignDisplay_NegOnly
+        ) noexcept
+    {
+        string ret_str;
+        error_code_t res = mstr_fmt_iqtoa(
+            &ret_str.this_obj,
+            static_cast<int32_t>(value.value),
+            p,
+            sign
+        );
+        if (MSTR_SUCC(res)) {
+            return ret_str;
+        }
+        else {
+            return res;
+        }
+    }
+
+    /**
+     * @brief 对无符号量化值进行格式化并返回
+     *
+     * @attention 定点数类型应该是整数类型的type alias,
+     * 并使用mtfmt::fixed_value转一下
+     *
+     * @param[in] value: 需要转换的值
+     * @param[in] q: 指定转换的量化值的精度
+     */
+    template <typename T>
+    static details::enable_if_t<
+        std::is_unsigned<details::wrapper_t<T>>::value &&
+            details::is_instance_of<details::fixed_wrapper, T>::value,
+        result<string, error_code_t>>
+        from(const T& value, uint32_t p) noexcept
+    {
+        string ret_str;
+        error_code_t res = mstr_fmt_uqtoa(
+            &ret_str.this_obj, static_cast<uint32_t>(value.value), p
+        );
+        if (MSTR_SUCC(res)) {
+            return ret_str;
+        }
+        else {
+            return res;
+        }
+    }
+
+    /**
      * @brief 取得Unicode代码点的字符
      *
      * @param u8char: utf-8字符串

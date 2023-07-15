@@ -68,16 +68,20 @@ extern "C"
     void string_retain_endwith(void);
     void string_retain_startwith(void);
 
-    void test_itoa_int_index(void);
-    void test_itoa_int_type(void);
-    void test_itoa_int_sign(void);
-    void test_itoa_uint_index(void);
-    void test_itoa_uint_type(void);
+    void itoa_int_index(void);
+    void itoa_int_type(void);
+    void itoa_int_sign(void);
+    void itoa_int_from(void);
+    void itoa_uint_index(void);
+    void itoa_uint_type(void);
+    void itoa_uint_from(void);
 
-    void test_qtoa_signed(void);
-    void test_qtoa_unsigned(void);
+    void qtoa_signed(void);
+    void qtoa_unsigned(void);
+    void qtoa_signed_from(void);
+    void qtoa_unsigned_from(void);
 
-    void test_ftoa_basic(void);
+    void ftoa_basic(void);
 
     void fmt_align_left(void);
     void fmt_align_left_fill(void);

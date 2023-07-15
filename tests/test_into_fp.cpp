@@ -16,6 +16,6 @@
 #include <stddef.h>
 #include <stdio.h>
 
-extern "C" void test_ftoa_basic(void)
+extern "C" void ftoa_basic(void)
 {
 }

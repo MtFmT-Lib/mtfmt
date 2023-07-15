@@ -16,7 +16,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-extern "C" void test_itoa_int_index(void)
+extern "C" void itoa_int_index(void)
 {
     // @mstr_fmt_itoa
     // MStrFmtIntIndex_Bin
@@ -51,7 +51,7 @@ extern "C" void test_itoa_int_index(void)
     ASSERT_EQUAL_VALUE(str_hex_prefix_upper, u8"0XAA55");
 }
 
-extern "C" void test_itoa_int_type(void)
+extern "C" void itoa_int_type(void)
 {
     // @mstr_fmt_itoa
     // i8
@@ -71,7 +71,7 @@ extern "C" void test_itoa_int_type(void)
     ASSERT_EQUAL_VALUE(str_32, u8"123-123");
 }
 
-extern "C" void test_itoa_int_sign(void)
+extern "C" void itoa_int_sign(void)
 {
     // @mstr_fmt_itoa
     // MStrFmtSignDisplay_NegOnly
@@ -99,7 +99,16 @@ extern "C" void test_itoa_int_sign(void)
     ASSERT_EQUAL_VALUE(str_space, u8" 123-123");
 }
 
-extern "C" void test_itoa_uint_index(void)
+extern "C" void itoa_int_from(void)
+{
+    // @mstr_fmt_itoa
+    // 这个函数的所有功能在其它地方测试过啦
+    // 所以简单确认下wrapper是否正确
+    mtfmt::string str = mtfmt::string::from(123).or_value(u8"error");
+    ASSERT_EQUAL_VALUE(str, u8"123");
+}
+
+extern "C" void itoa_uint_index(void)
 {
     // @mstr_fmt_utoa
     // MStrFmtIntIndex_Bin
@@ -134,7 +143,7 @@ extern "C" void test_itoa_uint_index(void)
     ASSERT_EQUAL_VALUE(str_hex_prefix_upper, u8"0XAA55");
 }
 
-extern "C" void test_itoa_uint_type(void)
+extern "C" void itoa_uint_type(void)
 {
     // @mstr_fmt_utoa
     // u8
@@ -149,4 +158,13 @@ extern "C" void test_itoa_uint_type(void)
     mtfmt::string str_32 = u8"";
     str_32.append_from(static_cast<uint32_t>(123));
     ASSERT_EQUAL_VALUE(str_32, u8"123");
+}
+
+extern "C" void itoa_uint_from(void)
+{
+    // @mstr_fmt_utoa
+    // 这个函数的所有功能在其它地方测试过啦
+    // 所以简单确认下wrapper是否正确
+    mtfmt::string str = mtfmt::string::from(123u).or_value(u8"error");
+    ASSERT_EQUAL_VALUE(str, u8"123");
 }
