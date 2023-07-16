@@ -45,4 +45,10 @@ void fmt_quat_value_dualprec(void)
 
 void fmt_quat_value_singprec(void)
 {
+    MString s;
+    EVAL(mstr_create_empty(&s));
+    // 1/4 ..
+    EVAL(mstr_format(&s, "@{0:q2}@", 1, 1));
+    ASSERT_EQUAL_STRING(&s, "@0.25@");
+    mstr_free(&s);
 }

@@ -1246,9 +1246,14 @@ static void parse_arg_get_fixed_props(
     // 跳过 `:` `q`
     const char* beg = token->beg + 2;
     uint32_t v1 = (uint32_t)(beg[0] - '0');
-    uint32_t v2 = (uint32_t)(beg[1] - '0');
-    // 计算值
-    arg_prop->a = v1 * 10 + v2;
+    if (token->len > 3 && IS_NUMBER(beg[1])) {
+        uint32_t v2 = (uint32_t)(beg[1] - '0');
+        arg_prop->a = v1 * 10 + v2;
+    }
+    else {
+        mstr_assert(token->len == 3);
+        arg_prop->a = v1;
+    }
     arg_prop->b = 0;
 }
 
