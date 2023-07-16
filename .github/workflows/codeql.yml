@@ -22,6 +22,13 @@ on:
         required: true
         default: "warning"
 
+concurrency:
+  group: CodeQL-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   analyze:
     permissions:
@@ -36,3 +43,18 @@ jobs:
         with:
           submodules: true
 
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: cpp
+
+      - name: Build
+        run: |
+          make dylib
+        env:
+          MTFMT_BUILD_C_DEFS: >-
+            -D_MSTR_BUILD_DYLIB=1
+          MTFMT_BUILD_USE_LTO: "1"
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
