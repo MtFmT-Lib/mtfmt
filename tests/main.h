@@ -81,6 +81,10 @@ extern "C"
 
     void ftoa_basic(void);
 
+    void parser_err_invaild_begin(void);
+    void parser_err_invaild_end(void);
+    void parser_err_invaild_fmt_spec(void);
+
     void fmt_integer_i8(void);
     void fmt_integer_i16(void);
     void fmt_integer_i32(void);

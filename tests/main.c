@@ -116,6 +116,10 @@ int main()
 
     RUN_TEST(ftoa_basic);
 
+    RUN_TEST(parser_err_invaild_begin);
+    RUN_TEST(parser_err_invaild_end);
+    RUN_TEST(parser_err_invaild_fmt_spec);
+
     RUN_TEST(fmt_integer_i8);
     RUN_TEST(fmt_integer_i16);
     RUN_TEST(fmt_integer_i32);
