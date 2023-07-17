@@ -50,9 +50,14 @@ jobs:
         run: |
           make coverage
         env:
-          MTFMT_BUILD_C_DEFS: "-D_MSTR_USE_MALLOC=0 -D_MSTR_USE_HARDWARE_DIV=0"
           MTFMT_BUILD_USE_LTO: "1"
           MTFMT_BUILD_COVERAGE: "1"
+          MTFMT_BUILD_C_DEFS: >-
+            -D_MSTR_USE_MALLOC=0
+            -D_MSTR_USE_HARDWARE_DIV=0
+            -D_MSTR_USE_UTF_8=1
+            -D_MSTR_USE_FP_FLOAT32=1
+            -D_MSTR_USE_FP_FLOAT64=1
       # 覆盖率报告
       - name: Code coverage report
         uses: threeal/gcovr-action@latest
