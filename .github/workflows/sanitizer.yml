@@ -1,0 +1,71 @@
+name: Tests
+
+on:
+  push:
+    paths:
+      - "inc/**.h"
+      - "inc/**.hpp"
+      - "src/**.c"
+      - "src/**.cpp"
+      - "tests/**.c"
+      - "tests/**.cpp"
+      - "Makefile"
+      - ".github/workflows/sanitizer.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "inc/**.h"
+      - "inc/**.hpp"
+      - "src/**.c"
+      - "src/**.cpp"
+      - "tests/**.c"
+      - "tests/**.cpp"
+      - "Makefile"
+      - ".github/workflows/sanitizer.yml"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+
+jobs:
+  sanitizer:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        sanitizer: [none, address, leak, undefined]
+    name: >-
+      Sanitizer ${{ matrix.sanitizer }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      # 设置GCC版本
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: latest
+      # 运行
+      - name: Test with sanitizer
+        if: ${{ matrix.sanitizer }} != 'none'
+        run: |
+          make test
+        env:
+          MTFMT_BUILD_DEBUG: "1"
+          MTFMT_BUILD_WITH_SANITIZER: "-fsanitize=${{ matrix.sanitizer }}"
+          MTFMT_BUILD_C_DEFS: >-
+            -D_MSTR_USE_MALLOC=1
+            -D_MSTR_USE_HARDWARE_DIV=1
+      # 运行
+      - name: Test without sanitizer
+        if: ${{ matrix.sanitizer }} == 'none'
+        run: |
+          make test
+        env:
+          MTFMT_BUILD_DEBUG: "1"
+          MTFMT_BUILD_C_DEFS: >-
+            -D_MSTR_USE_MALLOC=1
+            -D_MSTR_USE_HARDWARE_DIV=1
