@@ -58,7 +58,6 @@ mstr_io_init(void* context, MStrIOCallback* obj, MStrIOWrite cb_write);
  *
  * @param[inout] io: IO
  * @param[in] fmt: 格式化串
- * @param[in] buff_sz: buff的最大允许大小
  * @param[in] fmt_place: 预期fmt中使用的参数数目.
  * 最大不超过16(MFMT_PLACE_MAX_NUM)
  *
@@ -74,7 +73,6 @@ mstr_ioformat(
  *
  * @param[inout] io: IO
  * @param[in] fmt: 格式化串
- * @param[in] buff_sz: buff的最大允许大小
  * @param[in] fmt_place: 预期fmt中使用的参数数目.
  * 最大不超过16(MFMT_PLACE_MAX_NUM)
  * @param[in] ap_ptr: &ap

@@ -71,7 +71,6 @@ typedef enum tagMStrFmtIntIndex
  *
  * @param[in] fmt: 格式化串
  * @param[out] res_str: 格式化结果输出
- * @param[in] buff_sz: buff的最大允许大小
  * @param[in] fmt_place: 预期fmt中使用的参数数目.
  * 最大不超过16(MFMT_PLACE_MAX_NUM)
  *
@@ -84,8 +83,7 @@ mstr_format(MString* res_str, const char* fmt, usize_t fmt_place, ...);
  * @brief 格式化字符串
  *
  * @param[in] fmt: 格式化串
- * @param[out] buff: 格式化结果输出
- * @param[in] buff_sz: buff的最大允许大小
+ * @param[out] res_str: 格式化结果输出
  * @param[in] fmt_place: 预期fmt中使用的参数数目.
  * 最大不超过16(MFMT_PLACE_MAX_NUM)
  * @param[in] ap_ptr: &ap
