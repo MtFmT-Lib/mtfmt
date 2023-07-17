@@ -10,6 +10,7 @@ on:
       - "tests/**.c"
       - "tests/**.cpp"
       - "Makefile"
+      - "thirds/unity"
       - ".github/workflows/tests.yml"
   pull_request:
     branches: [master]
@@ -20,6 +21,7 @@ on:
       - "src/**.cpp"
       - "tests/**.c"
       - "tests/**.cpp"
+      - "thirds/unity"
       - "Makefile"
       - ".github/workflows/tests.yml"
   workflow_dispatch:
