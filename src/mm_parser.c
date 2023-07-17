@@ -108,9 +108,6 @@ typedef enum tagTokenType
     //! 'qXXu'
     TokenType_Type_UQuant,
 
-    //! f16
-    TokenType_Type_Floating16,
-
     //! f32
     TokenType_Type_Floating32,
 
@@ -1615,10 +1612,7 @@ type_quat_end:
 type_floating:
     LEX_MOVE_TO_NEXT(pstr);
     ch = LEX_PEEK_CHAR(pstr);
-    if (ch == '1') {
-        goto type_floating_1x;
-    }
-    else if (ch == '3') {
+    if (ch == '3') {
         goto type_floating_3x;
     }
     else if (ch == '6') {
@@ -1628,16 +1622,6 @@ type_floating:
         // 默认fp32
         LEX_ACCEPT_TOKEN(token, TokenType_Type_Floating32, pstr);
         goto acc;
-    }
-type_floating_1x:
-    LEX_MOVE_TO_NEXT(pstr);
-    ch = LEX_PEEK_CHAR(pstr);
-    if (ch == '6') {
-        LEX_MOVE_TO_NEXT(pstr);
-        LEX_ACCEPT_TOKEN(token, TokenType_Type_Floating16, pstr);
-    }
-    else {
-        goto err;
     }
 type_floating_3x:
     LEX_MOVE_TO_NEXT(pstr);
