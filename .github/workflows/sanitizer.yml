@@ -1,4 +1,4 @@
-name: Tests
+name: Sanitizer
 
 on:
   push:
@@ -35,7 +35,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        sanitizer: [none, address, leak, undefined]
+        sanitizer: [address, leak, undefined]
     name: >-
       Sanitizer ${{ matrix.sanitizer }}
     steps:
@@ -56,16 +56,6 @@ jobs:
         env:
           MTFMT_BUILD_DEBUG: "1"
           MTFMT_BUILD_WITH_SANITIZER: "-fsanitize=${{ matrix.sanitizer }}"
-          MTFMT_BUILD_C_DEFS: >-
-            -D_MSTR_USE_MALLOC=1
-            -D_MSTR_USE_HARDWARE_DIV=1
-      # 运行
-      - name: Test without sanitizer
-        if: ${{ matrix.sanitizer }} == 'none'
-        run: |
-          make test
-        env:
-          MTFMT_BUILD_DEBUG: "1"
           MTFMT_BUILD_C_DEFS: >-
             -D_MSTR_USE_MALLOC=1
             -D_MSTR_USE_HARDWARE_DIV=1

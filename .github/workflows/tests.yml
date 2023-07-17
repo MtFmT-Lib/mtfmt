@@ -41,7 +41,6 @@ jobs:
         buildin-div: ["0", "1"]
         buildin-alloc: ["0", "1"]
         utf-8-support: ["0", "1"]
-        sanitizer: [none, address, undefined]
     runs-on: ubuntu-latest
     name: >-
       Tests ${{ matrix.platform }}
@@ -70,6 +69,5 @@ jobs:
             -D_MSTR_USE_MALLOC=${{ matrix.buildin-alloc }}
             -D_MSTR_USE_HARDWARE_DIV=${{ matrix.buildin-div }}
             -D_MSTR_USE_UTF_8=${{ matrix.utf-8-support }}
-            -D_MSTR_USE_FP_FLOAT16=${{ matrix.fp }}
             -D_MSTR_USE_FP_FLOAT32=${{ matrix.fp }}
             -D_MSTR_USE_FP_FLOAT64=${{ matrix.fp }}

@@ -211,34 +211,6 @@
 #define _MSTR_RUNTIME_CTRLFLOW_MARKER 1
 #endif // _MSTR_RUNTIME_CTRLFLOW_MARKER
 
-#if !defined(_MSTR_USE_FP_FLOAT16)
-#if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
-    MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
-#if defined(__TARGET_FPU_SOFTVFP_VFPV3_FP16) ||     \
-    defined(__TARGET_FPU_SOFTVFP_VFPV3_D16_FP16) || \
-    defined(__TARGET_FPU_VFPV3_FP16) ||             \
-    defined(__TARGET_FPU_VFPV3_D16_FP16)
-/**
- * @brief 指定是否使用float16 (ARMCC指定fp16, 启用)
- *
- */
-#define _MSTR_USE_FP_FLOAT16 1
-#else
-/**
- * @brief 指定是否使用float16 (ARMCC未指定fp16, 不启用)
- *
- */
-#define _MSTR_USE_FP_FLOAT16 0
-#endif // ARMCC: __TARGET_FPU
-#else
-/**
- * @brief 指定是否使用float16 (默认不启用)
- *
- */
-#define _MSTR_USE_FP_FLOAT16 0
-#endif // MSTR_BUILD_CC
-#endif // _MSTR_USE_FP_FLOAT16
-
 #if !defined(_MSTR_USE_FP_FLOAT32)
 #if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
     MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
