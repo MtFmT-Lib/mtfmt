@@ -60,6 +60,4 @@ jobs:
           root: '.'
           coveralls-send: true
           github-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
-          excludes: |
-            test_*
-            thirds/*
+          exclude: thirds/*
