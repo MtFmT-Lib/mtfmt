@@ -1,0 +1,46 @@
+name: Tests
+
+on:
+  push:
+    paths:
+      - "inc/**.h"
+      - "inc/**.hpp"
+      - "src/**.c"
+      - "src/**.cpp"
+      - "tests/**.c"
+      - "tests/**.cpp"
+      - "Makefile"
+      - ".github/workflows/sanitizer.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "inc/**.h"
+      - "inc/**.hpp"
+      - "src/**.c"
+      - "src/**.cpp"
+      - "tests/**.c"
+      - "tests/**.cpp"
+      - "Makefile"
+      - ".github/workflows/sanitizer.yml"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+
+jobs:
+  sanitizer:
+    runs-on: ubuntu-latest
+    name: Sanitizer
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      # 设置GCC版本
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: latest
+      # TODO

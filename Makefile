@@ -13,7 +13,7 @@
 # MTFMT_BUILD_ARCH                      体系结构标记
 # MTFMT_BUILD_USE_LTO                   使用LTO
 # MTFMT_BUILD_COVERAGE                  代码测试覆盖率
-# MTFMT_BUILD_WITH_SANITIZE             需要启用的sanitizer
+# MTFMT_BUILD_WITH_SANITIZER            需要启用的sanitizer
 
 ifdef MTFMT_BUILD_TARGET_NAME
 TARGET_NAME = $(MTFMT_BUILD_TARGET_NAME)
@@ -130,8 +130,8 @@ ifeq ($(MTFMT_BUILD_COVERAGE),1)
 OPT += -fprofile-arcs -ftest-coverage
 endif
 # sanifizer选项
-ifdef MTFMT_BUILD_WITH_SANITIZE
-OPT += $(MTFMT_BUILD_WITH_SANITIZE)
+ifdef MTFMT_BUILD_WITH_SANITIZER
+OPT += $(MTFMT_BUILD_WITH_SANITIZER)
 endif
 
 # C defines
@@ -187,6 +187,10 @@ endif
 TEST_LD_OPTS += -lstdc++
 ifeq ($(MTFMT_BUILD_COVERAGE),1)
 TEST_LD_OPTS += -lgcov
+endif
+
+ifdef MTFMT_BUILD_WITH_SANITIZER
+TEST_LD_OPTS += $(MTFMT_BUILD_WITH_SANITIZER)
 endif
 
 # 回收不需要的段
