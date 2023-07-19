@@ -34,18 +34,10 @@
 //
 
 static mstr_result_t patt_match_naive(
-    MStringMatchResult*,
-    const mstr_char_t*,
-    usize_t,
-    const mstr_char_t*,
-    usize_t
+    isize_t*, const mstr_char_t*, usize_t, const mstr_char_t*, usize_t
 );
 static mstr_result_t patt_match_large(
-    MStringMatchResult*,
-    const mstr_char_t*,
-    usize_t,
-    const mstr_char_t*,
-    usize_t
+    isize_t*, const mstr_char_t*, usize_t, const mstr_char_t*, usize_t
 );
 
 //
@@ -61,50 +53,82 @@ mstr_find(
     usize_t pattern_cnt
 )
 {
-    mstr_result_t res;
-    MStringMatchResult find_res;
     usize_t offset;
-    if (begin_pos > str->length || pattern_cnt > str->count) {
+    isize_t find_res;
+    mstr_result_t ret_code;
+    offset = mstr_char_offset_at(str, begin_pos);
+    ret_code = mstr_find_simple(
+        &find_res, str->buff, str->count, offset, pattern, pattern_cnt
+    );
+    if (MSTR_SUCC(ret_code)) {
+        if (find_res == -1) {
+            f_res->is_matched = False;
+            f_res->begin_pos = 0;
+            f_res->begin_offset = 0;
+        }
+        else {
+            usize_t cur_cnt = 0;
+            usize_t cur_len = 0;
+            const char* it = str->buff + offset;
+            while (cur_cnt != (usize_t)find_res) {
+                usize_t cnt = mstr_char_length(*it);
+                it += cnt;
+                cur_len += 1;
+                cur_cnt += cnt;
+            }
+            f_res->is_matched = True;
+            f_res->begin_pos = cur_len;
+            f_res->begin_offset = (usize_t)find_res;
+        }
+    }
+    return ret_code;
+}
+
+MSTR_EXPORT_API(mstr_result_t)
+mstr_find_simple(
+    isize_t* result,
+    const char* main_str,
+    usize_t main_str_cnt,
+    usize_t begin_pos,
+    const char* pattern,
+    usize_t pattern_cnt
+)
+{
+    isize_t find_res = -1;
+    mstr_result_t ret_code;
+    if (begin_pos > main_str_cnt || pattern_cnt > main_str_cnt) {
         // 超过主串的长度了, 肯定是找不到的
         // 子串过长, 肯定是找不到的
-        f_res->is_matched = false;
-        f_res->begin_pos = 0;
-        f_res->begin_offset = 0;
+        *result = -1;
         return MStr_Ok;
     }
     if (pattern_cnt == 0) {
         // 空的, 永远返回true
-        f_res->begin_pos = 0;
-        f_res->begin_offset = 0;
-        f_res->is_matched = True;
+        *result = 0;
         return MStr_Ok;
     }
-    offset = mstr_char_offset_at(str, begin_pos);
     if (pattern_cnt < BM_THRESHOLD_CNT) {
-        res = patt_match_naive(
+        ret_code = patt_match_naive(
             &find_res,
-            str->buff + offset,
-            str->count - offset,
+            main_str + begin_pos,
+            main_str_cnt - begin_pos,
             pattern,
             pattern_cnt
         );
     }
     else {
-        res = patt_match_large(
+        ret_code = patt_match_large(
             &find_res,
-            str->buff + offset,
-            str->count - offset,
+            main_str + begin_pos,
+            main_str_cnt - begin_pos,
             pattern,
             pattern_cnt
         );
     }
-    if (MSTR_SUCC(res)) {
-        f_res->is_matched = find_res.is_matched;
-        f_res->begin_pos = f_res->is_matched ? find_res.begin_pos : 0;
-        f_res->begin_offset =
-            f_res->is_matched ? find_res.begin_offset : 0;
+    if (MSTR_SUCC(ret_code)) {
+        *result = find_res;
     }
-    return res;
+    return ret_code;
 }
 
 /**
@@ -117,23 +141,20 @@ mstr_find(
  * @param[in] patt_len: 模式串长度
  */
 static mstr_result_t patt_match_naive(
-    MStringMatchResult* res,
+    isize_t* res,
     const mstr_char_t* mstr,
     usize_t mstr_cnt,
     const mstr_char_t* patt,
     usize_t patt_cnt
 )
 {
-    usize_t offset = 0;
     usize_t match_cnt = patt_cnt - 1;
     const mstr_char_t* m_b = mstr;
     const mstr_char_t* m_p = mstr;
     const mstr_char_t* m_end = mstr + mstr_cnt;
     mstr_assert(patt_cnt > 0);
     // 默认为没有找到
-    res->begin_pos = 0;
-    res->begin_offset = 0;
-    res->is_matched = False;
+    *res = -1;
     // 匹配子串
     while (m_p < m_end - match_cnt) {
         isize_t i = (isize_t)match_cnt;
@@ -143,15 +164,12 @@ static mstr_result_t patt_match_naive(
         }
         if (i < 0) {
             // 匹配成功
-            res->begin_pos = offset;
-            res->begin_offset = (usize_t)(m_p - m_b);
-            res->is_matched = True;
+            *res = (isize_t)(m_p - m_b);
             break;
         }
         else {
             // 匹配失败, 跳过1个字符的距离
-            offset += 1;
-            m_p += mstr_char_length(*m_p);
+            m_p += 1;
         }
     }
     return MStr_Ok;
@@ -167,7 +185,7 @@ static mstr_result_t patt_match_naive(
  * @param[in] patt_cnt: 模式串长度
  */
 static mstr_result_t patt_match_large(
-    MStringMatchResult* res,
+    isize_t* res,
     const mstr_char_t* mstr,
     usize_t mstr_cnt,
     const mstr_char_t* patt,
@@ -182,8 +200,7 @@ static mstr_result_t patt_match_large(
     const usize_t BAD_CHAR_MAX_OFFSET = 255;
     mstr_assert(patt_cnt > 0);
     // 默认为没有找到
-    res->begin_pos = 0;
-    res->is_matched = False;
+    *res = -1;
     // 分配bad char数组
     bad_char_arr = (uint8_t*)mstr_heap_alloc(
         sizeof(*bad_char_arr) * BM_CHAR_INDEX_MAX
@@ -216,16 +233,7 @@ static mstr_result_t patt_match_large(
         }
         if (i < 0) {
             // 匹配成功
-            usize_t ch_cnt = 0;
-            res->is_matched = True;
-            res->begin_offset = (usize_t)(m_p - m_b);
-            // 计算跨过了多少utf-8的字符串
-            while (m_b < m_p) {
-                usize_t cnt = mstr_char_length(*m_b);
-                ch_cnt += 1;
-                m_b += cnt;
-            }
-            res->begin_pos = ch_cnt;
+            *res = (isize_t)(m_p - m_b);
             break;
         }
         else {
