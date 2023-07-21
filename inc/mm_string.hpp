@@ -300,7 +300,8 @@ public:
      */
     string(const string& str) noexcept
     {
-        mstr_copy_create(&this_obj, &str.this_obj);
+        mstr_create_empty(&this_obj);
+        mstr_copy_from(&this_obj, &str.this_obj);
     }
 
     ~string()

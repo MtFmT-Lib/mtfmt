@@ -84,8 +84,11 @@ mstr_create(MString* str, const char* content)
 }
 
 MSTR_EXPORT_API(void)
-mstr_move_create(MString* str, MString* other)
+mstr_move_from(MString* str, MString* other)
 {
+    if (str->buff != NULL) {
+        mstr_free(str);
+    }
     if (other->buff == other->stack_region) {
         str->buff = str->stack_region;
         str->count = other->count;
@@ -104,9 +107,12 @@ mstr_move_create(MString* str, MString* other)
 }
 
 MSTR_EXPORT_API(mstr_result_t)
-mstr_copy_create(MString* str, const MString* other)
+mstr_copy_from(MString* str, const MString* other)
 {
     mstr_result_t result = MStr_Ok;
+    if (str->buff != NULL) {
+        mstr_free(str);
+    }
     MSTR_AND_THEN(result, mstr_create(str, ""));
     MSTR_AND_THEN(result, mstr_concat(str, other));
     return result;

@@ -181,22 +181,27 @@ mstr_create(MString* str, const char* content);
 #define mstr_create_empty(s) (mstr_create((s), "\0"))
 
 /**
- * @brief 移动字符串来创建
+ * @brief 从other移动字符串到str
  *
- * @param[out] str: 需要创建的字符串结构
+ * @param[out] str: 目标字符串
  * @param[inout] other: 需要移动的字符串
+ *
+ * @attention 该函数转移other的所有权, other不需要再次释放
  */
 MSTR_EXPORT_API(void)
-mstr_move_create(MString* str, MString* other);
+mstr_move_from(MString* str, MString* other);
 
 /**
- * @brief 复制字符串来创建
+ * @brief 从other复制字符串到str
  *
- * @param[out] str: 需要创建的字符串结构
+ * @param[out] str: 目标字符串
  * @param[in] other: 需要移动的字符串
+ *
+ * @attention 该函数会清空释放原有的字符串并创建一个新的,
+ * other需要再次释放
  */
 MSTR_EXPORT_API(mstr_result_t)
-mstr_copy_create(MString* str, const MString* other);
+mstr_copy_from(MString* str, const MString* other);
 
 /**
  * @brief 拼接字符串
