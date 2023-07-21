@@ -1,4 +1,4 @@
-name: "Build dylib"
+name: "make dylib"
 
 on:
   push:
@@ -7,14 +7,14 @@ on:
       - "src/**.c"
       - "inc/**.h"
       - "Makefile"
-      - ".github/workflows/build-dylib.yml"
+      - ".github/workflows/make-dylib.yml"
   pull_request:
     branches: [master]
     paths:
       - "src/**.c"
       - "inc/**.h"
       - "Makefile"
-      - ".github/workflows/build-dylib.yml"
+      - ".github/workflows/make-dylib.yml"
   workflow_dispatch:
     inputs:
       logLevel:

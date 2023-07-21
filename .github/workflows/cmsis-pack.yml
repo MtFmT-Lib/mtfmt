@@ -1,4 +1,4 @@
-name: "Build CMSIS pack"
+name: "CMSIS pack"
 
 on:
   push:

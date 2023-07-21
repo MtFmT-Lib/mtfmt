@@ -8,8 +8,8 @@ MtFmT
 
 
 [![TESTS](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/tests.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/tests.yml)
-[![DYLIB-BUILD](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-dylib.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-dylib.yml)
-[![LIB-BUILD](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-staticlib.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-staticlib.yml)
+[![DYLIB-BUILD](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-dylib.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-dylib.yml)
+[![LIB-BUILD](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-lib.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-lib.yml)
 [![CMAKE-BUILD](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/cmake-build.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/cmake-build.yml)
 [![CLANG-FORMAT](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/format-checker.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/format-checker.yml)
 
@@ -17,8 +17,8 @@ MtFmT
 \[ [HomePage](https://mtfmt.cc/mtfmt/) \]
 \[ [Document](https://mtfmt.cc/mtfmt/doc) \]
 \[ [Code Document](https://mtfmt.cc/mtfmt/html/) \]
-\[ [Pre-build Libs](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-staticlib.yml) \]
-\[ [Pre-build DLLs](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-dylib.yml) \]
+\[ [Pre-build Libs](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-lib.yml) \]
+\[ [Pre-build DLLs](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-dylib.yml) \]
 
 
 一个类似于`{fmtlib}`和python的format语法的字符串格式化库，以足够低的资源占用和足够高的性能实现string format。
