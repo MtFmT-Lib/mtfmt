@@ -33,6 +33,9 @@
 // private:
 //
 
+static mstr_result_t mstr_find_simple(
+    isize_t*, const char*, usize_t, usize_t, const char*, usize_t
+);
 static mstr_result_t patt_match_naive(
     isize_t*, const mstr_char_t*, usize_t, const mstr_char_t*, usize_t
 );
@@ -84,8 +87,18 @@ mstr_find(
     return ret_code;
 }
 
-MSTR_EXPORT_API(mstr_result_t)
-mstr_find_simple(
+/**
+ * @brief 字符串查找(仅返回字符的count)
+ *
+ * @param[out] result: 结果, -1表示没有找到
+ * @param[in] main_str: 主串
+ * @param[in] main_str_cnt: 主串的字符计数
+ * @param[in] begin_pos: 开始查找的位置的字符计数偏移量
+ * @param[in] pattern: 模式串
+ * @param[in] pattern_cnt: 模式串的长度计数
+ *
+ */
+static mstr_result_t mstr_find_simple(
     isize_t* result,
     const char* main_str,
     usize_t main_str_cnt,

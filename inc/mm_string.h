@@ -388,29 +388,6 @@ mstr_find(
 );
 
 /**
- * @brief 字符串查找(仅返回字符的count)
- *
- * @param[out] result: 结果, -1表示没有找到
- * @param[in] main_str: 主串
- * @param[in] main_str_cnt: 主串的字符计数
- * @param[in] begin_pos: 开始查找的位置的字符计数偏移量
- * @param[in] pattern: 模式串
- * @param[in] pattern_cnt: 模式串的长度计数
- *
- @attention 通常情况下该函数仅供内部实现使用, 因为参数很不统一,
- 使用它注意确认字符长度都是字符的计数值(即strlen的结果)
- */
-MSTR_EXPORT_API(mstr_result_t)
-mstr_find_simple(
-    isize_t* result,
-    const char* main_str,
-    usize_t main_str_cnt,
-    usize_t begin_pos,
-    const char* pattern,
-    usize_t pattern_cnt
-);
-
-/**
  * @brief 进行字符串替换
  *
  * @param[inout] str: 字符串
