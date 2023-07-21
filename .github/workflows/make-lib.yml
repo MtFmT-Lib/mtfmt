@@ -1,4 +1,4 @@
-name: "Build staticlib"
+name: "make lib"
 
 on:
   push:
