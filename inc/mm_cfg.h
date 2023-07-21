@@ -85,30 +85,41 @@
 // TODO
 #endif // _MSC_VER
 
-#if !defined(_MSTR_USE_HARDWARE_DIV)
-#if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
-    MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
-#if defined(__TARGET_FEATURE_DIVIDE)
+#if !defined(_MSTR_BUILD_DLL)
 /**
- * @brief 指定是否使用硬件除法指令(跟随arm cc, 使用)
+ * @brief 指定是否使用动态库构建
  *
  */
-#define _MSTR_USE_HARDWARE_DIV 1
-#else
+#define _MSTR_BUILD_DLL 0
+#endif // _MSTR_BUILD_DLL
+
+#if !defined(_MSTR_USE_ALLOC)
 /**
- * @brief 指定是否使用硬件除法指令(跟随arm cc, 关闭)
+ * @brief 指定是否使用内存分配 (默认启用)
  *
  */
-#define _MSTR_USE_HARDWARE_DIV 1
-#endif // __TARGET_FEATURE_DIVIDE
-#else
+#define _MSTR_USE_ALLOC 1
+#endif // _MSTR_USE_ALLOC
+
+#if !defined(_MSTR_USE_UTF_8)
 /**
- * @brief 指定是否使用硬件除法指令 (关闭)
+ * @brief 指定是否启用UTF-8支持
  *
  */
-#define _MSTR_USE_HARDWARE_DIV 0
-#endif // 硬件除法, 默认关掉
-#endif // _MSTR_USE_HARDWARE_DIV
+#define _MSTR_USE_UTF_8 1
+#endif // _MSTR_USE_UTF_8
+
+#if !defined(_MSTR_USE_STD_IO)
+/**
+ * @brief 指定是否使用stdout这些标准io操作 (默认不启用)
+ *
+ */
+#define _MSTR_USE_STD_IO 0
+#endif // _MSTR_USE_STD_IO
+
+#if _MSTR_USE_STD_IO
+#include <stdio.h>
+#endif // _MSTR_USE_STD_IO
 
 #if !defined(_MSTR_USE_MALLOC)
 /**
@@ -117,6 +128,14 @@
  */
 #define _MSTR_USE_MALLOC 0
 #endif // _MSTR_USE_MALLOC
+
+#if !defined(_MSTR_RUNTIME_HEAP_ALIGN)
+/**
+ * @brief 指定堆分配的对齐值
+ *
+ */
+#define _MSTR_RUNTIME_HEAP_ALIGN 4
+#endif // _MSTR_RUNTIME_HEAP_ALIGN
 
 #if _MSTR_USE_MALLOC
 #include <stdlib.h>
@@ -183,25 +202,30 @@
 #define _MSTR_RUNTIME_HEAP_TRACING(type, ptr, size, old_size) ((void)0U)
 #endif // _MSTR_RUNTIME_HEAP_TRACING
 
-#if !defined(_MSTR_RUNTIME_HEAP_ALIGN)
+#if !defined(_MSTR_USE_CPP_EXCEPTION)
+#if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
+    MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
+#if defined(__EXCEPTIONS)
 /**
- * @brief 指定堆分配的对齐值
+ * @brief 指定是否使用异常(跟随arm cc, 使用)
  *
  */
-#define _MSTR_RUNTIME_HEAP_ALIGN 4
-#endif // _MSTR_RUNTIME_HEAP_ALIGN
-
-#if !defined(_MSTR_USE_STD_IO)
+#define _MSTR_USE_CPP_EXCEPTION 1
+#else
 /**
- * @brief 指定是否使用stdout这些标准io操作
+ * @brief 指定是否使用异常(跟随arm cc, 不使用)
  *
  */
-#define _MSTR_USE_STD_IO 0
-#endif // _MSTR_USE_STD_IO
-
-#if _MSTR_USE_STD_IO
-#include <stdio.h>
-#endif // _MSTR_USE_STD_IO
+#define _MSTR_USE_CPP_EXCEPTION 0
+#endif // __EXCEPTIONS
+#else
+/**
+ * @brief 指定是否使用异常 (默认打开)
+ *
+ */
+#define _MSTR_USE_CPP_EXCEPTION 1
+#endif // MSTR_BUILD_CC
+#endif // _MSTR_USE_CPP_EXCEPTION
 
 #if !defined(_MSTR_RUNTIME_CTRLFLOW_MARKER)
 /**
@@ -210,6 +234,44 @@
  */
 #define _MSTR_RUNTIME_CTRLFLOW_MARKER 1
 #endif // _MSTR_RUNTIME_CTRLFLOW_MARKER
+
+#if !defined(_MSTR_USE_HARDWARE_DIV)
+#if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
+    MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
+#if defined(__TARGET_FEATURE_DIVIDE)
+/**
+ * @brief 指定是否使用硬件除法指令(跟随arm cc, 使用)
+ *
+ */
+#define _MSTR_USE_HARDWARE_DIV 1
+#else
+/**
+ * @brief 指定是否使用硬件除法指令(跟随arm cc, 关闭)
+ *
+ */
+#define _MSTR_USE_HARDWARE_DIV 1
+#endif // __TARGET_FEATURE_DIVIDE
+#elif MSTR_BUILD_CC == MSTR_BUILD_CC_GNUC && \
+    (defined(__x86_64__) || defined(__i386__))
+/**
+ * @brief 指定是否使用硬件除法指令 (x86_64, enable)
+ *
+ */
+#define _MSTR_USE_HARDWARE_DIV 1
+#elif MSTR_BUILD_CC == MSTR_BUILD_CC_MSVC
+/**
+ * @brief 指定是否使用硬件除法指令 (x86_64, aarch64, enable)
+ *
+ */
+#define _MSTR_USE_HARDWARE_DIV 1
+#else
+/**
+ * @brief 指定是否使用硬件除法指令 (关闭)
+ *
+ */
+#define _MSTR_USE_HARDWARE_DIV 0
+#endif // 硬件除法, 默认关掉
+#endif // _MSTR_USE_HARDWARE_DIV
 
 #if !defined(_MSTR_USE_FP_FLOAT32)
 #if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
@@ -227,6 +289,19 @@
  */
 #define _MSTR_USE_FP_FLOAT32 0
 #endif // ARMCC: __TARGET_FPU
+#elif MSTR_BUILD_CC == MSTR_BUILD_CC_GNUC && \
+    (defined(__x86_64__) || defined(__i386__))
+/**
+ * @brief 指定是否使用float32 (x86_64, enable)
+ *
+ */
+#define _MSTR_USE_FP_FLOAT32 1
+#elif MSTR_BUILD_CC == MSTR_BUILD_CC_MSVC
+/**
+ * @brief 指定是否使用float32 (x86_64, aarch64, enable)
+ *
+ */
+#define _MSTR_USE_FP_FLOAT32 1
 #else
 /**
  * @brief 指定是否使用float32
@@ -257,6 +332,19 @@
  */
 #define _MSTR_USE_FP_FLOAT64 0
 #endif // ARMCC: __TARGET_FPU
+#elif MSTR_BUILD_CC == MSTR_BUILD_CC_GNUC && \
+    (defined(__x86_64__) || defined(__i386__))
+/**
+ * @brief 指定是否使用float32 (x86_64, enable)
+ *
+ */
+#define _MSTR_USE_FP_FLOAT32 1
+#elif MSTR_BUILD_CC == MSTR_BUILD_CC_MSVC
+/**
+ * @brief 指定是否使用float64 (x86_64, aarch64, enable)
+ *
+ */
+#define _MSTR_USE_FP_FLOAT64 1
 #else
 /**
  * @brief 指定是否使用float64
@@ -270,66 +358,23 @@
  * @brief 是否有float的支持
  *
  */
-#define _MSTR_USE_FP                                 \
-    (_MSTR_USE_FP_FLOAT16 || _MSTR_USE_FP_FLOAT32 || \
-     _MSTR_USE_FP_FLOAT64)
-
-#if !defined(_MSTR_USE_CPP_EXCEPTION)
-#if MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCLANG || \
-    MSTR_BUILD_CC == MSTR_BUILD_CC_ARMCC
-#if defined(__EXCEPTIONS)
-/**
- * @brief 指定是否使用异常(跟随arm cc, 使用)
- *
- */
-#define _MSTR_USE_CPP_EXCEPTION 1
-#else
-/**
- * @brief 指定是否使用异常(跟随arm cc, 不使用)
- *
- */
-#define _MSTR_USE_CPP_EXCEPTION 0
-#endif // __EXCEPTIONS
-#else
-/**
- * @brief 指定是否使用异常 (默认打开)
- *
- */
-#define _MSTR_USE_CPP_EXCEPTION 1
-#endif // MSTR_BUILD_CC
-#endif // _MSTR_USE_CPP_EXCEPTION
-
-#if !defined(_MSTR_USE_UTF_8)
-/**
- * @brief 指定是否启用UTF-8支持
- *
- */
-#define _MSTR_USE_UTF_8 1
-#endif // _MSTR_USE_UTF_8
-
-#if !defined(_MSTR_BUILD_DLL)
-/**
- * @brief 指定是否使用动态库构建
- *
- */
-#define _MSTR_BUILD_DLL 0
-#endif // _MSTR_BUILD_DLL
+#define _MSTR_USE_FP (_MSTR_USE_FP_FLOAT32 || _MSTR_USE_FP_FLOAT64)
 
 #if _MSTR_RUNTIME_CTRLFLOW_MARKER
 #if defined(USE_FULL_ASSERT)
 #include "stm32_assert.h"
 /**
- * @brief 标记不可达的分支
+ * @brief 标记不可达的分支 (stm32 HAL/LL assert_param)
  *
  */
 #define mstr_unreachable()         assert_param(0)
 /**
- * @brief 边界检查
+ * @brief 边界检查 (stm32 HAL/LL assert_param)
  *
  */
 #define mstr_bounding_check(expr)  assert_param(!!(expr))
 /**
- * @brief 造成异常
+ * @brief 造成异常 (stm32 HAL/LL assert_param)
  *
  */
 #define mstr_cause_exception(code) assert_param(0)
@@ -423,22 +468,22 @@
 #define MSTRCFG_USE_CXX_EXCEPTION  0x20
 
 /**
- * @brief 标记是否使用了float16支持
- *
- */
-#define MSTRCFG_USE_FLOAT16        0x40
-
-/**
  * @brief 标记是否使用了float支持
  *
  */
-#define MSTRCFG_USE_FLOAT32        0x80
+#define MSTRCFG_USE_FLOAT32        0x40
 
 /**
  * @brief 标记是否使用了float64支持
  *
  */
-#define MSTRCFG_USE_FLOAT64        0x100
+#define MSTRCFG_USE_FLOAT64        0x80
+
+/**
+ * @brief 标记是否使用了分配器
+ *
+ */
+#define MSTRCFG_USE_ALLOCATOR      0x100
 
 /**
  * @brief 取得库版本信息
