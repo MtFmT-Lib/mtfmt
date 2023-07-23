@@ -9,9 +9,9 @@
  * @copyright Copyright (c) 向阳, all rights reserved.
  *
  */
-#include "helper.h"
-#include "main.h"
 #include "mm_parser.h"
+#include "test_helper.h"
+#include "test_main.h"
 #include "unity.h"
 #include <stddef.h>
 #include <stdio.h>

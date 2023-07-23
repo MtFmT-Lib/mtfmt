@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    main.h
+ * @file    test_main.h
  * @author  向阳 (hinata.hoshino@foxmail.com)
  * @brief   所有可用的测试
  * @version 1.0

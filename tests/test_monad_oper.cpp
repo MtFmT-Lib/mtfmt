@@ -9,8 +9,8 @@
  * @copyright Copyright (c) 向阳, all rights reserved.
  *
  */
-#include "main.h"
 #include "mtfmt.hpp"
+#include "test_main.h"
 #include "unity.h"
 #include <exception>
 #include <stddef.h>
