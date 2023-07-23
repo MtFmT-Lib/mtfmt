@@ -6,6 +6,9 @@ on:
     paths:
       - "src/**.c"
       - "inc/**.h"
+      - "examples/**.h"
+      - "examples/**.c"
+      - "examples/**.cpp"
       - "Makefile"
       - ".github/workflows/make-examples.yml"
   pull_request:
@@ -13,6 +16,9 @@ on:
     paths:
       - "src/**.c"
       - "inc/**.h"
+      - "examples/**.h"
+      - "examples/**.c"
+      - "examples/**.cpp"
       - "Makefile"
       - ".github/workflows/make-examples.yml"
   workflow_dispatch:
@@ -88,3 +94,9 @@ jobs:
           MTFMT_BUILD_USE_LTO: "1"
           MTFMT_BUILD_TARGET_NAME: "mtfmt_${{ matrix.os }}_${{ matrix.arch }}"
           MTFMT_BUILD_EXEFILE_EXT: ".exe"
+      - name: Upload artifact
+        if: github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}_${{ matrix.arch }}-artifact
+          path: target/*.exe
