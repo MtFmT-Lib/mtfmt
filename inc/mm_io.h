@@ -93,6 +93,56 @@ mstr_iovformat(
  */
 MSTR_EXPORT_API(MStrIOCallback*) mstr_get_stdout(void);
 
+#define MSTR_COUNT_VA_ARGS_HELPER( \
+    _0,                            \
+    _1,                            \
+    _2,                            \
+    _3,                            \
+    _4,                            \
+    _5,                            \
+    _6,                            \
+    _7,                            \
+    _8,                            \
+    _9,                            \
+    _10,                           \
+    _11,                           \
+    _12,                           \
+    _13,                           \
+    _14,                           \
+    _15,                           \
+    _16,                           \
+    N,                             \
+    ...                            \
+)                                  \
+    N
+
+/**
+ * @brief 取得可变参数宏的参数个数
+ *
+ */
+#define MSTR_COUNT_VA_ARGS(...) \
+    MSTR_COUNT_VA_ARGS_HELPER(  \
+        0,                      \
+        ##__VA_ARGS__,          \
+        16,                     \
+        15,                     \
+        14,                     \
+        13,                     \
+        12,                     \
+        11,                     \
+        10,                     \
+        9,                      \
+        8,                      \
+        7,                      \
+        6,                      \
+        5,                      \
+        4,                      \
+        3,                      \
+        2,                      \
+        1,                      \
+        0                       \
+    )
+
 #if _MSTR_USE_STD_IO
 /**
  * @brief 写到 stdout
@@ -100,9 +150,12 @@ MSTR_EXPORT_API(MStrIOCallback*) mstr_get_stdout(void);
  * @attention 宏 _MSTR_USE_STD_IO 为1时有效, 该宏假定格式化参数为最大值,
  *            可能会为坏坏刻意修改格式化串从而造成二进制安全问题
  */
-#define mstr_print(fmt, ...)                                    \
-    (mstr_ioformat(                                             \
-        mstr_get_stdout(), fmt, MFMT_PLACE_MAX_NUM, __VA_ARGS__ \
+#define mstr_print(fmt, ...)             \
+    (mstr_ioformat(                      \
+        mstr_get_stdout(),               \
+        fmt,                             \
+        MSTR_COUNT_VA_ARGS(__VA_ARGS__), \
+        ##__VA_ARGS__                    \
     ))
 #else
 /**
