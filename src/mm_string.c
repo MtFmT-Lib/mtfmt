@@ -50,36 +50,36 @@ static mstr_result_t
 MSTR_EXPORT_API(mstr_result_t)
 mstr_create(MString* str, const char* content)
 {
-    usize_t content_len, content_cnt;
     if (content == NULL || content[0] == '\0') {
-        content_len = 0;
-        content_cnt = 0;
+        mstr_init(str);
+        return MStr_Ok;
     }
     else {
+        usize_t content_len, content_cnt;
         mstr_strlen(&content_len, &content_cnt, content, NULL);
-    }
-    str->count = content_cnt;
-    str->length = content_len;
-    if (content_cnt == 0) {
-        str->buff = str->stack_region;
-        str->cap_size = MSTR_STACK_REGION_SIZE;
-        return MStr_Ok;
-    }
-    else if (content_cnt < MSTR_STACK_REGION_SIZE) {
-        str->buff = str->stack_region;
-        str->cap_size = MSTR_STACK_REGION_SIZE;
-        strcpy(str->buff, content);
-        return MStr_Ok;
-    }
-    else {
-        str->cap_size = content_cnt + MSTR_STACK_REGION_SIZE;
-        str->buff = (char*)mstr_heap_alloc(str->cap_size);
-        if (str->buff == NULL) {
-            // 内存分配失败
-            return MStr_Err_HeapTooSmall;
+        str->count = content_cnt;
+        str->length = content_len;
+        if (content_cnt == 0) {
+            // str->buff =...;
+            // str->cap_size = ...;
+            return MStr_Ok;
         }
-        memcpy(str->buff, content, content_cnt);
-        return MStr_Ok;
+        else if (content_cnt < MSTR_STACK_REGION_SIZE) {
+            str->buff = str->stack_region;
+            str->cap_size = MSTR_STACK_REGION_SIZE;
+            strcpy(str->buff, content);
+            return MStr_Ok;
+        }
+        else {
+            str->cap_size = content_cnt + MSTR_STACK_REGION_SIZE;
+            str->buff = (char*)mstr_heap_alloc(str->cap_size);
+            if (str->buff == NULL) {
+                // 内存分配失败
+                return MStr_Err_HeapTooSmall;
+            }
+            memcpy(str->buff, content, content_cnt);
+            return MStr_Ok;
+        }
     }
 }
 

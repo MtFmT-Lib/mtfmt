@@ -270,7 +270,7 @@ public:
      */
     string() noexcept
     {
-        mstr_create_empty(&this_obj);
+        mstr_init(&this_obj);
     }
 
     /**
@@ -300,7 +300,7 @@ public:
      */
     string(const string& str) noexcept
     {
-        mstr_create_empty(&this_obj);
+        mstr_init(&this_obj);
         mstr_copy_from(&this_obj, &str.this_obj);
     }
 

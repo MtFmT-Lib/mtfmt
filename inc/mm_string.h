@@ -167,6 +167,19 @@ typedef struct tagMStringIter
 } MStringIter;
 
 /**
+ * @brief 初始化一个空的字符串
+ *
+ * @param[inout] pstr: 字符串
+ */
+#define mstr_init(pstr)                            \
+    do {                                           \
+        (pstr)->count = 0;                         \
+        (pstr)->length = 0;                        \
+        (pstr)->buff = (pstr)->stack_region;       \
+        (pstr)->cap_size = MSTR_STACK_REGION_SIZE; \
+    } while (0)
+
+/**
  * @brief 创建字符串
  *
  * @param[out] str: 需要创建的字符串结构
@@ -177,8 +190,11 @@ typedef struct tagMStringIter
 MSTR_EXPORT_API(mstr_result_t)
 mstr_create(MString* str, const char* content);
 
-//! 创建空字符串
-#define mstr_create_empty(s) (mstr_create((s), "\0"))
+/**
+ * @brief 创建空的总付出
+ *
+ */
+#define mstr_create_empty(s) mstr_create(s, "")
 
 /**
  * @brief 从other移动字符串到str
