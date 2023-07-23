@@ -7,14 +7,14 @@ on:
       - "src/**.c"
       - "inc/**.h"
       - "Makefile"
-      - ".github/workflows/make-dylib.yml"
+      - ".github/workflows/make-examples.yml"
   pull_request:
     branches: [master]
     paths:
       - "src/**.c"
       - "inc/**.h"
       - "Makefile"
-      - ".github/workflows/make-dylib.yml"
+      - ".github/workflows/make-examples.yml"
   workflow_dispatch:
     inputs:
       logLevel:
@@ -88,4 +88,3 @@ jobs:
           MTFMT_BUILD_USE_LTO: "1"
           MTFMT_BUILD_TARGET_NAME: "mtfmt_${{ matrix.os }}_${{ matrix.arch }}"
           MTFMT_BUILD_EXEFILE_EXT: ".exe"
-          
