@@ -5,7 +5,8 @@
 
 # ENV:
 # MTFMT_BUILD_GCC_PREFIX                gcc的前缀
-# GCC_PATH							gcc路径
+# GCC_PATH                              gcc路径
+# MTFMT_BUILD_EXEFILE_EXT               可执行文件的拓展名, 要带点
 # MTFMT_BUILD_TARGET_NAME               目标输出的文件名
 # MTFMT_BUILD_C_DEFS                    需要额外增加的cdefs
 # MTFMT_BUILD_INC_ADDITIONAL_OUT        输出def文件(opt)
@@ -33,8 +34,8 @@ else
 DYLIB_EXT = .so
 endif
 
-ifdef MTFMT_BUILD_TESTFILE_EXT
-EXE_EXT = $(MTFMT_BUILD_TESTFILE_EXT)
+ifdef MTFMT_BUILD_EXEFILE_EXT
+EXE_EXT = $(MTFMT_BUILD_EXEFILE_EXT)
 else
 EXE_EXT = .out
 endif
