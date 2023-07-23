@@ -35,6 +35,11 @@ int main(void)
     const char* compiler_name = "unknown";
     switch (compiler) {
     case MSTR_BUILD_CC_MSVC: compiler_name = "msvc"; break;
+    case MSTR_BUILD_CC_GNUC: compiler_name = "gcc"; break;
+    case MSTR_BUILD_CC_ARMCC: compiler_name = "armcc"; break;
+    case MSTR_BUILD_CC_ARMCLANG: compiler_name = "armclang"; break;
+    case MSTR_BUILD_CC_EMSCRIPTEN: compiler_name = "emscripten"; break;
+    case MSTR_BUILD_CC_OTHER: compiler_name = "unknown"; break;
     }
     printf("| Compiler  | %-24s |  ---  |\n", compiler_name);
 

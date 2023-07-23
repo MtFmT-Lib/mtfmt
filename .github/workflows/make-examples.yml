@@ -6,6 +6,7 @@ on:
     paths:
       - "src/**.c"
       - "inc/**.h"
+      - "inc/**.hpp"
       - "examples/**.h"
       - "examples/**.c"
       - "examples/**.cpp"
@@ -16,6 +17,7 @@ on:
     paths:
       - "src/**.c"
       - "inc/**.h"
+      - "inc/**.hpp"
       - "examples/**.h"
       - "examples/**.c"
       - "examples/**.cpp"
