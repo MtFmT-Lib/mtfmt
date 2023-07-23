@@ -296,7 +296,7 @@ $(OUTPUT_DIR)/$(TEST_TARGET): $(OBJECTS) $(TEST_OBJECTS) | $(OUTPUT_DIR)
 
 $(OUTPUT_DIR)/example_%$(EXE_EXT): $(EXAMPLE_OBJECTS) $(OBJECTS) | $(OUTPUT_DIR)
 	@gcc $(OBJECTS) "$(BUILD_DIR)/$(notdir $(basename $@)).o" $(EXAMPLE_LD_OPTS) -o $@
-	@echo Build example target "$@"
+	@echo Build example target "$@" completed.
 
 $(BUILD_DIR):
 	mkdir $@
