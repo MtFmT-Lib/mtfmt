@@ -11,8 +11,8 @@
  */
 #if !defined(_INCLUDE_MM_RESULT_HPP_)
 #define _INCLUDE_MM_RESULT_HPP_ 1
-#include "mm_type.hpp"
 #include "mm_result.h"
+#include "mm_type.hpp"
 namespace mtfmt
 {
 // class decl
