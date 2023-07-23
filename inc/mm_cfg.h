@@ -335,10 +335,10 @@
 #elif MSTR_BUILD_CC == MSTR_BUILD_CC_GNUC && \
     (defined(__x86_64__) || defined(__i386__))
 /**
- * @brief 指定是否使用float32 (x86_64, enable)
+ * @brief 指定是否使用float64 (x86_64, enable)
  *
  */
-#define _MSTR_USE_FP_FLOAT32 1
+#define _MSTR_USE_FP_FLOAT64 1
 #elif MSTR_BUILD_CC == MSTR_BUILD_CC_MSVC
 /**
  * @brief 指定是否使用float64 (x86_64, aarch64, enable)
@@ -444,43 +444,43 @@
 #define MSTRCFG_BUILD_DLL_BIT      0x02
 
 /**
- * @brief 标记是否使用了硬件除法
+ * @brief 标记是否使用了硬件除法 _MSTR_USE_HARDWARE_DIV
  *
  */
 #define MSTRCFG_BUILD_HARDWARE_DIV 0x04
 
 /**
- * @brief 标记是否使用了stdio
+ * @brief 标记是否使用了stdio _MSTR_USE_STD_IO
  *
  */
 #define MSTRCFG_USE_STD_IO         0x08
 
 /**
- * @brief 标记是否使用了UTF-8
+ * @brief 标记是否使用了UTF-8 _MSTR_USE_UTF_8
  *
  */
 #define MSTRCFG_USE_UTF_8          0x10
 
 /**
- * @brief 标记是否使用了CXX异常
+ * @brief 标记是否使用了CXX异常 _MSTR_USE_CPP_EXCEPTION
  *
  */
 #define MSTRCFG_USE_CXX_EXCEPTION  0x20
 
 /**
- * @brief 标记是否使用了float支持
+ * @brief 标记是否使用了float支持 _MSTR_USE_FP_FLOAT32
  *
  */
 #define MSTRCFG_USE_FLOAT32        0x40
 
 /**
- * @brief 标记是否使用了float64支持
+ * @brief 标记是否使用了float64支持 _MSTR_USE_FP_FLOAT64
  *
  */
 #define MSTRCFG_USE_FLOAT64        0x80
 
 /**
- * @brief 标记是否使用了分配器
+ * @brief 标记是否使用了分配器 _MSTR_USE_ALLOC
  *
  */
 #define MSTRCFG_USE_ALLOCATOR      0x100
