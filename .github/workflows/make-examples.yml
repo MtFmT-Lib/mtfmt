@@ -28,7 +28,7 @@ jobs:
       fail-fast: true
       matrix:
         os: [ubuntu-latest]
-        arch: [x86, x64]
+        arch: [x64]
     runs-on: "${{ matrix.os }}"
     name: "Build examples: ${{ matrix.os }} (${{ matrix.arch }})"
     steps:
@@ -60,3 +60,32 @@ jobs:
         with:
           name: ${{ matrix.os }}_${{ matrix.arch }}-artifact
           path: target/*.out
+
+  build-examples-windows:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [windows-latest]
+        arch: [x64]
+    runs-on: "${{ matrix.os }}"
+    name: "Build examples: ${{ matrix.os }} (${{ matrix.arch }})"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install Cygwin
+        uses: egor-tensin/setup-cygwin@v4
+        with:
+          packages: make gcc-g++
+      - name: Make examples at ${{ matrix.os }}
+        run: |
+          make examples
+        env:
+          MTFMT_BUILD_C_DEFS: >-
+            -D_MSTR_USE_MALLOC=1
+            -D_MSTR_USE_HARDWARE_DIV=1
+          MTFMT_BUILD_USE_LTO: "1"
+          MTFMT_BUILD_TARGET_NAME: "mtfmt_${{ matrix.os }}_${{ matrix.arch }}"
+          MTFMT_BUILD_EXEFILE_EXT: ".exe"
+          
