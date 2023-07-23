@@ -11,7 +11,7 @@
  */
 #if !defined(_INCLUDE_MM_RESULT_HPP_)
 #define _INCLUDE_MM_RESULT_HPP_ 1
-#include "mm_helper.hpp"
+#include "mm_type.hpp"
 #include "mm_result.h"
 namespace mtfmt
 {

@@ -13,4 +13,4 @@
 #define MSTR_IMP_SOURCES 1
 
 #include "mm_fmt.h"
-#include "mm_typedef.h"
+#include "mm_type.h"

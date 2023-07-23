@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file mm_typedef.h
- * @author HalfSweet (HalfSweet@HalfSweet.cn), 向阳
- * (hinatahoshino@foxmail.com)
- * @brief 字符串格式化依赖的类型
- * @version 0.1
- * @date 2023-05-06
+ * @file        mm_type.h
+ * @author      HalfSweet (HalfSweet@HalfSweet.cn),
+ *              向阳 (hinatahoshino@foxmail.com)
+ * @brief       type alias和type def
+ * @version     0.1
+ * @date        2023-05-06
  *
- * @copyright Copyright (C) 2023 HalfSweet, 向阳, all rights reserved.
+ * @copyright   Copyright (C) 2023 HalfSweet, 向阳, all rights reserved.
  *
  */
 
-#if !defined(__MM_TYPEDEF_H__)
-#define __MM_TYPEDEF_H__ 1
+#if !defined(__INCLUDE_MM_TYPE_H__)
+#define __INCLUDE_MM_TYPE_H__ 1
 #include "mm_cfg.h"
 #include <stdarg.h>
 #include <stdbool.h>
@@ -103,4 +103,4 @@ typedef struct tagMStrTime
     //! (BCD) 亚秒值, 单位: x0.1ms
     uint32_t sub_second;
 } MStrTime;
-#endif
+#endif // __INCLUDE_MM_TYPE_H__

@@ -13,7 +13,7 @@
 #define _INCLUDE_MM_IO_H_ 1
 #include "mm_cfg.h"
 #include "mm_result.h"
-#include "mm_typedef.h"
+#include "mm_type.h"
 
 /**
  * @brief 写入数据

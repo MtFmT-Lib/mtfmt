@@ -12,7 +12,7 @@
 #if !defined(_INCLUDE_MM_HEAP_H_)
 #define _INCLUDE_MM_HEAP_H_ 1
 #include "mm_cfg.h"
-#include "mm_typedef.h"
+#include "mm_type.h"
 
 /**
  * @brief 初始化堆分配器

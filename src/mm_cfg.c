@@ -13,7 +13,7 @@
 #define MSTR_IMP_SOURCES 1
 
 #include "mm_cfg.h"
-#include "mm_typedef.h"
+#include "mm_type.h"
 
 MSTR_EXPORT_API(uint32_t) mstr_configure(void)
 {

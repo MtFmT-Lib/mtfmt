@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: LGPL-3.0
 /**
- * @file    mm_helper.hpp
+ * @file    mm_type.hpp
  * @author  向阳 (hinata.hoshino@foxmail.com)
- * @brief   helper
+ * @brief   type trait, type alias和type def
  * @version 1.0
  * @date    2023-06-15
  *
  * @copyright Copyright (c) 向阳, all rights reserved.
  *
  */
-#if !defined(_INCLUDE_MM_HELPER_HPP_)
-#define _INCLUDE_MM_HELPER_HPP_ 1
+#if !defined(_INCLUDE_MM_TYPE_HPP_)
+#define _INCLUDE_MM_TYPE_HPP_ 1
 #include "mm_cfg.h"
 #include <cstddef>
 #include <exception>
@@ -244,4 +244,4 @@ struct disjunction<A1, A2, An...>
 
 } // namespace details
 } // namespace mtfmt
-#endif // _INCLUDE_MM_HELPER_HPP_
+#endif // _INCLUDE_MM_TYPE_HPP_

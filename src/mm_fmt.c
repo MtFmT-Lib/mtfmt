@@ -13,7 +13,7 @@
 #define MSTR_IMP_SOURCES 1
 
 #include "mm_fmt.h"
-#include "mm_typedef.h"
+#include "mm_type.h"
 
 /**
  * @brief 将元素类型T转换为对应的数组类型值

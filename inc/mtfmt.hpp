@@ -11,7 +11,7 @@
  */
 #if !defined(_INCLUDE_MTFMT_HPP_)
 #define _INCLUDE_MTFMT_HPP_
-#include "mm_helper.hpp"
+#include "mm_type.hpp"
 #include "mm_parser.hpp"
 #include "mm_result.hpp"
 #include "mm_string.hpp"

@@ -13,7 +13,7 @@
 #define MSTR_IMP_SOURCES 1
 
 #include "mm_fmt.h"
-#include "mm_typedef.h"
+#include "mm_type.h"
 static mstr_result_t convert_sign_helper(
     MString*, int32_t, MStrFmtSignDisplay
 );

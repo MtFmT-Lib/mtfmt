@@ -13,7 +13,7 @@
 #include "mm_cfg.h"
 #include "mm_result.h"
 #include "mm_string.h"
-#include "mm_typedef.h"
+#include "mm_type.h"
 
 #define _INCLUDE_MM_PARSER_H_
 //! sizeof(MStrFmtParserState)
