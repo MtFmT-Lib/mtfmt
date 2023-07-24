@@ -1,0 +1,47 @@
+name: "make wasm"
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "src/**.c"
+      - "inc/**.h"
+      - "support/WebAssembly.mk"
+      - "support/WebAssemblyExport.mk"
+      - ".github/workflows/make-wasm.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "src/**.c"
+      - "inc/**.h"
+      - "support/WebAssembly.mk"
+      - "support/WebAssemblyExport.mk"
+      - ".github/workflows/make-wasm.yml"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+
+jobs:
+  build-wasm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      # WASM
+      - name: Setup emsdk
+        uses: mymindstorm/setup-emsdk@v12
+      - name: WASM build
+        run: |
+         emmake make --makefile=support/WebAssembly.mk
+      # 打包
+      - name: Upload artifact
+        if: github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v3
+        with:
+          name: wasm-artifact
+          path: target/*.wasm
