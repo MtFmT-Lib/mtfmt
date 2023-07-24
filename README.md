@@ -57,13 +57,37 @@ mstr_print("|{0:i32:<8}|\n", 1234); // => |1234    |
 mstr_print("|{0:i32:>8}|\n", 1234); // => |    1234|
 ```
 
-更多的例子查阅 [examples文件夹](https://github.com/MtFmT-Lib/mtfmt/tree/master/examples)
+数组格式化，且指定格式化采用的进制
+
+```c
+const uint32_t array[5] = {
+    0x12, 0x34, 0x56, 0x78, 0x90
+};
+const usize_t array_size = 5;
+mstr_print("{[0:i32]}\n", array, array_size);
+// => 18, 52, 86, 120, 144
+mstr_print("{[0:i32:x]}\n", array, array_size);
+// => 0x12, 0x34, 0x56, 0x78, 0x90
+```
+
+更多的例子在 [examples文件夹](https://github.com/MtFmT-Lib/mtfmt/tree/master/examples) 里面哦
 
 ## 工作方式
 
-MtFmt 通过数个 pass 来完成格式化工作，其均是动态的。
+MtFmt 通过数个 pass 来完成格式化工作，其均是动态的，可以分为输入串解析（Scanner）、格式化串解析（Replacement parser）和转换（Converter）三个过程。
 
-## 详细描述
+```mermaid
+graph LR;
+    Scanner --> Parser --> Converter;
+```
+
+三个 pass 是互不依赖的，mtfmt 提供了每个 pass 的函数导出：
+
+* Scanner : `mm_fmt.h` 文件中的  `mstr_format` 函数
+* Parser: `mm_parser.h` 中
+* Converter:  `mm_fmt.h` 文件中的 `mstr_fmt_XXX` 命名方式的函数
+
+## 语法描述
 
 这里给出了 `mtfmt` 的格式化语法细节。其使用一个小可爱语言来完成它，姑且称作 `MtFmt-DSL` 。MtFmt 通过 `replacement_field` 区分需要放置的值类型，使用 `{` 和 `}` 包起来。对于 replacement field，其至少需要指定参数位置以及参数类型，且参数位置必须是递增的。若使用 `{ A }` 表示0到多个的A, `[ A ]` 表示可选的A，`{ A }+` 表示1到多个的A，`{ A }?` 表示0或1个A。使用不同的行或者“\|”以表示“或”，使用缩进区分符号。下面给出了总体语法。
 
@@ -285,10 +309,6 @@ chrono_split_char :=
 项分割可以是除去 `:`、`}`、`]}` 以外的内容，且可以使用两个连续的 `%` 来表示 `%`
 
 ### 数组格式化
-
-TODO
-
-## 例子
 
 TODO
 

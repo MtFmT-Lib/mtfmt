@@ -24,13 +24,15 @@ env MTFMT_BUILD_C_DEFS="-D_MSTR_USE_STD_IO=1"
 
 ```powershell
 # PowerShell
+$Env:MTFMT_BUILD_EXEFILE_EXT=".exe"
 $Env:MTFMT_BUILD_C_DEFS="-D_MSTR_USE_STD_IO=1"
 ```
 
 下表给出了目前可用的示例。
 
-| 文件                                                                                                  | 描述                                     |
-| :---------------------------------------------------------------------------------------------------- | :--------------------------------------- |
-| [example_build_config.c](https://github.com/MtFmT-Lib/mtfmt/blob/master/examples/example_build_config.c) | 打印构建配置                             |
-| [example_fmt_align.c](https://github.com/MtFmT-Lib/mtfmt/blob/master/examples/example_fmt_align.c)       | 格式化的对齐方式（左对齐、居中、右对齐） |
-| [example_fmt_align.c](https://github.com/MtFmT-Lib/mtfmt/blob/master/examples/example_fmt_align.c)       | 不同进制下的整数格式化                   |
+| 文件                                                                                                    | 描述                                     |
+| :------------------------------------------------------------------------------------------------------ | :--------------------------------------- |
+| [example_build_config.c](https://github.com/MtFmT-Lib/mtfmt/blob/master/examples/example_build_config.c)   | 打印构建配置                             |
+| [example_fmt_align.c](https://github.com/MtFmT-Lib/mtfmt/blob/master/examples/example_fmt_align.c)         | 格式化的对齐方式（左对齐、居中、右对齐） |
+| [example_fmt_int_index.c](https://github.com/MtFmT-Lib/mtfmt/blob/master/examples/example_fmt_int_index.c) | 不同进制下的整数格式化                   |
+| [example_fmt_array.c](https://github.com/MtFmT-Lib/mtfmt/blob/master/examples/example_fmt_array.c)         | 数组格式化                               |
