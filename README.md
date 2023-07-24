@@ -6,42 +6,58 @@ MtFmT
 ![LANGUAGE](https://img.shields.io/badge/Language-100%25%20C-yellowgreen)
 [![Coverage Status](https://coveralls.io/repos/github/MtFmT-Lib/mtfmt/badge.svg?branch=master)](https://coveralls.io/github/MtFmT-Lib/mtfmt?branch=master)
 
-
 [![TESTS](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/tests.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/tests.yml)
 [![DYLIB-BUILD](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-dylib.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-dylib.yml)
 [![LIB-BUILD](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-lib.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-lib.yml)
 [![CMAKE-BUILD](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/cmake-build.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/cmake-build.yml)
 [![CLANG-FORMAT](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/format-checker.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/format-checker.yml)
 
+| [HomePage](https://mtfmt.cc/mtfmt/) | [Document](https://mtfmt.cc/mtfmt/doc) | [Code Document](https://mtfmt.cc/mtfmt/html/) | [Pre-build Libs](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-lib.yml) | [Pre-build DLLs](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-dylib.yml) |
 
-\[ [HomePage](https://mtfmt.cc/mtfmt/) \]
-\[ [Document](https://mtfmt.cc/mtfmt/doc) \]
-\[ [Code Document](https://mtfmt.cc/mtfmt/html/) \]
-\[ [Pre-build Libs](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-lib.yml) \]
-\[ [Pre-build DLLs](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-dylib.yml) \]
-
-
-一个类似于`{fmtlib}`和python的format语法的字符串格式化库，以足够低的资源占用和足够高的性能实现string format。
 `mtfmt` （Mini template formatter）是为嵌入式系统设计的格式化库，它实现了 [PEP-3101](https://peps.python.org/pep-3101/) 中的格式化串的一个方言。其它类似的实现包括 [{fmtlib}](https://fmt.dev/latest/syntax.html) 等。另外，mtfmt 还实现了.Net中对于日期和时间格式化中的[标准部分](https://learn.microsoft.com/zh-cn/dotnet/standard/base-types/standard-date-and-time-format-strings)、[用户定义部分](https://learn.microsoft.com/zh-cn/dotnet/standard/base-types/custom-date-and-time-format-strings)的一个子集，mtfmt的其主要特性包括：
 
-* [x] 无除法运算、取模运算的有符号/无符号整数格式化（二进制、八进制、十进制、十六进制）
-* [x] 无除法运算、取模运算的有符号/无符号的量化值格式化（q31_t等）
+* [X] 无除法运算、取模运算的有符号/无符号整数格式化（二进制、八进制、十进制、十六进制）
+* [X] 无除法运算、取模运算的有符号/无符号的量化值格式化（q31_t等）
 * [ ] ~~无除法运算、取模运算的有符号/无符号定点数格式化~~  **懒**
-* [x] 标准日期时间格式化、指定分隔符、项位置的日期和时间格式化
+* [X] 标准日期时间格式化、指定分隔符、项位置的日期和时间格式化
 * [ ] 12小时制
 * [ ] 星期名称
-* [x] 字符串格式化
-* [x] 指定对齐方式、填充宽度、符号显示方式
-* [x] C数组格式化
-* [x] 不依赖操作系统，提供用于嵌入式设备的内存分配器
-* [x] 提供动态长度字符串，字符串携带 stack allocator
-* [x] 提供可传入 `va_list` 函数，变参函数
+* [X] 字符串格式化
+* [X] 指定对齐方式、填充宽度、符号显示方式
+* [X] C数组格式化
+* [X] 不依赖操作系统，提供用于嵌入式设备的内存分配器
+* [X] 提供动态长度字符串，字符串携带 stack allocator
+* [X] 提供可传入 `va_list` 函数，变参函数
 * [X] 定位parser错误位置以及原因
 
 请注意区分于大多数的格式化器，`MtFmt-Core` **暂不提供**如下的功能：
 
 * 自定义格式化标记
 * 自定义错误处理
+
+## 例子
+
+整数格式化（二进制、八进制、十进制、十六进制）
+
+```c
+mstr_print("{0:i32:b}\n", 165); // => 10100101
+mstr_print("{0:i32:o}\n", 165); // => 245
+mstr_print("{0:i32:d}\n", 165); // => 165
+mstr_print("{0:i32:h}\n", 165); // => a5
+mstr_print("{0:i32:H}\n", 165); // => A5
+mstr_print("{0:i32:x}\n", 165); // => 0xa5
+mstr_print("{0:i32:X}\n", 165); // => 0XA5
+```
+
+对齐方式（左对齐、居中、右对齐）
+
+```c
+mstr_print("|{0:i32:=8}|\n", 1234); // => |  1234  |
+mstr_print("|{0:i32:<8}|\n", 1234); // => |1234    |
+mstr_print("|{0:i32:>8}|\n", 1234); // => |    1234|
+```
+
+更多的例子查阅 [examples文件夹](https://github.com/MtFmT-Lib/mtfmt/tree/master/examples)
 
 ## 工作方式
 
@@ -279,5 +295,3 @@ TODO
 ## See also
 
 TODO
-
-
