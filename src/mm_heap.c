@@ -312,6 +312,9 @@ static void* heap_re_allocate_impl(
  */
 static void heap_free_impl(Heap* heap, void* mem)
 {
+    if (mem == NULL) {
+        return;
+    }
     FreeBlock* block = (FreeBlock*)((uptr_t)(mem) - sizeof(FreeBlock));
     // 本内存块大小
     heap_size_t origin_sz = block->size;
