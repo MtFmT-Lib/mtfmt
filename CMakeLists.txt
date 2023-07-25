@@ -17,7 +17,6 @@ option(MTFMT_RT_USE_MALLOC "Use malloc instead build-in heap manager" OFF)
 option(MTFMT_RT_USE_STDOUT "Enable stdio support in the library" OFF)
 option(MTFMT_RT_USE_ASSERT "Enable assert" OFF)
 option(MTFMT_RT_USE_UTF8 "Enable UTF-8 string support" ON)
-option(MTFMT_RT_USE_FP16 "Enable 16bits floating number formatting support" OFF)
 option(MTFMT_RT_USE_FP32 "Enable 32bits floating number formatting support" OFF)
 option(MTFMT_RT_USE_FP64 "Enable 64bits floating number formatting support" OFF)
 option(MTFMT_BUILD_SHARED "Build dymatic library" OFF)
@@ -82,10 +81,6 @@ endif()
 
 if(MTFMT_RT_USE_UTF8)
     target_compile_definitions(${TARGET_NAME} PRIVATE _MSTR_USE_UTF_8)
-endif()
-
-if(MTFMT_RT_USE_FP16)
-    target_compile_definitions(${TARGET_NAME} PRIVATE _MSTR_USE_FP_FLOAT16)
 endif()
 
 if(MTFMT_RT_USE_FP32)
