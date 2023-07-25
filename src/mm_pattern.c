@@ -110,6 +110,7 @@ mstr_replace_set_target(
 MSTR_EXPORT_API(mstr_result_t)
 mstr_replace(MString* str, const char* pattern, const char* replace_to)
 {
+
     return MStr_Err_NoImplemention;
 }
 

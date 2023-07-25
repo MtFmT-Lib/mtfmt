@@ -202,7 +202,8 @@ mstr_create(MString* str, const char* content);
  * @param[out] str: 目标字符串
  * @param[inout] other: 需要移动的字符串
  *
- * @attention 该函数转移other的所有权, other不需要再次释放
+ * @attention 该函数转移other的所有权, other不需要再次释放,
+ * 且会释放掉str
  */
 MSTR_EXPORT_API(void)
 mstr_move_from(MString* str, MString* other);
@@ -214,10 +215,20 @@ mstr_move_from(MString* str, MString* other);
  * @param[in] other: 需要移动的字符串
  *
  * @attention 该函数会清空释放原有的字符串并创建一个新的,
- * other需要再次释放
+ * other需要再次释放, 且会释放掉原有的str
  */
 MSTR_EXPORT_API(mstr_result_t)
 mstr_copy_from(MString* str, const MString* other);
+
+/**
+ * @brief 保留 sz 个char数的内存区
+ *
+ * @param[inout] str: 字符串
+ * @param[in] new_size: 需要保留的大小
+ *
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_reserve(MString* str, usize_t new_size);
 
 /**
  * @brief 拼接字符串
