@@ -47,43 +47,6 @@ typedef enum tagMStringReplaceOption
 } MStringReplaceOption;
 
 /**
- * @brief 字符串替换信息
- *
- */
-typedef struct tagMStringReplaceTarget
-{
-    /**
-     * @brief 替换选项
-     *
-     */
-    MStringReplaceOption opt;
-
-    /**
-     * @brief 模式串
-     *
-     */
-    const char* substr;
-
-    /**
-     * @brief 模式串长度
-     *
-     */
-    usize_t substr_len;
-
-    /**
-     * @brief 替换为的目标字串
-     *
-     */
-    const char* replace_to;
-
-    /**
-     * @brief 目标串长度
-     *
-     */
-    usize_t replace_to_len;
-} MStringReplaceTarget;
-
-/**
  * @brief 字符串匹配信息
  *
  */
@@ -432,34 +395,6 @@ mstr_find(
 );
 
 /**
- * @brief 进行字符串替换
- *
- * @param[inout] str: 字符串
- * @param[in] target: 需要替换的目标
- * @param[in] target_cnt: 需要替换的目标的数组大小
- */
-MSTR_EXPORT_API(mstr_result_t)
-mstr_replace_multi(
-    MString* str, const MStringReplaceTarget* target, usize_t target_cnt
-);
-
-/**
- * @brief 设置替换的目标
- *
- * @param[out] rep: 替换目标的结构
- * @param[in] opt: 替换选项
- * @param[in] patt: 模式串
- * @param[in] target: 替换为的目标
- */
-MSTR_EXPORT_API(void)
-mstr_replace_set_target(
-    MStringReplaceTarget* rep,
-    MStringReplaceOption opt,
-    const char* pattern,
-    const char* target
-);
-
-/**
  * @brief 从字符串中移除所有匹配substr的字符
  *
  * @param[inout] str: 字符串
@@ -479,11 +414,21 @@ mstr_retain(
  * @brief 进行字符串替换(单个目标)
  *
  * @param[inout] str: 字符串
- * @param[in] target: 需要替换的子串
+ * @param[in] opt: 替换模式
+ * @param[in] pattern: 需要替换的子串模式
+ * @param[in] pattern_cnt: 模式串的字符计数
  * @param[in] replace_to: 需要替换为的结果
+ * @param[in] replace_to_cnt_cnt: 结果的字符计数
  */
 MSTR_EXPORT_API(mstr_result_t)
-mstr_replace(MString* str, const char* pattern, const char* replace_to);
+mstr_replace(
+    MString* str,
+    MStringReplaceOption opt,
+    const char* pattern,
+    usize_t pattern_cnt,
+    const char* replace_to,
+    usize_t replace_to_cnt
+);
 
 /**
  * @brief 取得迭代器

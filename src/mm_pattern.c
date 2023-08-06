@@ -39,6 +39,12 @@ static mstr_result_t mstr_find_simple(
 static mstr_result_t patt_match_impl(
     isize_t*, const mstr_char_t*, usize_t, const mstr_char_t*, usize_t
 );
+static mstr_result_t mstr_retain_start_with_impl(
+    MString*, const char*, usize_t
+);
+static mstr_result_t mstr_retain_end_with_impl(
+    MString*, const char*, usize_t
+);
 static mstr_result_t mstr_retain_all_impl(
     MString*, const char*, usize_t
 );
@@ -46,7 +52,7 @@ static mstr_result_t mstr_retain_all_impl_helper(
     MString*, const MString*, const char*, usize_t, usize_t
 );
 static void make_jump_table(uint8_t*, const mstr_char_t*, usize_t);
-
+static mstr_result_t unicode_length_of(usize_t*, const char*, usize_t);
 //
 // public:
 //
@@ -91,30 +97,14 @@ mstr_find(
 }
 
 MSTR_EXPORT_API(mstr_result_t)
-mstr_replace_multi(
-    MString* str, const MStringReplaceTarget* target, usize_t target_cnt
-)
-{
-    return MStr_Err_NoImplemention;
-}
-
-MSTR_EXPORT_API(void)
-mstr_replace_set_target(
-    MStringReplaceTarget* rep,
+mstr_replace(
+    MString* str,
     MStringReplaceOption opt,
     const char* pattern,
-    const char* target
+    usize_t pattern_cnt,
+    const char* replace_to,
+    usize_t replace_to_cnt
 )
-{
-    rep->opt = opt;
-    rep->substr = pattern;
-    rep->substr_len = strlen(pattern);
-    rep->replace_to = target;
-    rep->replace_to_len = strlen(target);
-}
-
-MSTR_EXPORT_API(mstr_result_t)
-mstr_replace(MString* str, const char* pattern, const char* replace_to)
 {
 
     return MStr_Err_NoImplemention;
@@ -132,10 +122,10 @@ mstr_retain(
         return MStr_Ok;
     }
     else if (opt == MStringReplaceOption_StartWith) {
-        return MStr_Err_NoImplemention;
+        return mstr_retain_start_with_impl(str, patt, patt_cnt);
     }
     else if (opt == MStringReplaceOption_EndWith) {
-        return MStr_Err_NoImplemention;
+        return mstr_retain_end_with_impl(str, patt, patt_cnt);
     }
     else if (opt == MStringReplaceOption_All) {
         return mstr_retain_all_impl(str, patt, patt_cnt);
@@ -255,6 +245,64 @@ static mstr_result_t patt_match_impl(
 }
 
 /**
+ * @brief mstr_retain (start_with) 的实现
+ *
+ * @param[inout] str: 需要进行剔除的字符串
+ * @param[in] patt: 模式串
+ * @param[in] patt_cnt: 模式串的字符计数
+ */
+static mstr_result_t mstr_retain_start_with_impl(
+    MString* str, const char* patt, usize_t patt_cnt
+)
+{
+    usize_t patt_len = 0;
+    mstr_result_t res = MStr_Ok;
+    if (mstr_start_with(str, patt, patt_cnt)) {
+        // 计算unicode长度
+        MSTR_AND_THEN(
+            res, unicode_length_of(&patt_len, patt, patt_cnt)
+        );
+        // 把数据挪到前面覆盖掉
+        if (MSTR_SUCC(res)) {
+            memmove(
+                str->buff, str->buff + patt_cnt, str->count - patt_cnt
+            );
+            // 减去长度
+            str->count -= patt_cnt;
+            str->length -= patt_len;
+        }
+    }
+    return res;
+}
+
+/**
+ * @brief mstr_retain (end_with) 的实现
+ *
+ * @param[inout] str: 需要进行剔除的字符串
+ * @param[in] patt: 模式串
+ * @param[in] patt_cnt: 模式串的字符计数
+ */
+static mstr_result_t mstr_retain_end_with_impl(
+    MString* str, const char* patt, usize_t patt_cnt
+)
+{
+    usize_t patt_len = 0;
+    mstr_result_t res = MStr_Ok;
+    if (mstr_end_with(str, patt, patt_cnt)) {
+        // 计算unicode长度
+        MSTR_AND_THEN(
+            res, unicode_length_of(&patt_len, patt, patt_cnt)
+        );
+        if (MSTR_SUCC(res)) {
+            // 减去长度, 把数据截断
+            str->count -= patt_cnt;
+            str->length -= patt_len;
+        }
+    }
+    return res;
+}
+
+/**
  * @brief mstr_retain (all) 的实现
  *
  * @param[inout] str: 需要进行剔除的字符串
@@ -268,20 +316,10 @@ static mstr_result_t mstr_retain_all_impl(
     MString tmp_str;
     usize_t patt_len = 0;
     mstr_result_t res = MStr_Ok;
-    const mstr_char_t* patt_beg = patt;
     mstr_init(&tmp_str);
     mstr_assert(patt_cnt > 0);
     // 计算unicode长度
-    while (*patt && (usize_t)(patt - patt_beg) < patt_cnt) {
-        usize_t cnt = mstr_char_length(*patt);
-        if (cnt == 0) {
-            res = MStr_Err_UnicodeEncodingError;
-            break;
-        }
-        patt += cnt;
-        patt_len += 1;
-    }
-    patt = patt_beg;
+    MSTR_AND_THEN(res, unicode_length_of(&patt_len, patt, patt_cnt));
     // 保留足够的长度, retain 结果一定是 小于等于 源字符串 的
     MSTR_AND_THEN(res, mstr_reserve(&tmp_str, str->count));
     // 进行处理
@@ -409,4 +447,26 @@ static void make_jump_table(
         mstr_assert(ch_idx >= 0 && ch_idx <= BM_CHAR_INDEX_MAX);
         table[ch_idx] = (uint8_t)li_off;
     }
+}
+
+/**
+ * @brief 计算unicode字符串的字符长度
+ *
+ */
+static mstr_result_t unicode_length_of(
+    usize_t* len, const char* str, usize_t cnt
+)
+{
+    usize_t str_len = 0;
+    const char* str_beg = str;
+    while (*str && (usize_t)(str - str_beg) < cnt) {
+        usize_t cnt = mstr_char_length(*str);
+        if (cnt == 0) {
+            return MStr_Err_UnicodeEncodingError;
+        }
+        str += cnt;
+        str_len += 1;
+    }
+    *len = str_len;
+    return MStr_Ok;
 }
