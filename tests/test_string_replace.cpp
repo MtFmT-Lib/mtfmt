@@ -31,6 +31,7 @@ extern "C" void string_retain_all(void)
     ASSERT_EQUAL_VALUE(str_ascii.length(), 9);
     ASSERT_EQUAL_VALUE(str_ascii.byte_count(), 9);
 #if _MSTR_USE_UTF_8
+    // Unicode retain
     mtfmt::string str_unicode = u8"😀😊😔🍥😊😔😀";
     auto result_unicode = str_unicode.retain(u8"😔");
     ASSERT_EQUAL_VALUE(result_unicode.is_succ(), true);

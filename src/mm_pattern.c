@@ -257,20 +257,14 @@ static mstr_result_t mstr_retain_start_with_impl(
 {
     usize_t patt_len = 0;
     mstr_result_t res = MStr_Ok;
-    if (mstr_start_with(str, patt, patt_cnt)) {
-        // 计算unicode长度
-        MSTR_AND_THEN(
-            res, unicode_length_of(&patt_len, patt, patt_cnt)
-        );
-        // 把数据挪到前面覆盖掉
-        if (MSTR_SUCC(res)) {
-            memmove(
-                str->buff, str->buff + patt_cnt, str->count - patt_cnt
-            );
-            // 减去长度
-            str->count -= patt_cnt;
-            str->length -= patt_len;
-        }
+    // 计算unicode长度
+    MSTR_AND_THEN(res, unicode_length_of(&patt_len, patt, patt_cnt));
+    // 把数据挪到前面覆盖掉
+    if (MSTR_SUCC(res) && mstr_start_with(str, patt, patt_cnt)) {
+        memmove(str->buff, str->buff + patt_cnt, str->count - patt_cnt);
+        // 减去长度
+        str->count -= patt_cnt;
+        str->length -= patt_len;
     }
     return res;
 }
@@ -288,16 +282,12 @@ static mstr_result_t mstr_retain_end_with_impl(
 {
     usize_t patt_len = 0;
     mstr_result_t res = MStr_Ok;
-    if (mstr_end_with(str, patt, patt_cnt)) {
-        // 计算unicode长度
-        MSTR_AND_THEN(
-            res, unicode_length_of(&patt_len, patt, patt_cnt)
-        );
-        if (MSTR_SUCC(res)) {
-            // 减去长度, 把数据截断
-            str->count -= patt_cnt;
-            str->length -= patt_len;
-        }
+    // 计算unicode长度
+    MSTR_AND_THEN(res, unicode_length_of(&patt_len, patt, patt_cnt));
+    // 减去长度, 把数据截断
+    if (MSTR_SUCC(res) && mstr_end_with(str, patt, patt_cnt)) {
+        str->count -= patt_cnt;
+        str->length -= patt_len;
     }
     return res;
 }
@@ -460,13 +450,19 @@ static mstr_result_t unicode_length_of(
     usize_t str_len = 0;
     const char* str_beg = str;
     while (*str && (usize_t)(str - str_beg) < cnt) {
-        usize_t cnt = mstr_char_length(*str);
-        if (cnt == 0) {
-            return MStr_Err_UnicodeEncodingError;
+        usize_t cur_cnt = mstr_char_length(*str);
+        if (cur_cnt == 0) {
+            break;
         }
-        str += cnt;
+        str += cur_cnt;
         str_len += 1;
     }
-    *len = str_len;
-    return MStr_Ok;
+    if ((usize_t)(str - str_beg) != cnt) {
+        *len = 0;
+        return MStr_Err_UnicodeEncodingError;
+    }
+    else {
+        *len = str_len;
+        return MStr_Ok;
+    }
 }
