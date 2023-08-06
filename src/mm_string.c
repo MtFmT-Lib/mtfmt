@@ -39,7 +39,6 @@ static mstr_bool_t mstr_compare_helper(
 static void
     mstr_reverse_unicode_helper(mstr_char_t*, const mstr_char_t*);
 static void* mstr_string_realloc(void*, mstr_bool_t, usize_t, usize_t);
-static mstr_result_t mstr_expand_size(MString*, usize_t);
 static usize_t mstr_resize_tactic(usize_t, usize_t);
 static mstr_result_t
     mstr_strlen(usize_t*, usize_t*, const mstr_char_t*, const mstr_char_t*);
@@ -89,20 +88,21 @@ mstr_move_from(MString* str, MString* other)
     if (str->buff != NULL) {
         mstr_free(str);
     }
+    str->count = other->count;
+    str->length = other->length;
     if (other->buff == other->stack_region) {
         str->buff = str->stack_region;
-        str->count = other->count;
         str->cap_size = MSTR_STACK_REGION_SIZE;
         // 复制stack上的内容
         memcpy(str->buff, other->buff, other->count);
     }
     else {
         str->buff = other->buff;
-        str->count = other->count;
         str->cap_size = other->cap_size;
     }
     other->buff = NULL;
     other->count = 0;
+    other->length = 0;
     other->cap_size = 0;
 }
 
@@ -116,6 +116,28 @@ mstr_copy_from(MString* str, const MString* other)
     MSTR_AND_THEN(result, mstr_create(str, ""));
     MSTR_AND_THEN(result, mstr_concat(str, other));
     return result;
+}
+MSTR_EXPORT_API(mstr_result_t)
+mstr_reserve(MString* str, usize_t new_size)
+{
+    if (new_size > str->cap_size) {
+        char* new_ptr = (char*)mstr_string_realloc(
+            str->buff,
+            str->buff == str->stack_region,
+            str->count,
+            new_size
+        );
+        if (new_ptr == NULL) {
+            // 分配失败
+            return MStr_Err_HeapTooSmall;
+        }
+        str->buff = new_ptr;
+        str->cap_size = new_size;
+        return MStr_Ok;
+    }
+    else {
+        return MStr_Ok;
+    }
 }
 
 MSTR_EXPORT_API(mstr_result_t)
@@ -147,7 +169,7 @@ mstr_repeat_append(MString* str, mstr_codepoint_t ch, usize_t cnt)
             // 且有足够的空间存放下一个字符
             MSTR_AND_THEN(
                 result,
-                mstr_expand_size(
+                mstr_reserve(
                     str, mstr_resize_tactic(str->cap_size, need_len)
                 )
             );
@@ -177,7 +199,7 @@ mstr_concat(MString* str, const MString* other)
         // 且有足够的空间存放
         MSTR_AND_THEN(
             result,
-            mstr_expand_size(
+            mstr_reserve(
                 str, mstr_resize_tactic(str->cap_size, other->count)
             )
         );
@@ -215,19 +237,24 @@ mstr_concat_cstr(MString* str, const char* other)
 MSTR_EXPORT_API(mstr_result_t)
 mstr_concat_cstr_slice(MString* str, const char* start, const char* end)
 {
-    MString lit;
-    usize_t content_len, content_cnt;
-    mstr_result_t res;
-    res = mstr_strlen(&content_len, &content_cnt, start, end);
-    if (MSTR_SUCC(res)) {
-        // const MString不会被修改, 所以可强转一下
-        lit.buff = (char*)(iptr_t)start;
-        lit.count = content_cnt;
-        lit.length = content_len;
-        lit.cap_size = 0;
-        res = mstr_concat(str, &lit);
+    if (start == end) {
+        return MStr_Ok;
     }
-    return res;
+    else {
+        MString lit;
+        usize_t content_len, content_cnt;
+        mstr_result_t res;
+        res = mstr_strlen(&content_len, &content_cnt, start, end);
+        if (MSTR_SUCC(res)) {
+            // const MString不会被修改, 所以可强转一下
+            lit.buff = (char*)(iptr_t)start;
+            lit.count = content_cnt;
+            lit.length = content_len;
+            lit.cap_size = 0;
+            res = mstr_concat(str, &lit);
+        }
+        return res;
+    }
 }
 
 MSTR_EXPORT_API(void) mstr_clear(MString* str)
@@ -268,12 +295,17 @@ MSTR_EXPORT_API(const char*) mstr_c_str(MString* str)
 MSTR_EXPORT_API(mstr_bool_t)
 mstr_equal(const MString* a, const MString* b)
 {
-    if (a->count != b->count) {
+    return mstr_equal_cstr(a, b->buff, b->count);
+}
+
+MSTR_EXPORT_API(mstr_bool_t)
+mstr_equal_cstr(const MString* a, const mstr_char_t* b, usize_t b_cnt)
+{
+    if (a->count != b_cnt) {
         return False;
     }
     else {
-        usize_t len = a->count;
-        return mstr_compare_helper(a->buff, b->buff, len);
+        return mstr_compare_helper(a->buff, b, b_cnt);
     }
 }
 
@@ -409,7 +441,7 @@ mstr_insert(MString* str, usize_t idx, mstr_codepoint_t ch)
             // 且有足够的空间存放下一个字符
             MSTR_AND_THEN(
                 res,
-                mstr_expand_size(
+                mstr_reserve(
                     str,
                     mstr_resize_tactic(str->cap_size, insert_data_len)
                 )
@@ -795,35 +827,6 @@ static mstr_bool_t mstr_compare_helper(
         bit |= ch_a ^ ch_b;
     }
     return bit == 0;
-}
-
-/**
- * @brief 扩展str的size
- *
- * @param[inout] str: 需要调整大小的str
- * @param[in] new_size: 调整到的新的大小
- * @return mstr_result_t: 调整结果
- */
-static mstr_result_t mstr_expand_size(MString* str, usize_t new_size)
-{
-    if (new_size > str->cap_size) {
-        char* new_ptr = (char*)mstr_string_realloc(
-            str->buff,
-            str->buff == str->stack_region,
-            str->count,
-            new_size
-        );
-        if (new_ptr == NULL) {
-            // 分配失败
-            return MStr_Err_HeapTooSmall;
-        }
-        str->buff = new_ptr;
-        str->cap_size = new_size;
-        return MStr_Ok;
-    }
-    else {
-        return MStr_Ok;
-    }
 }
 
 /**

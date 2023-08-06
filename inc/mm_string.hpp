@@ -353,11 +353,7 @@ public:
     template <std::size_t N>
     bool operator==(const value_t (&str)[N]) const noexcept
     {
-        MString obj;
-        mstr_create(&obj, str);
-        bool result = !!mstr_equal(&this_obj, &obj);
-        mstr_free(&obj);
-        return result;
+        return !!mstr_equal_cstr(&this_obj, str, N - 1);
     }
 
     /**
@@ -401,6 +397,22 @@ public:
     ) noexcept
     {
         return !(pthis == str);
+    }
+
+    /**
+     * @brief 保留足够的内存
+     *
+     * @param new_size: 需要保留的内存字节数
+     */
+    result<unit_t, mstr_result_t> reserve(usize_t new_size) noexcept
+    {
+        mstr_result_t code = mstr_reserve(&this_obj, new_size);
+        if (MSTR_SUCC(code)) {
+            return unit_t();
+        }
+        else {
+            return code;
+        }
     }
 
     /**
@@ -467,8 +479,7 @@ public:
      * @brief 放入一个字符
      *
      */
-    result<unit_t, mstr_result_t> push(mstr_codepoint_t uni_char
-    ) noexcept
+    result<unit_t, mstr_result_t> push(unicode_t uni_char) noexcept
     {
         mstr_result_t code = mstr_append(&this_obj, uni_char);
         if (MSTR_SUCC(code)) {
@@ -484,7 +495,7 @@ public:
      *
      */
     result<unit_t, mstr_result_t> push(
-        mstr_codepoint_t ch, std::size_t repeat
+        unicode_t ch, std::size_t repeat
     ) noexcept
     {
         mstr_result_t code = mstr_repeat_append(&this_obj, ch, repeat);
