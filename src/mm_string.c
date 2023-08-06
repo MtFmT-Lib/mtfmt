@@ -88,20 +88,21 @@ mstr_move_from(MString* str, MString* other)
     if (str->buff != NULL) {
         mstr_free(str);
     }
+    str->count = other->count;
+    str->length = other->length;
     if (other->buff == other->stack_region) {
         str->buff = str->stack_region;
-        str->count = other->count;
         str->cap_size = MSTR_STACK_REGION_SIZE;
         // 复制stack上的内容
         memcpy(str->buff, other->buff, other->count);
     }
     else {
         str->buff = other->buff;
-        str->count = other->count;
         str->cap_size = other->cap_size;
     }
     other->buff = NULL;
     other->count = 0;
+    other->length = 0;
     other->cap_size = 0;
 }
 
@@ -236,19 +237,24 @@ mstr_concat_cstr(MString* str, const char* other)
 MSTR_EXPORT_API(mstr_result_t)
 mstr_concat_cstr_slice(MString* str, const char* start, const char* end)
 {
-    MString lit;
-    usize_t content_len, content_cnt;
-    mstr_result_t res;
-    res = mstr_strlen(&content_len, &content_cnt, start, end);
-    if (MSTR_SUCC(res)) {
-        // const MString不会被修改, 所以可强转一下
-        lit.buff = (char*)(iptr_t)start;
-        lit.count = content_cnt;
-        lit.length = content_len;
-        lit.cap_size = 0;
-        res = mstr_concat(str, &lit);
+    if (start == end) {
+        return MStr_Ok;
     }
-    return res;
+    else {
+        MString lit;
+        usize_t content_len, content_cnt;
+        mstr_result_t res;
+        res = mstr_strlen(&content_len, &content_cnt, start, end);
+        if (MSTR_SUCC(res)) {
+            // const MString不会被修改, 所以可强转一下
+            lit.buff = (char*)(iptr_t)start;
+            lit.count = content_cnt;
+            lit.length = content_len;
+            lit.cap_size = 0;
+            res = mstr_concat(str, &lit);
+        }
+        return res;
+    }
 }
 
 MSTR_EXPORT_API(void) mstr_clear(MString* str)
@@ -289,12 +295,17 @@ MSTR_EXPORT_API(const char*) mstr_c_str(MString* str)
 MSTR_EXPORT_API(mstr_bool_t)
 mstr_equal(const MString* a, const MString* b)
 {
-    if (a->count != b->count) {
+    return mstr_equal_cstr(a, b->buff, b->count);
+}
+
+MSTR_EXPORT_API(mstr_bool_t)
+mstr_equal_cstr(const MString* a, const mstr_char_t* b, usize_t b_cnt)
+{
+    if (a->count != b_cnt) {
         return False;
     }
     else {
-        usize_t len = a->count;
-        return mstr_compare_helper(a->buff, b->buff, len);
+        return mstr_compare_helper(a->buff, b, b_cnt);
     }
 }
 

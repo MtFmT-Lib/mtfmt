@@ -353,11 +353,7 @@ public:
     template <std::size_t N>
     bool operator==(const value_t (&str)[N]) const noexcept
     {
-        MString obj;
-        mstr_create(&obj, str);
-        bool result = !!mstr_equal(&this_obj, &obj);
-        mstr_free(&obj);
-        return result;
+        return !!mstr_equal_cstr(&this_obj, str, N - 1);
     }
 
     /**

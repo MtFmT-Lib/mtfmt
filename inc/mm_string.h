@@ -333,6 +333,18 @@ MSTR_EXPORT_API(mstr_bool_t)
 mstr_equal(const MString* a, const MString* b);
 
 /**
+ * @brief 判断两个字符串是否相等(cstr)
+ *
+ * @param[in] a: 字符串a
+ * @param[in] b: 字符串b
+ * @param[in] b_cnt: 字符串b的字符数
+ *
+ * @return mstr_bool_t: 字符串相等情况
+ */
+MSTR_EXPORT_API(mstr_bool_t)
+mstr_equal_cstr(const MString* a, const mstr_char_t* b, usize_t b_cnt);
+
+/**
  * @brief 判断字符串是否以某个字串开始
  *
  * @param[in] str: 字符串

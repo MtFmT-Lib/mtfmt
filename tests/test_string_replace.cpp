@@ -24,6 +24,20 @@ constexpr mtfmt::unicode_t unicode_char(const char (&u8char)[N])
 
 extern "C" void string_retain_all(void)
 {
+    mtfmt::string str_ascii = "Exa#mmp#ml#ee";
+    auto result_ascii = str_ascii.retain("#m");
+    ASSERT_EQUAL_VALUE(result_ascii.is_succ(), true);
+    ASSERT_EQUAL_VALUE(str_ascii, u8"Exampl#ee");
+    ASSERT_EQUAL_VALUE(str_ascii.length(), 9);
+    ASSERT_EQUAL_VALUE(str_ascii.byte_count(), 9);
+#if _MSTR_USE_UTF_8
+    mtfmt::string str_unicode = u8"😀😊😔🍥😊😔😀";
+    auto result_unicode = str_unicode.retain(u8"😔");
+    ASSERT_EQUAL_VALUE(result_unicode.is_succ(), true);
+    ASSERT_EQUAL_VALUE(str_unicode, u8"😀😊🍥😊😀");
+    ASSERT_EQUAL_VALUE(str_unicode.length(), 5);
+    ASSERT_EQUAL_VALUE(str_unicode.byte_count(), 20);
+#endif // _MSTR_USE_UTF_8
 }
 
 extern "C" void string_retain_endwith(void)
