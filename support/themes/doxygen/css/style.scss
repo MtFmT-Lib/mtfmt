@@ -1,0 +1,28 @@
+@import 'code';
+@import 'config';
+@import 'header';
+@import 'search';
+@import 'footer';
+@import 'content';
+
+// SPDX-License-Identifier: AGPL-3.0
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    color: $fr-color;
+    background-color: $bg-color;
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+hr {
+    height: 1px;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+    border: 1px solid $light-line-color;
+    background-color: $light-line-color;
+}

@@ -9,9 +9,9 @@
  * @copyright Copyright (c) 向阳, all rights reserved.
  *
  */
-#include "helper.h"
-#include "main.h"
 #include "mtfmt.h"
+#include "test_helper.h"
+#include "test_main.h"
 #include "unity.h"
 #include <stddef.h>
 #include <stdio.h>
@@ -21,12 +21,12 @@ void fmt_quat_value_sign(void)
     MString s;
     EVAL(mstr_create_empty(&s));
     // 1/4096 ..
-    EVAL(mstr_format("@{0:q12}@{1:q12}@", &s, 2, 1, -1));
+    EVAL(mstr_format(&s, "@{0:q12}@{1:q12}@", 2, 1, -1));
     ASSERT_EQUAL_STRING(&s, "@0.000244140625@-0.000244140625@");
     // 无符号版本
     // 1048575 * 4096 = 0xfffff000
     mstr_clear(&s);
-    EVAL(mstr_format("@{0:q12u}@{1:q12u}@", &s, 2, 4096, -4096));
+    EVAL(mstr_format(&s, "@{0:q12u}@{1:q12u}@", 2, 4096, -4096));
     ASSERT_EQUAL_STRING(&s, "@1@1048575@");
     mstr_free(&s);
 }
@@ -36,7 +36,7 @@ void fmt_quat_value_dualprec(void)
     MString s;
     EVAL(mstr_create_empty(&s));
     // 1/4096 ..
-    EVAL(mstr_format("@{0:q12}@{1:q31}@", &s, 2, 1, 1));
+    EVAL(mstr_format(&s, "@{0:q12}@{1:q31}@", 2, 1, 1));
     ASSERT_EQUAL_STRING(
         &s, "@0.000244140625@0.0000000000000000000002166527565@"
     );
@@ -45,4 +45,10 @@ void fmt_quat_value_dualprec(void)
 
 void fmt_quat_value_singprec(void)
 {
+    MString s;
+    EVAL(mstr_create_empty(&s));
+    // 1/4 ..
+    EVAL(mstr_format(&s, "@{0:q2}@", 1, 1));
+    ASSERT_EQUAL_STRING(&s, "@0.25@");
+    mstr_free(&s);
 }

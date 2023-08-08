@@ -14,7 +14,8 @@
 #include "mm_cfg.h"
 #include "mm_fmt.h"
 #include "mm_heap.h"
+#include "mm_io.h"
 #include "mm_result.h"
 #include "mm_string.h"
-#include "mm_typedef.h"
+#include "mm_type.h"
 #endif // _INCLUDE_MTFMT_H_

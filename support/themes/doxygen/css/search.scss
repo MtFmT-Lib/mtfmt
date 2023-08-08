@@ -1,0 +1,23 @@
+@import 'config';
+
+// SPDX-License-Identifier: AGPL-3.0
+
+// inactive 下的样式
+#MSearchBox,
+.MSearchBoxInactive {
+    box-shadow: none;
+    border: 1px solid $light-line-color;
+    border-radius: 2px;
+}
+
+#MSearchClose {
+    display: none;
+}
+
+// 搜索结果
+#MSearchResultsWindow {
+    border-radius: 2px;
+    border: 1px solid $split-line-color;
+    background-color: $bg-color;
+    padding: 0.5em;
+}

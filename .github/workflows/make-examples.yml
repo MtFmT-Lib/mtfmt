@@ -1,0 +1,113 @@
+name: "make examples"
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "src/**.c"
+      - "inc/**.h"
+      - "inc/**.hpp"
+      - "examples/**.h"
+      - "examples/**.c"
+      - "examples/**.cpp"
+      - "Makefile"
+      - ".github/workflows/make-examples.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "src/**.c"
+      - "inc/**.h"
+      - "inc/**.hpp"
+      - "examples/**.h"
+      - "examples/**.c"
+      - "examples/**.cpp"
+      - "Makefile"
+      - ".github/workflows/make-examples.yml"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+
+jobs:
+  build-examples-linux:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest]
+        arch: [x64]
+    runs-on: "${{ matrix.os }}"
+    name: "Build examples: ${{ matrix.os }} (${{ matrix.arch }})"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      # 设置GCC版本
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: latest
+          platform: "${{ matrix.arch }}"
+      # 构建
+      - name: Make examples at ${{ matrix.os }}
+        run: |
+          make examples
+        env:
+          MTFMT_BUILD_C_DEFS: >-
+            -D_MSTR_USE_STD_IO=1
+            -D_MSTR_USE_MALLOC=1
+            -D_MSTR_USE_HARDWARE_DIV=1
+          MTFMT_BUILD_USE_LTO: "1"
+          MTFMT_BUILD_TARGET_NAME: "mtfmt_${{ matrix.os }}_${{ matrix.arch }}"
+          MTFMT_BUILD_EXEFILE_EXT: ".out"
+      # 打包
+      - name: Upload artifact
+        if: github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}_${{ matrix.arch }}-artifact
+          path: target/*.out
+
+  build-examples-windows:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [windows-latest]
+        arch: [x64]
+    runs-on: "${{ matrix.os }}"
+    name: "Build examples: ${{ matrix.os }} (${{ matrix.arch }})"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install Cygwin
+        uses: egor-tensin/setup-cygwin@v4
+        with:
+          packages: make gcc-g++
+      - name: Make examples at ${{ matrix.os }}
+        run: |
+          make examples
+        env:
+          MTFMT_BUILD_C_DEFS: >-
+            -D_MSTR_USE_STD_IO=1
+            -D_MSTR_USE_MALLOC=1
+            -D_MSTR_USE_HARDWARE_DIV=1
+          MTFMT_BUILD_USE_LTO: "1"
+          MTFMT_BUILD_TARGET_NAME: "mtfmt_${{ matrix.os }}_${{ matrix.arch }}"
+          MTFMT_BUILD_EXEFILE_EXT: ".exe"
+      # 因为cygwin要1个dll...所以把它copy过去一起放到存档里
+      - name: Copy cygwin dlls
+        run: |
+          copy C:\tools\cygwin\bin\cygwin1.dll target/
+      # 打包
+      - name: Upload artifact
+        if: github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}_${{ matrix.arch }}-artifact
+          path: |
+            target/*.exe
+            target/*.dll

@@ -8,6 +8,9 @@ on:
       - "inc/**.hpp"
       - "tests/**.c"
       - "tests/**.h"
+      - "examples/**.c"
+      - "examples/**.h"
+      - "examples/**.hpp"
       - "**.clang-format"
       - ".github/workflows/format-checker.yml"
   pull_request:
@@ -18,6 +21,9 @@ on:
       - "inc/**.hpp"
       - "tests/**.c"
       - "tests/**.h"
+      - "examples/**.c"
+      - "examples/**.h"
+      - "examples/**.hpp"
       - "**.clang-format"
       - ".github/workflows/format-checker.yml"
   workflow_dispatch:

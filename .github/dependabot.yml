@@ -6,11 +6,6 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 2
-  # npm包
-  - package-ecosystem: "npm"
-    directory: "www/"
-    schedule:
-      interval: "weekly"
   # 子模块
   - package-ecosystem: "gitsubmodule"
     directory: "/"

@@ -1,0 +1,66 @@
+on:
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+
+permissions:
+  contents: write
+
+name: Release it
+jobs:
+  release-to-github:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      # 源代码
+      - name: Archive project sources
+        id: archive_project
+        run: |
+          FILE_NAME=${GITHUB_REPOSITORY#*/}-${GITHUB_REF##*/}
+          git archive ${{ github.ref }} -o ${FILE_NAME}.zip
+          git archive ${{ github.ref }} -o ${FILE_NAME}.tar.gz
+          echo "::set-output name=file_name::${FILE_NAME}"
+      - name: Compute digests
+        id: compute_digests_arch
+        run: |
+          echo "$(openssl dgst -sha256 -r ${{ steps.archive_project.outputs.file_name }}.tar.gz)" >>checksum.txt
+          echo "$(openssl dgst -sha512 -r ${{ steps.archive_project.outputs.file_name }}.tar.gz)" >>checksum.txt
+          echo "$(openssl dgst -sha256 -r ${{ steps.archive_project.outputs.file_name }}.zip)" >>checksum.txt
+          echo "$(openssl dgst -sha512 -r ${{ steps.archive_project.outputs.file_name }}.zip)" >>checksum.txt
+      # keil包
+      # TODO 下面的内容都只是单纯的复制了其它的workflows, 把它们改成actions
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest
+          if [ -f zipack/requirements.txt ]; then pip install -r zipack/requirements.txt; fi
+      - name: Generate CMSIS pack
+        run: |
+          python zipack --project=./support/project.toml cmsis-pack
+      - name: Compute digests for CMSIS pack
+        id: compute_digests_cmsis
+        run: |
+          echo "$(openssl dgst -sha256 -r target_package/*.pack)" >>checksum.txt
+          echo "$(openssl dgst -sha512 -r target_package/*.pack)" >>checksum.txt
+      # 上传发布内容
+      - name: Create Release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: >-
+            ./${{ steps.archive_project.outputs.file_name }}.zip,
+            ./${{ steps.archive_project.outputs.file_name }}.tar.gz,
+            ./target_package/*.pack,
+            ./checksum.txt
+          allowUpdates: true
+          body: |
+              Automated release from `releases.yml`

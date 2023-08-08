@@ -6,37 +6,28 @@ MtFmT
 ![LANGUAGE](https://img.shields.io/badge/Language-100%25%20C-yellowgreen)
 [![Coverage Status](https://coveralls.io/repos/github/MtFmT-Lib/mtfmt/badge.svg?branch=master)](https://coveralls.io/github/MtFmT-Lib/mtfmt?branch=master)
 
-
-[![DOCUMENT](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/document.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/document.yml)
-[![DOCUMENT LINT](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/eslint.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/eslint.yml)
 [![TESTS](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/tests.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/tests.yml)
-[![DYLIB-BUILD](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-dylib.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-dylib.yml)
-[![LIB-BUILD](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-staticlib.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-staticlib.yml)
+[![DYLIB-BUILD](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-dylib.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-dylib.yml)
+[![LIB-BUILD](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-lib.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-lib.yml)
+[![CMAKE-BUILD](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/cmake-build.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/cmake-build.yml)
 [![CLANG-FORMAT](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/format-checker.yml/badge.svg)](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/format-checker.yml)
 
+| [HomePage](https://mtfmt.cc/mtfmt/) | [Document](https://mtfmt.cc/mtfmt/doc) | [Code Document](https://mtfmt.cc/mtfmt/html/) | [Pre-build Libs](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-lib.yml) | [Pre-build DLLs](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/make-dylib.yml) |
 
-\[ [HomePage](https://mtfmt-lib.github.io/mtfmt/) \]
-\[ [Document](https://mtfmt-lib.github.io/mtfmt/doc) \]
-\[ [Code Document](https://mtfmt-lib.github.io/mtfmt/doxygen/html/) \]
-\[ [Pre-build Download](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-staticlib.yml) \]
-\[ [Pre-build DLLs](https://github.com/MtFmT-Lib/mtfmt/actions/workflows/build-dylib.yml) \]
-
-
-一个类似于`{fmtlib}`和python的format语法的字符串格式化库，以足够低的资源占用和足够高的性能实现string format。
 `mtfmt` （Mini template formatter）是为嵌入式系统设计的格式化库，它实现了 [PEP-3101](https://peps.python.org/pep-3101/) 中的格式化串的一个方言。其它类似的实现包括 [{fmtlib}](https://fmt.dev/latest/syntax.html) 等。另外，mtfmt 还实现了.Net中对于日期和时间格式化中的[标准部分](https://learn.microsoft.com/zh-cn/dotnet/standard/base-types/standard-date-and-time-format-strings)、[用户定义部分](https://learn.microsoft.com/zh-cn/dotnet/standard/base-types/custom-date-and-time-format-strings)的一个子集，mtfmt的其主要特性包括：
 
-* [x] 无除法运算、取模运算的有符号/无符号整数格式化（二进制、八进制、十进制、十六进制）
-* [x] 无除法运算、取模运算的有符号/无符号的量化值格式化（q31_t等）
+* [X] 无除法运算、取模运算的有符号/无符号整数格式化（二进制、八进制、十进制、十六进制）
+* [X] 无除法运算、取模运算的有符号/无符号的量化值格式化（q31_t等）
 * [ ] ~~无除法运算、取模运算的有符号/无符号定点数格式化~~  **懒**
-* [x] 标准日期时间格式化、指定分隔符、项位置的日期和时间格式化
+* [X] 标准日期时间格式化、指定分隔符、项位置的日期和时间格式化
 * [ ] 12小时制
 * [ ] 星期名称
-* [x] 字符串格式化
-* [x] 指定对齐方式、填充宽度、符号显示方式
-* [x] C数组格式化
-* [x] 不依赖操作系统，提供用于嵌入式设备的内存分配器
-* [x] 提供动态长度字符串，字符串携带 stack allocator
-* [x] 提供可传入 `va_list` 函数，变参函数
+* [X] 字符串格式化
+* [X] 指定对齐方式、填充宽度、符号显示方式
+* [X] C数组格式化
+* [X] 不依赖操作系统，提供用于嵌入式设备的内存分配器
+* [X] 提供动态长度字符串，字符串携带 stack allocator
+* [X] 提供可传入 `va_list` 函数，变参函数
 * [X] 定位parser错误位置以及原因
 
 请注意区分于大多数的格式化器，`MtFmt-Core` **暂不提供**如下的功能：
@@ -44,11 +35,59 @@ MtFmT
 * 自定义格式化标记
 * 自定义错误处理
 
+## 例子
+
+整数格式化（二进制、八进制、十进制、十六进制）
+
+```c
+mstr_print("{0:i32:b}\n", 165); // => 10100101
+mstr_print("{0:i32:o}\n", 165); // => 245
+mstr_print("{0:i32:d}\n", 165); // => 165
+mstr_print("{0:i32:h}\n", 165); // => a5
+mstr_print("{0:i32:H}\n", 165); // => A5
+mstr_print("{0:i32:x}\n", 165); // => 0xa5
+mstr_print("{0:i32:X}\n", 165); // => 0XA5
+```
+
+对齐方式（左对齐、居中、右对齐）
+
+```c
+mstr_print("|{0:i32:=8}|\n", 1234); // => |  1234  |
+mstr_print("|{0:i32:<8}|\n", 1234); // => |1234    |
+mstr_print("|{0:i32:>8}|\n", 1234); // => |    1234|
+```
+
+数组格式化，且指定格式化采用的进制
+
+```c
+const uint32_t array[5] = {
+    0x12, 0x34, 0x56, 0x78, 0x90
+};
+const usize_t array_size = 5;
+mstr_print("{[0:i32]}\n", array, array_size);
+// => 18, 52, 86, 120, 144
+mstr_print("{[0:i32:x]}\n", array, array_size);
+// => 0x12, 0x34, 0x56, 0x78, 0x90
+```
+
+更多的例子在 [examples文件夹](https://github.com/MtFmT-Lib/mtfmt/tree/master/examples) 里面哦
+
 ## 工作方式
 
-MtFmt 通过数个 pass 来完成格式化工作，其均是动态的。
+MtFmt 通过数个 pass 来完成格式化工作，其均是动态的，可以分为输入串解析（Scanner）、格式化串解析（Replacement parser）和转换（Converter）三个过程。
 
-## 详细描述
+```mermaid
+graph LR;
+    Scanner --> Parser --> Converter;
+```
+
+三个 pass 是互不依赖的，mtfmt 提供了每个 pass 的函数导出：
+
+* Scanner : `mm_fmt.h` 文件中的  `mstr_format` 函数
+* Parser: `mm_parser.h` 中
+* Converter:  `mm_fmt.h` 文件中的 `mstr_fmt_XXX` 命名方式的函数
+
+## 语法描述
 
 这里给出了 `mtfmt` 的格式化语法细节。其使用一个小可爱语言来完成它，姑且称作 `MtFmt-DSL` 。MtFmt 通过 `replacement_field` 区分需要放置的值类型，使用 `{` 和 `}` 包起来。对于 replacement field，其至少需要指定参数位置以及参数类型，且参数位置必须是递增的。若使用 `{ A }` 表示0到多个的A, `[ A ]` 表示可选的A，`{ A }+` 表示1到多个的A，`{ A }?` 表示0或1个A。使用不同的行或者“\|”以表示“或”，使用缩进区分符号。下面给出了总体语法。
 
@@ -273,12 +312,6 @@ chrono_split_char :=
 
 TODO
 
-## 例子
-
-TODO
-
 ## See also
 
 TODO
-
-
