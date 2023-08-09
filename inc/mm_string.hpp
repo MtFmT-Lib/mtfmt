@@ -895,6 +895,64 @@ public:
     }
 
     /**
+     * @brief 替换patt(cstr buffer)的内容为rep_to
+     *
+     * @param[in] patt: 模式串
+     * @param[in] rep_to: 替换为的内容
+     * @param[in] rep_to_cnt: 替换内容的字符数
+     * @param[in] mode: 替换模式
+     *
+     */
+    template <std::size_t N>
+    result<unit_t, error_code_t> replace(
+        const value_t (&patt)[N],
+        const value_t* rep_to,
+        MStringReplaceOption mode = MStringReplaceOption_All,
+        usize_t rep_to_cnt = 0
+    ) noexcept
+    {
+        return replace(patt, rep_to, mode, N - 1, rep_to_cnt);
+    }
+
+    /**
+     * @brief 替换patt的内容为rep_to (cstr buffer)
+     *
+     * @param[in] patt: 模式串
+     * @param[in] rep_to: 替换为的内容
+     * @param[in] rep_to_cnt: 替换内容的字符数
+     * @param[in] mode: 替换模式
+     *
+     */
+    template <std::size_t N>
+    result<unit_t, error_code_t> replace(
+        const value_t* patt,
+        const value_t (&rep_to)[N],
+        MStringReplaceOption mode = MStringReplaceOption_All,
+        usize_t patt_cnt = 0
+    ) noexcept
+    {
+        return replace(patt, rep_to, mode, patt_cnt, N - 1);
+    }
+
+    /**
+     * @brief 替换patt (cstr buffer) 的内容为rep_to (cstr buffer)
+     *
+     * @param[in] patt: 模式串
+     * @param[in] rep_to: 替换为的内容
+     * @param[in] mode: 替换模式
+     *
+     */
+    template <std::size_t Npatt, std::size_t Nrepto>
+    result<unit_t, error_code_t> replace(
+        const value_t (&patt)[Npatt],
+        const value_t (&rep_to)[Nrepto],
+        MStringReplaceOption mode = MStringReplaceOption_All
+    ) noexcept
+    {
+        return replace(patt, rep_to, mode, Npatt - 1, Nrepto - 1);
+    }
+
+    /**
      * @brief 取得C风格字符串
      *
      * @return const element_t*: c风格字符串指针吗

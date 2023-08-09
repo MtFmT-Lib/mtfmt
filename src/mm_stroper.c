@@ -17,16 +17,6 @@
 #include <stddef.h>
 #include <string.h>
 
-//
-// private:
-//
-
-static void
-    mstr_reverse_unicode_helper(mstr_char_t*, const mstr_char_t*);
-static mstr_bool_t mstr_compare_helper(
-    const char*, const char*, usize_t
-);
-
 /**
  * @brief 指定使用BM算法的阈值
  *
@@ -43,6 +33,11 @@ static mstr_bool_t mstr_compare_helper(
 // private:
 //
 
+static void
+    mstr_reverse_unicode_helper(mstr_char_t*, const mstr_char_t*);
+static mstr_bool_t mstr_compare_helper(
+    const char*, const char*, usize_t
+);
 static mstr_result_t mstr_find_simple(
     isize_t*, const char*, usize_t, usize_t, const char*, usize_t
 );
@@ -63,6 +58,9 @@ static mstr_result_t mstr_replace_end_with_impl(
 );
 static mstr_result_t mstr_replace_all_impl(
     MString*, const char*, usize_t, const char*, usize_t
+);
+static mstr_result_t mstr_replace_all_impl_helper(
+    MString*, const MString*, const char*, usize_t, const char*, usize_t
 );
 static void make_jump_table(uint8_t*, const mstr_char_t*, usize_t);
 
@@ -946,6 +944,57 @@ static mstr_result_t mstr_replace_all_impl(
     usize_t rep_to_cnt
 )
 {
+    MString tmp_str;
+    mstr_result_t res = MStr_Ok;
+    mstr_init(&tmp_str);
+    mstr_assert(patt_cnt > 0);
+    // 进行处理
+    MSTR_AND_THEN(
+        res,
+        mstr_replace_all_impl_helper(
+            &tmp_str, str, patt, patt_cnt, rep_to, rep_to_cnt
+        )
+    );
+    // 把tmp_str移动到str
+    if (MSTR_SUCC(res)) {
+        mstr_move_from(str, &tmp_str);
+    }
+    return res;
+}
+
+/**
+ * @brief 替换(all)的实现(helper)
+ *
+ * @param[out] out_str: 替换结果
+ * @param[in] src_str: 源字符串
+ * @param[in] patt: 匹配模式
+ * @param[in] patt_cnt: 匹配模式的字符串的字符计数
+ * @param[in] rep_to: 替换到的字符串
+ * @param[in] rep_to_cnt: 替换到的字符串的字符计数
+ *
+ */
+static mstr_result_t mstr_replace_all_impl_helper(
+    MString* out_str,
+    const MString* src_str,
+    const char* patt,
+    usize_t patt_cnt,
+    const char* rep_to,
+    usize_t rep_to_cnt
+)
+{
+    usize_t patt_len = 0;
+    usize_t replace_len = 0;
+    mstr_result_t res = MStr_Ok;
+    mstr_assert(patt_cnt > 0);
+    mstr_assert(patt_cnt <= src_str->count);
+    // 计算unicode长度
+    MSTR_AND_THEN(
+        res, mstr_strlen(&patt_len, NULL, patt, patt + patt_cnt)
+    );
+    MSTR_AND_THEN(
+        res,
+        mstr_strlen(&replace_len, NULL, rep_to, rep_to + rep_to_cnt)
+    );
     return MStr_Err_NoImplemention;
 }
 
