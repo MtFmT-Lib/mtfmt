@@ -105,31 +105,6 @@ typedef struct tagMString
 } MString;
 
 /**
- * @brief 字符串迭代器
- *
- */
-typedef struct tagMStringIter
-{
-    /**
-     * @brief 位置
-     *
-     */
-    const char* it;
-
-    /**
-     * @brief 结束位置
-     *
-     */
-    const char* it_end;
-
-    /**
-     * @brief 剩余的长度
-     *
-     */
-    usize_t rem_length;
-} MStringIter;
-
-/**
  * @brief 初始化一个空的字符串
  *
  * @param[inout] pstr: 字符串
@@ -184,6 +159,13 @@ MSTR_EXPORT_API(mstr_result_t)
 mstr_copy_from(MString* str, const MString* other);
 
 /**
+ * @brief 释放一个字符串所占的内存
+ *
+ * @param str: 字符串结构
+ */
+MSTR_EXPORT_API(void) mstr_free(MString* str);
+
+/**
  * @brief 保留 sz 个char数的内存区
  *
  * @param[inout] str: 字符串
@@ -192,6 +174,159 @@ mstr_copy_from(MString* str, const MString* other);
  */
 MSTR_EXPORT_API(mstr_result_t)
 mstr_reserve(MString* str, usize_t new_size);
+
+/**
+ * @brief 改变cap的策略
+ *
+ * @param[in] old_sz: 以前的大小
+ * @param[in] inc_len: 至少需要增加的大小, 会在此基础上增加1
+ */
+MSTR_EXPORT_API(usize_t)
+mstr_resize_tactic(usize_t old_sz, usize_t inc_len);
+
+/**
+ * @brief 取得第idx位置的字符ch
+ *
+ * @attention 边界检查失败会造成assert false, 函数失败会返回0
+ * 而不是返回mstr_result
+ */
+MSTR_EXPORT_API(mstr_codepoint_t)
+mstr_char_at(const MString* str, usize_t idx);
+
+/**
+ * @brief 判断buff的lead字符偏移量(相反数, 比如偏移量是-2但是会返回2)
+ *
+ * @note 在UTF-8功能启用的情况下, 其判断UTF-8编码的字符长度, 错误返回0,
+ * 否则, 该函数永远返回1
+ *
+ * @param[in] buff: 字符数组
+ * @param[in] hist_len: 字符数组允许往前查找的长度, 大于等于0
+ * (不然就返回0啦), 如果大于6, 那么最大会被限制到6(1个utf-8编码的长度)
+ *
+ */
+MSTR_EXPORT_API(usize_t)
+mstr_lead_char_offset(const mstr_char_t* buff, usize_t hist_len);
+
+/**
+ * @brief 找到第idx个字符的offset
+ *
+ * @param[in] str: 字符串
+ * @param[in] idx: 字符索引
+ *
+ * @attention 该函数会进行边界检查
+ *
+ * @return usize_t: 相对于 buff 的偏移量, buff + 返回值 是该字符的 lead
+ *
+ */
+MSTR_EXPORT_API(usize_t)
+mstr_char_offset_at(const MString* str, usize_t idx);
+
+/**
+ * @brief 转换为UTF-8, 如果未启用UTF-8, 该函数返回未实现错误
+ *
+ * @param code: 字符代码点
+ * @param result: 转换输出, 至少要有6个bytes
+ * @param result_len: 转换输出的有效长度
+ *
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_as_utf8(
+    mstr_codepoint_t code, mstr_char_t* result, usize_t* result_len
+);
+
+/**
+ * @brief 取得lead字符ch[0]所跟着的内容的unicode代码点值
+ * 如果未启用UTF-8, 该函数返回未实现错误
+ *
+ * @param[out] code: 解码结果
+ * @param[in] ch: 字符串
+ * @param[in] byte_count: 字符的字节数
+ *
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_codepoint_of(
+    mstr_codepoint_t* code, const mstr_char_t* ch, usize_t byte_count
+);
+
+/**
+ * @brief 转换为cstr
+ *
+ * @param str: 字符串
+ * @return const char*: C字符串指针
+ */
+MSTR_EXPORT_API(const char*) mstr_c_str(MString* str);
+
+/**
+ * @brief 判断前导字符lead后面的字符长度, 前导字符包括在内
+ *
+ * @note 在UTF-8功能启用的情况下, 其判断UTF-8编码的字符长度, 错误返回0,
+ * 否则, 该函数永远返回1
+ *
+ */
+MSTR_EXPORT_API(usize_t) mstr_char_length(char lead);
+
+/**
+ * @brief 计算字符串长度
+ *
+ * @param len: 字符长度
+ * @param count: 字符串占用的字节数
+ * @param str: 字符串
+ * @param str_end: 字符串结束, 为NULL表示'\0'自己算
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_strlen(
+    usize_t* len,
+    usize_t* count,
+    const mstr_char_t* str,
+    const mstr_char_t* str_end
+);
+
+/**
+ * @brief 清空字符串
+ *
+ * @param[inout] str: 需要清空的字符串
+ */
+MSTR_EXPORT_API(void) mstr_clear(MString* str);
+
+/**
+ * @brief 翻转字符串
+ *
+ * @param[inout] str: 需要翻转的字符串
+ *
+ */
+MSTR_EXPORT_API(void) mstr_reverse_self(MString* str);
+
+/**
+ * @brief 翻转字符串, 不做任何其它处理
+ *
+ * @param[inout] str: 需要翻转的字符串
+ *
+ * @attention 通常情况下不需要使用此函数,
+ * 此函数不会保证反转后的编码正确。它设计出来是为了给明确只有ASCII字符的字符串做翻转的,
+ * 在UTF-8编码下, 该函数可降低很多操作
+ */
+MSTR_EXPORT_API(void) mstr_reverse_only(MString* str);
+
+/**
+ * @brief 向字符串尾部插入一个字符
+ *
+ * @param[inout] str: 字符串
+ * @param[in] ch: 需要放入的字符(unicode point)
+ * @return mstr_result_t: 结果
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_append(MString* str, mstr_codepoint_t ch);
+
+/**
+ * @brief 向字符串尾部重复插入一个字符
+ *
+ * @param[inout] str: 字符串
+ * @param[in] ch: 需要放入的字符(unicode point)
+ * @param[in] cnt: 重复次数
+ * @return mstr_result_t: 结果
+ */
+MSTR_EXPORT_API(mstr_result_t)
+mstr_repeat_append(MString* str, mstr_codepoint_t ch, usize_t cnt);
 
 /**
  * @brief 拼接字符串
@@ -228,61 +363,6 @@ MSTR_EXPORT_API(mstr_result_t)
 mstr_concat_cstr_slice(
     MString* str, const char* start, const char* end
 );
-
-/**
- * @brief 向字符串尾部插入一个字符
- *
- * @param[inout] str: 字符串
- * @param[in] ch: 需要放入的字符(unicode point)
- * @return mstr_result_t: 结果
- */
-MSTR_EXPORT_API(mstr_result_t)
-mstr_append(MString* str, mstr_codepoint_t ch);
-
-/**
- * @brief 向字符串尾部重复插入一个字符
- *
- * @param[inout] str: 字符串
- * @param[in] ch: 需要放入的字符(unicode point)
- * @param[in] cnt: 重复次数
- * @return mstr_result_t: 结果
- */
-MSTR_EXPORT_API(mstr_result_t)
-mstr_repeat_append(MString* str, mstr_codepoint_t ch, usize_t cnt);
-
-/**
- * @brief 清空字符串
- *
- * @param[inout] str: 需要清空的字符串
- */
-MSTR_EXPORT_API(void) mstr_clear(MString* str);
-
-/**
- * @brief 翻转字符串
- *
- * @param[inout] str: 需要翻转的字符串
- *
- */
-MSTR_EXPORT_API(void) mstr_reverse_self(MString* str);
-
-/**
- * @brief 翻转字符串, 不做任何其它处理
- *
- * @param[inout] str: 需要翻转的字符串
- *
- * @attention 通常情况下不需要使用此函数,
- * 此函数不会保证反转后的编码正确。它设计出来是为了给明确只有ASCII字符的字符串做翻转的,
- * 在UTF-8编码下, 该函数可降低很多操作
- */
-MSTR_EXPORT_API(void) mstr_reverse_only(MString* str);
-
-/**
- * @brief 转换为cstr
- *
- * @param str: 字符串
- * @return const char*: C字符串指针
- */
-MSTR_EXPORT_API(const char*) mstr_c_str(MString* str);
 
 /**
  * @brief 判断两个字符串是否相等
@@ -345,15 +425,6 @@ MSTR_EXPORT_API(mstr_bool_t)
 mstr_contains(
     const MString* str, const char* pattern, usize_t pattern_cnt
 );
-
-/**
- * @brief 取得第idx位置的字符ch
- *
- * @attention 边界检查失败会造成assert false, 函数失败会返回0
- * 而不是返回mstr_result
- */
-MSTR_EXPORT_API(mstr_codepoint_t)
-mstr_char_at(const MString* str, usize_t idx);
 
 /**
  * @brief 从字符串中移除idx位置的字符
@@ -429,102 +500,5 @@ mstr_replace(
     const char* replace_to,
     usize_t replace_to_cnt
 );
-
-/**
- * @brief 取得迭代器
- *
- * @param[out] it: 迭代器输出
- * @param[in] str: 原字符串
- *
- */
-MSTR_EXPORT_API(void) mstr_iter(MStringIter* it, const MString* str);
-
-/**
- * @brief 移动到下一个位置
- *
- */
-#define mstr_iter_move_next(it)                      \
-    do {                                             \
-        usize_t step = mstr_char_length(*((it).it)); \
-        (it).it += step;                             \
-        (it).rem_leng -= 1;                          \
-    } while (0)
-
-/**
- * @brief 判断迭代器是否已到末尾
- *
- */
-#define mstr_iter_is_end(it) ((it).it == (it).it_end)
-
-/**
- * @brief 判断前导字符lead后面的字符长度, 前导字符包括在内
- *
- * @note 在UTF-8功能启用的情况下, 其判断UTF-8编码的字符长度, 错误返回0,
- * 否则, 该函数永远返回1
- *
- */
-MSTR_EXPORT_API(usize_t) mstr_char_length(char lead);
-
-/**
- * @brief 判断buff的lead字符偏移量(相反数, 比如偏移量是-2但是会返回2)
- *
- * @note 在UTF-8功能启用的情况下, 其判断UTF-8编码的字符长度, 错误返回0,
- * 否则, 该函数永远返回1
- *
- * @param[in] buff: 字符数组
- * @param[in] hist_len: 字符数组允许往前查找的长度, 大于等于0
- * (不然就返回0啦), 如果大于6, 那么最大会被限制到6(1个utf-8编码的长度)
- *
- */
-MSTR_EXPORT_API(usize_t)
-mstr_lead_char_offset(const mstr_char_t* buff, usize_t hist_len);
-
-/**
- * @brief 转换为UTF-8, 如果未启用UTF-8, 该函数返回未实现错误
- *
- * @param code: 字符代码点
- * @param result: 转换输出, 至少要有6个bytes
- * @param result_len: 转换输出的有效长度
- *
- */
-MSTR_EXPORT_API(mstr_result_t)
-mstr_as_utf8(
-    mstr_codepoint_t code, mstr_char_t* result, usize_t* result_len
-);
-
-/**
- * @brief 取得lead字符ch[0]所跟着的内容的unicode代码点值
- * 如果未启用UTF-8, 该函数返回未实现错误
- *
- * @param[out] code: 解码结果
- * @param[in] ch: 字符串
- * @param[in] byte_count: 字符的字节数
- *
- */
-MSTR_EXPORT_API(mstr_result_t)
-mstr_codepoint_of(
-    mstr_codepoint_t* code, const mstr_char_t* ch, usize_t byte_count
-);
-
-/**
- * @brief 找到第idx个字符的offset
- *
- * @param[in] str: 字符串
- * @param[in] idx: 字符索引
- *
- * @attention 该函数会进行边界检查
- *
- * @return usize_t: 相对于 buff 的偏移量, buff + 返回值 是该字符的 lead
- *
- */
-MSTR_EXPORT_API(usize_t)
-mstr_char_offset_at(const MString* str, usize_t idx);
-
-/**
- * @brief 释放一个字符串所占的内存
- *
- * @param str: 字符串结构
- */
-MSTR_EXPORT_API(void) mstr_free(MString* str);
 
 #endif // _INCLUDE_MM_STRING_H_
