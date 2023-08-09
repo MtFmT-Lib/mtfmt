@@ -100,6 +100,9 @@ int main()
     RUN_TEST(string_retain_all);
     RUN_TEST(string_retain_endwith);
     RUN_TEST(string_retain_startwith);
+    RUN_TEST(string_replace_all);
+    RUN_TEST(string_replace_endwith);
+    RUN_TEST(string_replace_startwith);
 
     RUN_TEST(itoa_int_index);
     RUN_TEST(itoa_int_type);

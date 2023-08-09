@@ -860,6 +860,41 @@ public:
     }
 
     /**
+     * @brief 替换patt的内容为rep_to
+     *
+     * @param[in] patt: 模式串
+     * @param[in] patt_cnt: 模式串的字符数
+     * @param[in] rep_to: 替换为的内容
+     * @param[in] rep_to_cnt: 替换内容的字符数
+     * @param[in] mode: 替换模式
+     *
+     */
+    result<unit_t, error_code_t> replace(
+        const value_t* patt,
+        const value_t* rep_to,
+        MStringReplaceOption mode = MStringReplaceOption_All,
+        usize_t patt_cnt = 0,
+        usize_t rep_to_cnt = 0
+    ) noexcept
+    {
+        mstr_result_t res;
+        res = mstr_replace(
+            &this_obj,
+            mode,
+            patt,
+            patt_cnt == 0 ? strlen(patt) : patt_cnt,
+            rep_to,
+            rep_to_cnt == 0 ? strlen(rep_to) : rep_to_cnt
+        );
+        if (MSTR_SUCC(res)) {
+            return unit_t{};
+        }
+        else {
+            return res;
+        }
+    }
+
+    /**
      * @brief 取得C风格字符串
      *
      * @return const element_t*: c风格字符串指针吗

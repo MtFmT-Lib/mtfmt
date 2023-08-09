@@ -49,12 +49,6 @@ static mstr_result_t mstr_find_simple(
 static mstr_result_t mstr_find_large(
     isize_t*, const mstr_char_t*, usize_t, const mstr_char_t*, usize_t
 );
-static mstr_result_t mstr_retain_start_with_impl(
-    MString*, const char*, usize_t
-);
-static mstr_result_t mstr_retain_end_with_impl(
-    MString*, const char*, usize_t
-);
 static mstr_result_t mstr_retain_all_impl(
     MString*, const char*, usize_t
 );
@@ -530,7 +524,7 @@ mstr_replace(
 )
 {
     mstr_result_t res = MStr_Ok;
-    if (patt_cnt == 0) {
+    if (patt_cnt == 0 || patt_cnt > str->count) {
         res = MStr_Ok;
     }
     else if (opt == MStringReplaceOption_StartWith) {
@@ -564,14 +558,14 @@ mstr_retain(
 )
 {
     mstr_result_t res = MStr_Ok;
-    if (patt_cnt == 0) {
+    if (patt_cnt == 0 || patt_cnt > str->count) {
         res = MStr_Ok;
     }
     else if (opt == MStringReplaceOption_StartWith) {
-        res = mstr_retain_start_with_impl(str, patt, patt_cnt);
+        res = mstr_replace_start_with_impl(str, patt, patt_cnt, "", 0);
     }
     else if (opt == MStringReplaceOption_EndWith) {
-        res = mstr_retain_end_with_impl(str, patt, patt_cnt);
+        res = mstr_replace_end_with_impl(str, patt, patt_cnt, "", 0);
     }
     else if (opt == MStringReplaceOption_All) {
         res = mstr_retain_all_impl(str, patt, patt_cnt);
@@ -689,58 +683,6 @@ static mstr_result_t mstr_find_large(
         mstr_heap_free(bad_char_arr);
     }
     return MStr_Ok;
-}
-
-/**
- * @brief mstr_retain (start_with) 的实现
- *
- * @param[inout] str: 需要进行剔除的字符串
- * @param[in] patt: 模式串
- * @param[in] patt_cnt: 模式串的字符计数
- */
-static mstr_result_t mstr_retain_start_with_impl(
-    MString* str, const char* patt, usize_t patt_cnt
-)
-{
-    usize_t patt_len = 0;
-    mstr_result_t res = MStr_Ok;
-    // 计算unicode长度
-    MSTR_AND_THEN(
-        res, mstr_strlen(&patt_len, NULL, patt, patt + patt_cnt)
-    );
-    // 把数据挪到前面覆盖掉
-    if (MSTR_SUCC(res) && mstr_start_with(str, patt, patt_cnt)) {
-        memmove(str->buff, str->buff + patt_cnt, str->count - patt_cnt);
-        // 减去长度
-        str->count -= patt_cnt;
-        str->length -= patt_len;
-    }
-    return res;
-}
-
-/**
- * @brief mstr_retain (end_with) 的实现
- *
- * @param[inout] str: 需要进行剔除的字符串
- * @param[in] patt: 模式串
- * @param[in] patt_cnt: 模式串的字符计数
- */
-static mstr_result_t mstr_retain_end_with_impl(
-    MString* str, const char* patt, usize_t patt_cnt
-)
-{
-    usize_t patt_len = 0;
-    mstr_result_t res = MStr_Ok;
-    // 计算unicode长度
-    MSTR_AND_THEN(
-        res, mstr_strlen(&patt_len, NULL, patt, patt + patt_cnt)
-    );
-    // 减去长度, 把数据截断
-    if (MSTR_SUCC(res) && mstr_end_with(str, patt, patt_cnt)) {
-        str->count -= patt_cnt;
-        str->length -= patt_len;
-    }
-    return res;
 }
 
 /**
@@ -879,7 +821,52 @@ static mstr_result_t mstr_replace_start_with_impl(
     usize_t rep_to_cnt
 )
 {
-    return MStr_Err_NoImplemention;
+    usize_t patt_len = 0;
+    usize_t replace_len = 0;
+    mstr_result_t res = MStr_Ok;
+    mstr_assert(patt_cnt > 0);
+    mstr_assert(patt_cnt <= str->count);
+    // 计算unicode长度
+    MSTR_AND_THEN(
+        res, mstr_strlen(&patt_len, NULL, patt, patt + patt_cnt)
+    );
+    MSTR_AND_THEN(
+        res,
+        mstr_strlen(&replace_len, NULL, rep_to, rep_to + rep_to_cnt)
+    );
+    // 如果开头是合适的就替换掉
+    if (!mstr_start_with(str, patt, patt_cnt) || MSTR_FAILED(res)) {
+        return res;
+    }
+    // 按照 rep_to_cnt 做个特判
+    if (rep_to_cnt == 0) {
+        // 把数据挪到前面覆盖掉
+        memmove(str->buff, str->buff + patt_cnt, str->count - patt_cnt);
+        // 减去长度
+        str->count -= patt_cnt;
+        str->length -= patt_len;
+    }
+    else {
+        usize_t need_cnt = str->count + rep_to_cnt;
+        // 判断够不够长, 不够就把空间弄起来
+        if (need_cnt >= str->cap_size + patt_cnt) {
+            res = mstr_reserve(
+                str, mstr_resize_tactic(str->cap_size, need_cnt + 1)
+            );
+        }
+        // 挪出一个空间
+        memmove(
+            str->buff + rep_to_cnt,
+            str->buff + patt_cnt,
+            str->count - patt_cnt
+        );
+        // 把替换结果挪进去
+        memmove(str->buff, rep_to, rep_to_cnt);
+        // 减去长度
+        str->count = str->count - patt_cnt + rep_to_cnt;
+        str->length = str->length - patt_len + replace_len;
+    }
+    return res;
 }
 
 /**
@@ -900,7 +887,45 @@ static mstr_result_t mstr_replace_end_with_impl(
     usize_t rep_to_cnt
 )
 {
-    return MStr_Err_NoImplemention;
+    usize_t patt_len = 0;
+    usize_t replace_len = 0;
+    mstr_result_t res = MStr_Ok;
+    mstr_assert(patt_cnt > 0);
+    mstr_assert(patt_cnt <= str->count);
+    // 计算unicode长度
+    MSTR_AND_THEN(
+        res, mstr_strlen(&patt_len, NULL, patt, patt + patt_cnt)
+    );
+    MSTR_AND_THEN(
+        res,
+        mstr_strlen(&replace_len, NULL, rep_to, rep_to + rep_to_cnt)
+    );
+    // 如果结尾是合适的就替换掉
+    if (!mstr_end_with(str, patt, patt_cnt) || MSTR_FAILED(res)) {
+        return res;
+    }
+    // 按照 rep_to_cnt 做个特判
+    if (rep_to_cnt == 0) {
+        // 减去长度, 把数据截断
+        str->count -= patt_cnt;
+        str->length -= patt_len;
+    }
+    else {
+        // 不然等效为append
+        usize_t need_cnt = str->count + rep_to_cnt;
+        // 判断够不够长, 不够就把空间弄起来
+        if (need_cnt >= str->cap_size + patt_cnt) {
+            res = mstr_reserve(
+                str, mstr_resize_tactic(str->cap_size, need_cnt + 1)
+            );
+        }
+        // 把替换结果挪进去
+        memmove(str->buff + str->count - patt_cnt, rep_to, rep_to_cnt);
+        // 减去长度
+        str->count = str->count - patt_cnt + rep_to_cnt;
+        str->length = str->length - patt_len + replace_len;
+    }
+    return res;
 }
 
 /**

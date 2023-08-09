@@ -65,6 +65,9 @@ extern "C"
     void string_retain_all(void);
     void string_retain_endwith(void);
     void string_retain_startwith(void);
+    void string_replace_all(void);
+    void string_replace_endwith(void);
+    void string_replace_startwith(void);
 
     void itoa_int_index(void);
     void itoa_int_type(void);
