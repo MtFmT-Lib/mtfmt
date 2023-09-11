@@ -28,7 +28,7 @@ jobs:
     name: cmake build on ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
       - name: cmake
@@ -51,7 +51,7 @@ jobs:
     name: cmake build on windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
       - name: cmake
