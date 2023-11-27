@@ -34,7 +34,7 @@ jobs:
           submodules: true
       # WASM
       - name: Setup emsdk
-        uses: mymindstorm/setup-emsdk@v12
+        uses: mymindstorm/setup-emsdk@v13
       - name: WASM build
         run: |
          emmake make --makefile=support/WebAssembly.mk
