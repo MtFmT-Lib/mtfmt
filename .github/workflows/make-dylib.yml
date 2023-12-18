@@ -53,7 +53,7 @@ jobs:
       # 打包
       - name: Upload artifact
         if: github.ref == 'refs/heads/master'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dylib-artifact
           path: target/*
@@ -92,7 +92,7 @@ jobs:
       # 打包
       - name: Upload artifact
         if: github.ref == 'refs/heads/master'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dll-artifact
           path: target/*

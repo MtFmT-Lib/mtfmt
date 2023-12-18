@@ -41,7 +41,7 @@ jobs:
       # 打包
       - name: Upload artifact
         if: github.ref == 'refs/heads/master'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: wasm-artifact
           path: target/*.wasm
