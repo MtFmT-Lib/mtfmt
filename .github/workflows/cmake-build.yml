@@ -40,7 +40,7 @@ jobs:
       # 打包动态库
       - name: Upload artifact
         if: github.ref == 'refs/heads/master'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cmake-linux-artifact
           path: |
@@ -64,7 +64,7 @@ jobs:
       # 打包动态库
       - name: Upload artifact
         if: github.ref == 'refs/heads/master'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cmake-windows-artifact
           path: |

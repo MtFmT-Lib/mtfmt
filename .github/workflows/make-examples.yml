@@ -65,7 +65,7 @@ jobs:
       # 打包
       - name: Upload artifact
         if: github.ref == 'refs/heads/master'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}_${{ matrix.arch }}-artifact
           path: target/*.out
@@ -105,7 +105,7 @@ jobs:
       # 打包
       - name: Upload artifact
         if: github.ref == 'refs/heads/master'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}_${{ matrix.arch }}-artifact
           path: |
