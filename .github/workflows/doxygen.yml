@@ -58,7 +58,7 @@ jobs:
           doxyfile-path: "support/Doxyfile"
       # 打包
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
 
   # 进行部署 (仅master branch)
   deploy:
