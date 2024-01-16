@@ -121,6 +121,8 @@ install(EXPORT mtfmt-targets
     NAMESPACE mtfmt::
     DESTINATION mtfmt/lib/cmake/mtfmt)
 
+install(TARGETS mtfmt)
+
 # 测试
 # enable_testing()
 
