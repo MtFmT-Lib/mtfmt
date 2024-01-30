@@ -55,7 +55,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v4
         with:
-          name: dylib-artifact
+          name: dylib-artifact-${{ matrix.os }}-${{ matrix.platform }}
           path: target/*
 
   build-dylib-win:
@@ -94,5 +94,5 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v4
         with:
-          name: dll-artifact
+          name: dll-artifact-${{ matrix.os }}-${{ matrix.platform }}
           path: target/*
