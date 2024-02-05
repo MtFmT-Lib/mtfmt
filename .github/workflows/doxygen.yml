@@ -52,7 +52,7 @@ jobs:
           outputStyle: compressed
       # Doxygen
       - name: Doxygen
-        uses: mattnotmitt/doxygen-action@v1.9.5
+        uses: mattnotmitt/doxygen-action@v1.9.8
         with:
           working-directory: "./"
           doxyfile-path: "support/Doxyfile"
