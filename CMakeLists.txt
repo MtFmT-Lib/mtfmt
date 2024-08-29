@@ -62,31 +62,40 @@ else()
 endif()
 
 # 宏开关
+# default: auto, following the compiler pre-defined macros
 if(MTFMT_RT_USE_DIV)
     target_compile_definitions(${TARGET_NAME} PRIVATE _MSTR_USE_HARDWARE_DIV)
 endif()
 
+# default: 0
 if(MTFMT_RT_USE_MALLOC)
     target_compile_definitions(${TARGET_NAME} PRIVATE _MSTR_USE_MALLOC)
 endif()
 
+# default: 0
 if(MTFMT_RT_USE_STDOUT)
     target_compile_definitions(${TARGET_NAME} PRIVATE _MSTR_USE_STD_IO)
 endif()
 
+# default: 0
 if(MTFMT_RT_USE_ASSERT)
     target_compile_definitions(${TARGET_NAME} PRIVATE _MSTR_RUNTIME_ASSERT)
     target_compile_definitions(${TARGET_NAME} PRIVATE _MSTR_RUNTIME_CTRLFLOW_MARKER)
 endif()
 
+# default: 1
 if(MTFMT_RT_USE_UTF8)
-    target_compile_definitions(${TARGET_NAME} PRIVATE _MSTR_USE_UTF_8)
+    target_compile_definitions(${TARGET_NAME} PRIVATE _MSTR_USE_UTF_8=1)
+else()
+    target_compile_definitions(${TARGET_NAME} PRIVATE _MSTR_USE_UTF_8=0)
 endif()
 
+# default: 0
 if(MTFMT_RT_USE_FP32)
     target_compile_definitions(${TARGET_NAME} PRIVATE _MSTR_USE_FP_FLOAT32)
 endif()
 
+# default: auto, following the compiler pre-defined macros
 if(MTFMT_RT_USE_FP64)
     target_compile_definitions(${TARGET_NAME} PRIVATE _MSTR_USE_FP_FLOAT64)
 endif()
