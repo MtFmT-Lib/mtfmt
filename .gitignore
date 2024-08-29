@@ -39,7 +39,10 @@ cmake-build-debug
 !*.toml
 !Makefile
 !Doxyfile
-!*_resource.rc
+!conanfile.py
 
+cmake-build-debug/
+.idea/
+!*_resource.rc
 */internal/*
 
