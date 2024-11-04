@@ -86,14 +86,14 @@ struct function_trait_impl<Ret (*)(Args...)>
 {
 };
 
-// for: lambda函数
+// for: member function pointer
 template <typename Ret, typename Cl, typename... Args>
 struct function_trait_impl<Ret (Cl::*)(Args...)>
     : public function_traits_base<Ret, Args...>
 {
 };
 
-// for: lambda函数(不可变capture)
+// for: const member function pointer
 template <typename Ret, typename Cl, typename... Args>
 struct function_trait_impl<Ret (Cl::*)(Args...) const>
     : public function_traits_base<Ret, Args...>
